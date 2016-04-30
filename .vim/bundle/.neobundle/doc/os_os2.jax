@@ -1,0 +1,13 @@
+*os_os2.txt*    For Vim バージョン 7.4.  Last change: 2015 Dec 31
+
+
+		VIMリファレンスマニュアル    by Paul Slootman
+
+
+							*os2* *OS2* *OS/2*
+このファイルには以前VimのOS/2バージョンの詳細が含まれていた。
+
+OS/2 サポートはパッチ 7.4.1008 で削除された。
+
+
+ vim:tw=78:ts=8:ft=help:norl:

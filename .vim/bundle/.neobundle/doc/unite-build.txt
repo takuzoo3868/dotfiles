@@ -1,0 +1,256 @@
+*unite-build.txt*	Build by unite interface
+
+Version: 0.1
+Author : Shougo <Shougo.Matsu@gmail.com>
+License: MIT license  {{{
+    Permission is hereby granted, free of charge, to any person obtaining
+    a copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+}}}
+
+CONTENTS					*unite-build-contents*
+
+Usage			|unite-build-usage|
+Install			|unite-build-install|
+Interface		|unite-build-interface|
+  Commands		  |unite-build-commands|
+  Variables		  |unite-build-variables|
+    Sources variables	    |unite-build-builders-variables|
+  Sources		  |unite-build-builders|
+Create source		|unite-build-create-builder|
+Configuration Examples	|unite-build-builder-examples|
+
+==============================================================================
+USAGE						*unite-build-usage*
+
+	This source nominates builder output asynchronously.
+	If arguments is not given, builder is detected.
+	If argument 1 is "!", errors is not filtered.
+
+		Source arguments:
+		1. builder name.
+		2-. builder arguments.
+
+	Start unite build source. Builder is detected.
+>
+	:Unite build
+	:Unite build:make
+	:Unite build:!
+<
+
+unite-builder description (Japanese) by rbtnn.
+http://qiita.com/items/270bcf94a8f588d3cd38
+
+
+==============================================================================
+INSTALL						*unite-build-install*
+
+Requirements: vimproc and unite.vim
+
+https://github.com/Shougo/vimproc
+https://github.com/Shougo/unite.vim
+
+==============================================================================
+INTERFACE					*unite-build-interface*
+
+------------------------------------------------------------------------------
+COMMANDS 					*unite-build-commands*
+
+:UniteBuildClearHighlight			*:UniteBuildClearHighlight*
+		Clear error highlight and signs in current directory.
+
+------------------------------------------------------------------------------
+VARIABLES 					*unite-build-variables*
+
+g:unite_build_error_text			*g:unite_build_error_text*
+g:unite_build_warning_text			*g:unite_build_warning_text*
+		The occurred error or warning markup text(see |:sign-define|
+		for details).
+		Note: This option must be set before call unite.vim
+		functions or unite.vim command.
+
+		Default value is "!!" and "??".
+
+g:unite_build_error_highlight			*g:unite_build_error_highlight*
+g:unite_build_warning_highlight			*g:unite_build_warning_highlight*
+		The error or warning highlight setting(see
+		|:sign-define| for details).
+		Note: This option must be set before call unite.vim
+		functions or unite.vim command.
+		
+		Default value is "Error" and "Todo".
+
+g:unite_build_error_icon			*g:unite_build_error_icon*
+g:unite_build_warning_icon			*g:unite_build_warning_icon*
+		The error or warning markup icon path(see |:sign-define| for
+		details). This variable is enabled only in GUI Vim.
+		If the icon is not found(or empty), text markers are displayed
+		instead.
+		Note: This option must be set before call unite.vim
+		functions or unite.vim command.
+
+		Default value is "".
+
+BUILDER VARIABLES				*unite-build-builder-variables*
+
+g:unite_builder_make_command			*g:unite_builder_make_command*
+		|unite-build-builder-make| uses as the "make" command.
+
+		Default is "make".
+
+g:unite_builder_repoman_command			*g:unite_builder_repoman_command*
+		|unite-build-builder-repoman| uses as the "repoman" command.
+
+		Default is "repoman".
+
+g:unite_builder_ant_command			*g:unite_builder_ant_command*
+		|unite-build-builder-ant| uses as the "ant" command.
+
+		Default is "ant".
+
+g:unite_builder_maven_command			*g:unite_builder_maven_command*
+		|unite-build-builder-maven| uses as the "maven" command.
+
+		Default is "mvn".
+
+g:unite_builder_go_command			*g:unite_builder_go_command*
+		|unite-build-builder-go| uses as the "go" command.
+
+		Default is "go".
+
+g:unite_builder_vint_command			*g:unite_builder_vint_command*
+		|unite-build-builder-vint| uses as the "vint" command.
+
+		Default is "vint".
+
+==============================================================================
+BUILDERS					*unite-build-builders*
+
+						*unite-build-builder-make*
+make		This builder outputs "make" command output.
+		It requires "Makefile" in current directory.
+
+		Builder arguments:
+		1-. make arguments.
+
+						*unite-build-builder-repoman*
+repoman		This builder outputs "repoman manifest" command output.
+		repoman is a tool for Gentoo Linux to manage ebuild files, the
+		recipe files for its own package management system Portage.
+
+		It requires at least one ebuild in current directory.
+
+						*unite-build-builder-ant*
+ant		This builder outputs "ant" command output.
+
+		Builder arguments:
+		1-. ant arguments.
+
+
+						*unite-build-builder-maven*
+maven		This builder outputs "maven" command output.
+
+		Builder arguments:
+		1-. ant arguments(default is "compile").
+
+						*unite-build-builder-go*
+go		This builder outputs "go" command output.
+
+		Builder arguments:
+		1-. arguments(default is "build").
+
+
+
+						*unite-build-builder-vint*
+vint		This builder outputs "vint" command output.
+		https://github.com/Kuniwak/vint
+
+		Builder arguments:
+		1-. arguments.
+
+
+
+==============================================================================
+CREATE BUILDER					*unite-build-create-builder*
+
+Todo
+
+------------------------------------------------------------------------------
+BUILDER ATTRIBUTES				*unite-build-builder-attributes*
+
+						*unite-build-builder-attribute-name*
+name			String		(Required)
+			Builder name.
+
+						*unite-build-builder-attribute-description*
+description		String		(Optional)
+			Builder description.
+
+						*unite-build-builder-attribute-initialize*
+initialize		Function	(Required)
+			Called when unite buffer is initialized.
+			This function returns the build command (Ex: "make".)
+			
+			Function arguments:
+			{args}, {context}
+
+						*unite-build-builder-attribute-detect*
+detect			Function	(Optional)
+			Called when unite-build doesn't receive a builder name.
+			If you'd like to detect the build system, set this
+			function to return 1.
+			
+			Function arguments:
+			{args}, {context}
+
+						*unite-build-builder-attribute-parse*
+parse			Function	(Required)
+			Called when build process has an output.
+			This function returns {candidate}.
+			If the candidate is empty, unite-build ignores the
+			candidate.  Please refer to
+			|unite-notation-{candidate}|.
+
+{candidate}					*unite-build-notation-{candidate}*
+			Candidate dictionary. It has information below.
+
+			type			(String)	(Required)
+				Candidate type.
+				"error", "warning" or "message".
+
+			text			(String)	(Required)
+				Error message text.
+
+			filename		(String)	(Optional)
+				Error file name.
+
+			line			(Number)	(Optional)
+				Error line number.
+
+			col			(Number)	(Optional)
+				Error column number.
+
+			pattern			(String)	(Optional)
+				Error line pattern.
+
+==============================================================================
+EXAMPLES					*unite-build-examples*
+>
+	
+<
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:noet:fen:
