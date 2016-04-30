@@ -1,3 +1,6 @@
 [user]
-	name = takuzoo3868
-	email = sata3868.k.serpentis@gmail.com
+   name = takuzoo3868
+   # emailは.gitconfig.localに書く
+
+[include]
+   path = .gitconfig.local
