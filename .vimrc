@@ -16,22 +16,19 @@
 " Author: takuzoo3868
 " URL: https://www.twitter.com/takuzoo3868/
 " Source: https://github.com/takuzoo3868/dotfiles/.vimrc
-" Last Modified: 30 Apl 2016.
+" Last Modified: 30 Dec 2016.
 "
 "=====================================================================
 
-" Start up settings {{{===============================================
 
 " release autogroup in MyAutoCmd
 augroup MyAutoCmd
    autocmd!
 augroup END
-" }}}
 
 
-" Plugin Bundles {{{==================================================
-
-" NeoBundle {{{=======================================================
+" Plugin Bundles
+" NeoBundle
 " vim起動時のみruntimepathにneobundle.vimを追加"
 if has('vim_starting')
    if !&compatible
@@ -44,8 +41,7 @@ call neobundle#begin(expand('~/.vim/bundle/'))
 " neobundle.vim自身をneobundle.vimで管理する
 NeoBundleFetch 'Shougo/neobundle.vim'
 
-" Synthesis {{{
-" Unite {{{
+" Unite
 NeoBundle "Shougo/unite.vim"
 NeoBundle 'Shougo/unite-build'
 NeoBundleLazy 'h1mesuke/unite-outline', {
@@ -64,7 +60,7 @@ NeoBundle 'thinca/vim-unite-history', {
          \ 'lazy': 1,
          \ 'on_source': 'unite.vim',
          \ }
-" }}}
+
 NeoBundleLazy "Shougo/vimfiler", {
          \ "depends": ["Shougo/unite.vim"],
          \ "autoload": {
@@ -80,9 +76,8 @@ NeoBundle 'Shougo/vimshell', {
          \              'VimShellTerminal', 'VimShellPop'],
          \ 'mappings': '<Plug>',
          \ }
-" }}}
 
-" IDE {{{
+" IDE
 NeoBundleLazy 'scrooloose/nerdtree', {
          \ "autoload" : { "commands": ["NERDTreeToggle"] }}
 NeoBundleLazy 'majutsushi/tagbar', {
@@ -132,18 +127,16 @@ if ! empty(neobundle#get("nerdtree")) &&
          \! empty(neobundle#get("tagbar"))
    nn <silent> <Leader>A :SrcExplToggle<CR>:NERDTreeToggle<CR>:TagbarToggle<CR>
 endif
-" }}}
-" END Synthesis}}}
 
-" Writing {{{
+
 if has('lua') && v:version >= 703
    NeoBundle 'Shougo/neocomplete.vim'
 else
    NeoBundle 'Shougo/neocomplcache.vim'
 endif
-" }}}
 
-" Library {{{
+
+" Library
 NeoBundle 'Shougo/vimproc', {
          \ 'build' : {
          \   'windows' : 'make -f make_mingw32.mak',
@@ -153,18 +146,16 @@ NeoBundle 'Shougo/vimproc', {
          \ },
          \ }
 NeoBundle 'mattn/webapi-vim'
-" }}}
 
-" Development {{{
+" Development
 NeoBundle 'thinca/vim-quickrun'
 let g:quickrun_config={'*': {'split': ''}}
 let g:quickrun_config._={ 'runner':'vimproc',
          \       "runner/vimproc/updatetime" : 10,
          \       "outputter/buffer/close_on_empty" : 1,
          \ }
-" }}}
 
-" Git {{{
+" Git
 NeoBundle 'tpope/vim-fugitive'
 NeoBundleLazy "mattn/gist-vim", {
          \ "depends": ["mattn/webapi-vim"],
@@ -180,54 +171,25 @@ NeoBundle 'rhysd/git-messenger.vim', {
          \ 'lazy': 1,
          \ 'mappings': '<Plug>',
          \ }
-" }}}
 
-" C/C++ {{{
+" C/C++
 " NeoBundle 'Rip-Rip/clang_complete'
-" }}}
 
-" Java {{{
-" }}}
-
-" Python {{{
-" }}}
-
-" Japanese {{{
+" Japanese Document
 NeoBundle 'vim-jp/vimdoc-ja'
-" }}}
 
-" ColorScheme {{{
-NeoBundle 'junegunn/seoul256.vim'
+" ColorScheme
 NeoBundle 'tomasr/molokai'
-NeoBundle 'vim-scripts/Wombat'
-NeoBundle 'altercation/vim-colors-solarized'
-NeoBundle 'nanotech/jellybeans.vim'
-NeoBundle 'w0ng/vim-hybrid'
-NeoBundle 'vim-scripts/twilight'
-NeoBundle 'jonathanfilip/vim-lucius'
-NeoBundle 'jpo/vim-railscasts-theme'
-NeoBundle 'vim-scripts/rdark'
-NeoBundle 'djjcast/mirodark'
-NeoBundle 'sjl/badwolf'
-NeoBundle 'cocopon/iceberg.vim'
-NeoBundle 'reedes/vim-colors-pencil'
 
-" エラー箇所をハイライトする
+" エラー箇所をハイライト
 NeoBundle 'cohama/vim-hier'
 " エラーの原因をコマンドウィンドウに出力
 NeoBundle 'dannyob/quickfixstatus'
-" }}}
 
-" Utility {{{
-NeoBundle 'tyru/open-browser.vim'
-"}}}
-
-" Application {{{
+" Application
 NeoBundle 'itchyny/calendar.vim'
-" }}}
 
-" Others {{{
-NeoBundle 'thinca/vim-scouter'
+" Others
 " ~(=^･ω･^) 'Miaow miaow.'
 NeoBundle 'rtakasuke/vim-neko'
 NeoBundle 'rbtnn/game_engine.vim'
@@ -243,7 +205,6 @@ let g:tweetvim_tweet_per_page = 60
 NeoBundle 'basyura/twibill.vim'
 " Gmail on Vim
 NeoBundle 'yuratomo/gmail.vim'
-" }}}
 
 " neobundle.vimの設定終了
 call neobundle#end()
@@ -256,12 +217,10 @@ if !has('vim_starting')
    " .vimrcを読み込み直した時のための設定
    call neobundle#call_hook('on_source')
 endif
-" END NeoBundle }}}
 
 
-" Vim Setup  {{{======================================
 
-" Basic options {{{===================================
+" Settings
 
 " Vi互換モードをオフ（Vimの拡張機能を有効）
 set nocompatible
@@ -271,12 +230,6 @@ set mouse=a
 set encoding=utf-8
 set fileencoding=utf-8
 set fileencodings=iso-2022-jp,cp932,sjis,euc-jp,utf-8
-
-" }}}
-
-" Vim opptions {{{====================================
-
-" === View === {{{
 
 " 行番号を表示
 set number
@@ -305,36 +258,16 @@ set laststatus=2
 " "1"  ウィンドウが1つの時はステータスラインを表示しない
 " "2"  常にステータスラインを表示する
 " ステータスラインの設定
-:set statusline=%F%m%r%h%w\ [FORMAT=%{&ff}]\ [TYPE=%Y]\ [ASCII=\%03.3b]\ [HEX=\%02.2B]\ [POS=%04l,%04v][%p%%]\ [LEN=%L]
+:set statusline=%F%m%r%h%w\ [FORMAT=%{&ff}]\ [TYPE=%Y]\ [POS=%04l,%04v][%p%%]\ [LEN=%L]
 
 function! GetQuickFixCount() abort
    return len(filter(getqflist(), 'v:val.valid != 0'))
 endfunction
 
-" }}}
-
-" === Command === {{{
-
 " コマンドライン補完
 set wildmenu wildmode=list:full
 " コマンドの履歴の保存数
 set history=2000
-
-" }}}
-
-" === Search === {{{
-
-" incremental search
-set incsearch
-" 検索文字列が小文字の場合は大文字小文字を区別なく検索
-set ignorecase
-" 検索文字列に大文字が含まれている場合は区別して検索
-set smartcase
-set hlsearch | nohlsearch
-
-" }}}
-
-" === Indent === {{{
 
 " 改行時に前の行のインデントを継続
 set autoindent
@@ -354,11 +287,6 @@ set smarttab
 if exists('+breakindent')
    set breakindent
 endif
-
-" }}}
-
-" === Buffer === {{{
-
 " 外部でファイルが変更されたら自動で読みなおす
 set autoread
 " 編集情報の記録ファイルを作成
@@ -366,11 +294,6 @@ set swapfile
 " バックアップファイルを作成しない
 set nobackup
 set nowritebackup
-
-" }}}
-
-" === Input === {{{
-
 " インデント、改行、挿入モード開始位置を超えて削除
 "   indent        : 行頭の空白の削除を許す
 "   eol           : 改行の削除を許す
@@ -386,10 +309,7 @@ set ttimeoutlen=100
 " 行連結 "J" で間にスペースを入れない
 set nojoinspaces
 
-" }}}
-
-" === Colorscheme === {{{
-
+" Colorscheme
 if has('vim_starting')
    syntax enable
    set background=dark
@@ -405,370 +325,6 @@ if has('vim_starting')
    endif
 endif
 
-"}}}
 
-" END Vim opptions }}}
-
-
-" Mappings {{{=======================================================================
-"
-"==================================================================================="
-" コマンド        | ノーマル | 挿入 | コマンドライン | ビジュアル| 選択 | 演算待ち |
-" map  / noremap  |    @     |  -   |       -        |     @     |  @   |    @     |
-" nmap / nnoremap |    @     |  -   |       -        |     -     |  -   |    -     |
-" vmap / vnoremap |    -     |  -   |       -        |     @     |  @   |    -     |
-" omap / onoremap |    -     |  -   |       -        |     -     |  -   |    @     |
-" xmap / xnoremap |    -     |  -   |       -        |     @     |  -   |    -     |
-" smap / snoremap |    -     |  -   |       -        |           |  @   |    -     |
-" map! / noremap! |    -     |  @   |       @        |     -     |  -   |    -     |
-" imap / inoremap |    -     |  @   |       -        |     -     |  -   |    -     |
-" cmap / cnoremap |    -     |  -   |       @        |     -     |  -   |    -     |
-"==================================================================================="
-"
-" [[n/v/c/i][nore]map] <options> 入力する操作 Vimが解釈する操作
-"
-"====================================================================================
-
-" Useful Keymaps {{{
-" Thunks to haya14busa, cohama
-
-" Breakline with Enter {{{
-nnoremap <CR> o<ESC>
-" }}}
-
-" For Undo Revision, Break Undo Sequence {{{
-inoremap <CR> <C-]><C-G>u<CR>
-
-inoremap <C-h> <C-g>u<C-h>
-inoremap <BS> <C-g>u<BS>
-inoremap <Del> <C-g>u<Del>
-inoremap <C-d> <C-g>u<Del>
-inoremap <C-w> <C-g>u<C-w>
-inoremap <C-u> <C-g>u<C-u>
-" }}}
-
-" Motion {{{
-
-" Normal Mode {{{
-nnoremap j gj
-vnoremap j gj
-nnoremap gj j
-vnoremap gj j
-
-nnoremap k gk
-vnoremap k gk
-nnoremap gk k
-vnoremap gk k
-
-nnoremap - $
-" }}}
-
-" Insert & Comandline Mode {{{
-inoremap <C-b> <Left>
-inoremap <C-f> <Right>
-inoremap <C-a> <Home>
-inoremap <C-e> <End>
-
-cnoremap <C-b> <Left>
-cnoremap <C-f> <Right>
-cnoremap <C-a> <Home>
-cnoremap <C-e> <End>
-cnoremap <C-p> <Up>
-
-" Word Motion in Insert Mode
-" inoremap <M-w> <S-Right>
-" inoremap <M-b> <S-Left>
-" }}}
-
-" Scroll {{{
-nnoremap <C-e> <C-e>j
-nnoremap <C-y> <C-y>k
-nnoremap <C-f> <C-f>zz
-nnoremap <C-b> <C-b>zz
-
-nnoremap <Down> <C-e><C-e><C-e><C-e><C-e><C-e><C-e><C-e><C-e><C-e>
-nnoremap <Up>   <C-y><C-y><C-y><C-y><C-y><C-y><C-y><C-y><C-y><C-y>
-vnoremap <Down> <C-e><C-e><C-e><C-e><C-e><C-e><C-e><C-e><C-e><C-e>
-vnoremap <Up>   <C-y><C-y><C-y><C-y><C-y><C-y><C-y><C-y><C-y><C-y>
-
-nnoremap <Space>j <C-f>zz
-nnoremap <Space>k <C-b>zz
-vnoremap <Space>j <C-f>zz
-vnoremap <Space>k <C-b>zz
-" }}}
-
-" comaha's smooth scroll
-let s:scroll_time_ms = 100
-let s:scroll_precision = 8
-function! CohamaSmoothScroll(dir, windiv, factor)
-   let cl = &cursorline
-   let cc = &cursorcolumn
-   set nocursorline nocursorcolumn
-   let height = winheight(0) / a:windiv
-   let n = height / s:scroll_precision
-   if n <= 0
-      let n = 1
-   endif
-   let wait_per_one_move_ms = s:scroll_time_ms / s:scroll_precision * a:factor
-   let i = 0
-   let scroll_command = a:dir == "down" ?
-            \ "normal! " . n . "\<C-E>" . n ."j" :
-            \ "normal! " . n . "\<C-Y>" . n ."k"
-   while i < s:scroll_precision
-      let i = i + 1
-      execute scroll_command
-      execute "sleep " . wait_per_one_move_ms . "m"
-      redraw
-   endwhile
-   let &cursorline = cl
-   let &cursorcolumn = cc
-endfunction
-nnoremap <silent> <C-d> :call CohamaSmoothScroll("down", 2, 1)<CR>
-nnoremap <silent> <C-u> :call CohamaSmoothScroll("up", 2, 1)<CR>
-nnoremap <silent> <C-f> :call CohamaSmoothScroll("down", 1, 2)<CR>
-nnoremap <silent> <C-b> :call CohamaSmoothScroll("up", 1, 2)<CR>
-
-" END Motion }}}
-
-
-" Paste in insert and Command-line mode"{{{
-inoremap <C-y><C-y> <C-r>+
-cnoremap <C-y><C-y> <C-r>+
-" }}}
-
-" Vertical Paste"{{{
-vnoremap <C-p> I<C-r>+<ESC><ESC>
-" }}}
-
-" Select pasted text {{{
-" nnoremap <expr>gp '`['.strpart(getregtype(),0,1).'`]'
-" }}}
-
-" Command line History {{{
-cnoremap <C-p> <Up>
-cnoremap <C-n> <Down>
-" }}}
-
-" Save as root"{{{
-cnoremap w!! w !sudo tee > /dev/null %
-" }}}
-
-
-" Show invisibles {{{
-
-" Shortcut to rapidly toggle `set list`
-nnoremap <silent> <Leader>l :<C-u>set list!<CR>
-
-" Use the same symbols as TextMate for tabstops and EOLs
-set listchars=tab:▸\ ,eol:¬
-
-"Invisible character colors
-hi NonText guifg=#4a4a59
-hi SpecialKey guifg=#4a4a59
-
-" Highlight End-of-Line & Zenkaku Whitespace {{{
-function! s:hl_trailing_spaces() "{{{
-   " Test
-   highlight! link TrailingSpaces Error
-   syntax match TrailingSpaces containedin=ALL /\s\+$/
-endfunction "}}}
-function! s:hl_zenkaku() "{{{
-   highlight link ZenkakuSpace Error
-   syntax match ZenkakuSpace containedin=ALL /　/
-endfunction "}}}
-
-" Autocmd BufWinEnter,ColorScheme * call s:hl_trailing_spaces()
-" Autocmd BufWinEnter,ColorScheme * call s:hl_zenkaku()
-" }}}
-
-" Remove sapaces not wanted {{{
-function! RemoveUnwantedSpaces()
-   let pos_save = getpos('.')
-   try
-      keeppatterns %s/\s\+$//e
-      while 1
-         let lastline = getline('$')
-         if lastline =~ '^\s*$' && line('$') != 1
-            $delete
-         else
-            break
-         endif
-      endwhile
-   finally
-      call setpos('.', pos_save)
-   endtry
-endfunction
-command! -nargs=0 RemoveUnwantedSpaces call RemoveUnwantedSpaces()
-" }}}
-
-" END invisibles }}}
-
-
-" Tab {{{
-
-" Tab KeyMaps {{{
-nnoremap t; t
-nmap t <nop>
-nnoremap tl gt
-nnoremap th gT
-nnoremap to :<C-u>edit<Space>
-nnoremap tt :<C-u>tabnew<Space>
-nnoremap <silent> td :<C-u>tabclose<CR>
-
-nnoremap <silent> t] :<C-u>buffer<CR>
-nnoremap <silent> tn :<C-u>bnext<CR>
-nnoremap <silent> tp :<C-u>bprevious<CR>
-nnoremap <silent> tD :<C-u>bdelete<CR>
-nnoremap <silent> tL :<C-u>buffers<CR>
-" }}}
-
-" Tab jump {{{
-for n in range(1, 9)
-   execute 'nnoremap <silent> t'.n  ':<C-u>tabnext'.n.'<CR>'
-endfor
-" }}}
-
-" MoveToNewTab {{{
-" http://www.sopht.jp/blog/index.php?/archives/445-vim.html
-nnoremap <silent> tm :<C-u>call <SID>MoveToNewTab()<CR>
-function! s:MoveToNewTab()
-   tab split
-   tabprevious
-
-   if winnr('$') > 1
-      close
-   elseif bufnr('$') > 1
-      buffer #
-   endif
-
-   tabnext
-endfunction
-"}}}
-
-" Tab Help {{{
-command! -nargs=? Ht  tab help <args>
-command! -nargs=? Hv  vertical belowright help <args>
-nnoremap <Space>t :<C-u>tab help<Space>
-nnoremap <Space>v :<C-u>vertical belowright help<Space>
-" }}}
-
-" TabLine {{{
-set tabline=%!MakeTabLine()
-
-function! MakeTabLine()
-   let s = ''
-
-   for n in range(1, tabpagenr('$'))
-      if n == tabpagenr()
-         let s .= '%#TabLineSel#'
-      else
-         let s .= '%#TabLine#'
-      endif
-
-      let s .= '%' . n . 'T'
-
-      let s .= ' %{MakeTabLabel(' . n . ')} '
-
-      let s .= '%#TabLineFill#%T'
-      let s .= '|'
-   endfor
-
-   let s .= '%#TabLineFill#%T'
-   let s .= '%=%#TabLine#'
-   let s .= '%{fnamemodify(getcwd(), ":~:h")}%<'
-   return s
-endfunction
-
-function! MakeTabLabel(n)
-   let bufnrs = tabpagebuflist(a:n)
-   let bufnr = bufnrs[tabpagewinnr(a:n) - 1]
-
-   let bufname = bufname(bufnr)
-   if bufname == ''
-      let bufname = '[No Name]'
-   else
-      let bufname = fnamemodify(bufname, ":t")
-   endif
-
-   let no = len(bufnrs)
-   if no == 1
-      let no = ''
-   endif
-
-   let mod = len(filter(bufnrs, 'getbufvar(v:val, "&modified")')) ? '+' : ''
-   let sp = (no . mod) == '' ? '' : ' '
-
-   let s = no . mod . sp . bufname
-   return s
-endfunction " }}}
-
-" Close all right tabs.
-function! CloseAllRightTabs()
-   let current_tabnr = tabpagenr()
-   let last_tabnr = tabpagenr("$")
-   let num_close = last_tabnr - current_tabnr
-   let i = 0
-   while i < num_close
-      execute "tabclose " . (current_tabnr + 1)
-      let i = i + 1
-   endwhile
-endfunction
-nnoremap <silent> <C-t>dl :<C-u>call CloseAllRightTabs()<CR>
-
-" Close all left tabs.
-function! CloseAllLeftTabs()
-   let current_tabnr = tabpagenr()
-   let num_close = current_tabnr - 1
-   let i = 0
-   while i < num_close
-      execute "tabclose 1"
-      let i = i + 1
-   endwhile
-endfunction
-nnoremap <silent> <C-t>dh :<C-u>call CloseAllLeftTabs()<CR>
-
-" END Tabs }}}
-
-
-
-" Search highlight off
-nnoremap <silent> <Esc><Esc> :<C-u>nohlsearch<CR>:call Cancel()<CR>
-nnoremap <silent> <C-n> :<C-u>nohlsearch<CR>:call Cancel()<CR>
-
-" File rename command
-function! RenameMe(newFileName)
-   let currentFileName = expand('%')
-   execute 'saveas ' . a:newFileName
-   call delete(currentFileName)
-endfunction
-command! -nargs=1 RenameMe call RenameMe(<q-args>)
-
-" にゃーん ~(=^･ω･^)
+" にゃーん
 map <silent> neko :Neko<CR>
-
-" 戦闘力
-command! MyScouter Scouter ~/.vim/.vimrc ~/.vim/.gvimrc
-
-" END Mappings }}}
-
-
-" Plugin Settings {{{===============================================================
-" unite.vim
-
-" fugitive
-" Space × 2 is :Git
-nnoremap [Git] <Nop>
-nmap <Space> [Git]
-nnoremap [Git]<Space> :<C-u>Git<Space>
-nnoremap [Git]<CR> :<C-u>Git<Space>
-
-nnoremap [Git]s :<C-u>Gstatus<CR>
-nnoremap [Git]d :<C-u>Gdiff<CR>
-nnoremap [Git]a :<C-u>Gwrite<CR>
-nnoremap [Git]A :<C-u>Git add -A<CR>
-nnoremap [Git]c :<C-u>Gcommit -v<CR>
-nnoremap [Git]C :<C-u>Gcommit --amend<Space>
-nnoremap [Git]p :<C-u>Git push<CR>
-nnoremap [Git]f :<C-u>Git fetch<CR>
-nnoremap [Git]F :<C-u>Git pull --rebase<CR>
-nnoremap [Git]b :<C-u>Gblame<CR>
