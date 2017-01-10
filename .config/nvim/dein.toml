@@ -1,0 +1,75 @@
+[[plugins]]
+# プラグイン管理
+repo = 'Shougo/dein.vim'
+
+[[plugins]]
+# カーソル位置のコンテキストに合わせてfile typeを切り替える
+repo = 'osyo-manga/vim-precious'
+depends = ['context_filetype.vim']
+
+[[plugins]]
+# カーソル位置のコンテキストのfile typeを判定するライブラリ
+repo = 'Shougo/context_filetype.vim'
+
+[[plugins]]
+# toml syntax
+repo = 'cespare/vim-toml'
+on_ft = 'toml'
+
+[[plugins]]
+# カッコを自動で閉じる
+repo = 'Townk/vim-autoclose'
+
+[[plugins]]
+# 貼り付け時に自動でペーストモードにする
+repo = 'ConradIrwin/vim-bracketed-paste'
+
+[[plugins]]
+# 統合インターフェース(nvim用)
+repo = 'Shougo/denite.nvim'
+if = "has('nvim')"
+
+[[plugins]]
+# 統合インターフェース(vim用)
+repo = 'Shougo/denite.nvim'
+if = "!has('nvim')"
+
+[[plugins]]
+# 非同期処理
+repo = 'Shougo/vimproc.vim'
+hook_post_update = '''
+  if dein#util#_is_windows()
+    let cmd = 'tools\\update-dll-mingw'
+  elseif dein#util#_is_cygwin()
+    let cmd = 'make -f make_cygwin.mak'
+  elseif executable('gmake')
+    let cmd = 'gmake'
+  else
+    let cmd = 'make'
+  endif
+  let g:dein#plugin.build = cmd
+'''
+
+[[plugins]]
+# 補完(nvim用)
+repo = 'Shougo/deoplete.nvim'
+if = "has('nvim')"
+hook_post_source = '''
+  let g:deoplete#enable_at_startup = 1
+'''
+
+[[plugins]]
+repo = 'scrooloose/syntastic'
+hoos_add = '''
+  let g:syntastic_check_on_open = 0
+  let g:syntastic_check_on_save = 1
+  let g:syntastic_check_on_wq   = 0
+'''
+
+[[plugins]]
+# colorscheme 設定は source 後に行う必要があるので VimEnter を用いる
+repo = 'tomasr/molokai'
+hook_add = '''
+  set background=dark
+  au MyAutoCmd VimEnter * nested colorscheme molokai
+'''
