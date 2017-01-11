@@ -40,12 +40,14 @@ setup() {
   
   # Vimのセットアップ
   cd
-  if ![ -d $HOME/opt ]; then
+  if [ ! -d $HOME/opt ]; then
     mkdir $HOME/opt
   else
     git clone git@github.com:powerline/fonts.git $HOME/opt
-    cd fonts
+    cd opt
     ./install.sh
+    cd ../
+    rm -rf src
   fi
   
   if ! has vim; then
