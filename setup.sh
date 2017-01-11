@@ -39,11 +39,20 @@ setup() {
 
   
   # Vimのセットアップ
+  cd
+  if ![ -d $HOME/opt ]; then
+    mkdir $HOME/opt
+  else
+    git clone git@github.com:powerline/fonts.git $HOME/opt
+    cd fonts
+    ./install.sh
+  fi
+  
   if ! has vim; then
     install_package vim
   fi
   symlink "$dotfiles/.vimrc" "$HOME/.vimrc"
-
+  
   symlink "$dotfiles/.config/nvim" "$HOME/.config/nvim"
 
 }

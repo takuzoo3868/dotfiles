@@ -222,7 +222,7 @@ endif
 
 " Settings
 
-" Vi互換モードをオフ（Vimの拡張機能を有効）
+" Vi互換モードをオフ（Vimの拡張機能を有効化）
 set nocompatible
 " マウス
 set mouse=a
@@ -243,7 +243,7 @@ set nolist
 set showcmd
 " 括弧入力時の対応する括弧を表示
 set showmatch
-" " 補完候補をリスト表示
+" 補完候補をリスト表示
 set wildmenu
 " コマンドラインの表示行数
 set cmdheight=3
@@ -253,12 +253,8 @@ set cmdwinheight=5
 set showtabline=2
 " ステータスラインを常に表示
 set laststatus=2
-" ステータスライン表示モード
-" "0"  一番下のウィンドウはステータスラインを表示しない
-" "1"  ウィンドウが1つの時はステータスラインを表示しない
-" "2"  常にステータスラインを表示する
 " ステータスラインの設定
-:set statusline=%F%m%r%h%w\ [FORMAT=%{&ff}]\ [TYPE=%Y]\ [POS=%04l,%04v][%p%%]\ [LEN=%L]
+:set statusline=%F%=\ [FORMAT=%{&ff}]\ [TYPE=%Y]\ [LEN=%L]
 
 function! GetQuickFixCount() abort
    return len(filter(getqflist(), 'v:val.valid != 0'))

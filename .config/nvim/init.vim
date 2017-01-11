@@ -1,6 +1,10 @@
 " Author: takuzoo3868
 " Date: 10/Jan/2017
 
+" Vi互換モードをオフ（Vimの拡張機能を有効化）
+if &compatible
+  set nocompatible
+endif
 
 " release autogroup in MyAutoCmd
 augroup MyAutoCmd

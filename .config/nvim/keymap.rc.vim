@@ -1,4 +1,5 @@
-
+" にゃーん
+map <silent> neko :Neko<cr>
 
 " Tab jump
 noremap t1 1gt
@@ -11,3 +12,7 @@ noremap t7 7gt
 noremap t8 8gt
 noremap t9 9gt
 noremap t0 :tablast<cr>
+
+" Terminal
+" Esc to cmd mode
+tnoremap <silent> <ESC> <C-\><C-n>

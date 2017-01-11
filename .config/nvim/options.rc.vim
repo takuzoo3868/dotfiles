@@ -2,8 +2,25 @@
 set number
 " タイトル表示
 set title
-" シンタックスハイライトの有効化
-syntax on
+" ルーラーを表示
+set ruler
+" タブや改行を表示しない
+set nolist
+" 対応するカッコのハイライト
+set showmatch
+
+" 入力中のコマンドをステータスに表示
+set showcmd
+" 補完候補をリスト表示
+set wildmenu
+" コマンドラインの表示行数
+set cmdheight=2
+" コマンドウィンドウの表示行数
+set cmdwinheight=4
+
+" マウス操作も許してあげる
+set mouse=a
+
 " タブ幅の設定
 set tabstop=2
 " \tの幅
@@ -13,8 +30,6 @@ set autoindent
 set smarttab
 " タブをスペースに変える
 set expandtab
-" 対応するカッコのハイライト
-set showmatch
 " 貼り付けモードとの切り替え
 set pastetoggle=<C-E>
 " カーソルが端まで来たら次の行に飛ばす
@@ -26,7 +41,3 @@ set timeoutlen=1000
 set ttimeoutlen=100
 " backspaceの有効化
 set backspace=indent,eol,start
-" マウスの無効化
-set mouse=
-" ステータスライン
-set statusline=%F%=[%l/%L]

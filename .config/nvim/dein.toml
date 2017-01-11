@@ -66,10 +66,47 @@ hoos_add = '''
   let g:syntastic_check_on_wq   = 0
 '''
 
+#
+# colorscheme
+#
 [[plugins]]
-# colorscheme 設定は source 後に行う必要があるので VimEnter を用いる
 repo = 'tomasr/molokai'
 hook_add = '''
-  set background=dark
-  au MyAutoCmd VimEnter * nested colorscheme molokai
+  source ~/.config/nvim/plugins/molokai.rc.vim
 '''
+
+#[[plugins]]
+#repo = 'cocopon/iceberg.vim'
+#hook_add = '''
+#  source ~/.config/nvim/plugins/iceberg.rc.vim
+#'''
+
+#
+# powerline
+#
+[[plugins]]
+repo = 'majutsushi/tagbar'
+
+[[plugins]]
+repo = 'tpope/vim-fugitive'
+
+[[plugins]]
+repo = 'vim-airline/vim-airline'
+depends = ['tagbar', 'vim-fugitive']
+hook_add = '''
+source ~/.config/nvim/plugins/airline.rc.vim
+'''
+
+[[plugins]]
+repo = 'vim-airline/vim-airline-themes'
+depends = 'vim-airline'
+hook_add = '''
+let g:airline_theme='luna'
+'''
+
+#
+# other
+#
+[[plugins]]
+# にゃーん
+repo = 'rtakasuke/vim-neko'
