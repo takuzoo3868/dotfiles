@@ -21,6 +21,9 @@ set cmdwinheight=4
 " マウス操作も許してあげる
 set mouse=a
 
+" ステータスラインを常に表示
+set laststatus=2
+
 " タブ幅の設定
 set tabstop=2
 " \tの幅
@@ -38,6 +41,6 @@ set whichwrap=b,s,h,l,<,>,[,],~
 set timeout
 set timeoutlen=1000
 " キーコード受付時間
-set ttimeoutlen=100
+set ttimeoutlen=300
 " backspaceの有効化
 set backspace=indent,eol,start

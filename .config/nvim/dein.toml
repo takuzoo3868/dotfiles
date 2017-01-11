@@ -69,17 +69,17 @@ hoos_add = '''
 #
 # colorscheme
 #
-[[plugins]]
-repo = 'tomasr/molokai'
-hook_add = '''
-  source ~/.config/nvim/plugins/molokai.rc.vim
-'''
-
 #[[plugins]]
-#repo = 'cocopon/iceberg.vim'
+#repo = 'tomasr/molokai'
 #hook_add = '''
-#  source ~/.config/nvim/plugins/iceberg.rc.vim
+#  source ~/.config/nvim/plugins/molokai.rc.vim
 #'''
+
+[[plugins]]
+repo = 'cocopon/iceberg.vim'
+hook_add = '''
+  source ~/.config/nvim/plugins/iceberg.rc.vim
+'''
 
 #
 # powerline
