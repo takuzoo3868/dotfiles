@@ -47,7 +47,7 @@ setup() {
     cd opt
     ./install.sh
     cd ../
-    rm -rf src
+    rm -rf opt
   fi
   
   if ! has vim; then
