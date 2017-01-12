@@ -2,6 +2,45 @@
 # プラグイン管理
 repo = 'Shougo/dein.vim'
 
+# ==========================================================
+# filer
+# ==========================================================
+
+[[plugins]]
+# 統合インターフェース
+repo = 'Shougo/unite.vim'
+hook_add = '''
+nnoremap <silent> unite :<C-u>Unite buffer<CR>
+'''
+
+[[plugins]]
+repo = 'Shougo/vimfiler.vim'
+depends = 'unite.vim'
+hook_add = '''
+source ~/.config/nvim/plugins/vimfiler.rc.vim
+'''
+
+[[plugins]]
+# 重い作業時の非同期処理
+repo = 'Shougo/vimproc.vim'
+hook_post_update = '''
+  if dein#util#_is_windows()
+    let cmd = 'tools\\update-dll-mingw'
+  elseif dein#util#_is_cygwin()
+    let cmd = 'make -f make_cygwin.mak'
+  elseif executable('gmake')
+    let cmd = 'gmake'
+  else
+    let cmd = 'make'
+  endif
+  let g:dein#plugin.build = cmd
+'''
+
+# ==========================================================
+# basic
+# ==========================================================
+
+
 [[plugins]]
 # カーソル位置のコンテキストに合わせてfile typeを切り替える
 repo = 'osyo-manga/vim-precious'
@@ -25,16 +64,6 @@ repo = 'Townk/vim-autoclose'
 repo = 'ConradIrwin/vim-bracketed-paste'
 
 [[plugins]]
-# 統合インターフェース(nvim用)
-repo = 'Shougo/denite.nvim'
-if = "has('nvim')"
-
-[[plugins]]
-# 統合インターフェース(vim用)
-repo = 'Shougo/denite.nvim'
-if = "!has('nvim')"
-
-[[plugins]]
 # 非同期処理
 repo = 'Shougo/vimproc.vim'
 hook_post_update = '''
@@ -55,7 +84,7 @@ hook_post_update = '''
 repo = 'Shougo/deoplete.nvim'
 if = "has('nvim')"
 hook_post_source = '''
-  let g:deoplete#enable_at_startup = 1
+let g:deoplete#enable_at_startup = 1
 '''
 
 [[plugins]]
@@ -66,9 +95,28 @@ hoos_add = '''
   let g:syntastic_check_on_wq   = 0
 '''
 
-#
+# ==========================================================
+# terminal
+# ==========================================================
+
+#[[plugins]]
+#repo = 'kassio/neoterm'
+#if = "has('nvim')"
+#hook_add = '''
+#source ~/.config/nvim/plugins/neoterm.rc.vim
+#'''
+
+[[plugins]]
+repo = 'Shougo/vimshell'
+if = "!has('nvim')"
+hook_add = '''
+source ~/.config/nvim/plugins/vimshell.rc.vim
+'''
+
+# ==========================================================
 # colorscheme
-#
+# ==========================================================
+
 #[[plugins]]
 #repo = 'tomasr/molokai'
 #hook_add = '''
@@ -78,12 +126,13 @@ hoos_add = '''
 [[plugins]]
 repo = 'cocopon/iceberg.vim'
 hook_add = '''
-  source ~/.config/nvim/plugins/iceberg.rc.vim
+source ~/.config/nvim/plugins/iceberg.rc.vim
 '''
 
-#
+# ==========================================================
 # powerline
-#
+# ==========================================================
+
 [[plugins]]
 repo = 'majutsushi/tagbar'
 
@@ -104,9 +153,17 @@ hook_add = '''
 let g:airline_theme='luna'
 '''
 
-#
+# ==========================================================
 # other
-#
+# ==========================================================
+
 [[plugins]]
 # にゃーん
 repo = 'rtakasuke/vim-neko'
+hook_add = '''
+source ~/.config/nvim/plugins/vim-neko.rc.vim
+'''
+
+[[plugins]]
+# カレンダー
+repo = 'itchyny/calendar.vim'

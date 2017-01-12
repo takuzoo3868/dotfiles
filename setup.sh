@@ -19,7 +19,7 @@ setup() {
   install_package() {
     if [ -e /etc/arch-release ]; then
       yaourt -S $* 
-    elif [ -e /etc/lsb-release ]; then
+    elif [ -e /etc/debian_version ] || [ -e /etc/debian_release ]; then
       apt install $*
     fi
   }
