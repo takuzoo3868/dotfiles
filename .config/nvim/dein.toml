@@ -40,6 +40,14 @@ hook_post_update = '''
 # basic
 # ==========================================================
 
+#[[plugins]]
+# 補完 nvim用
+#repo = 'Shougo/deoplete.nvim'
+#if = "has('nvim')"
+#hook_source = '''
+#source ~/.config/nvim/plugins/deoplete.rc.vim
+#'''
+
 [[plugins]]
 # 楽にコメントアウト
 repo = 'scrooloose/nerdcommenter'

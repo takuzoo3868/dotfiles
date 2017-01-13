@@ -17,12 +17,3 @@ let g:neomake_message_sign = {
      \   'texthl': 'NeomakeMessageSign',
      \ }
 let g:neomake_info_sign = {'text': 'ℹ➤', 'texthl': 'NeomakeInfoSign'}
-
-" for c/c++
-let g:neomake_cpp_enabled_makers = ['gcc']
-
-" eslint
-let g:neomake_javascript_enabled_makers = ['eslint']
-
-" for Python
-let g:neomake_python_enabled_makers = ['python', 'flake8', 'mypy']
