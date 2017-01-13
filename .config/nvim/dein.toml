@@ -40,15 +40,12 @@ hook_post_update = '''
 # basic
 # ==========================================================
 
-
 [[plugins]]
-# カーソル位置のコンテキストに合わせてfile typeを切り替える
-repo = 'osyo-manga/vim-precious'
-depends = ['context_filetype.vim']
-
-[[plugins]]
-# カーソル位置のコンテキストのfile typeを判定するライブラリ
-repo = 'Shougo/context_filetype.vim'
+# 楽にコメントアウト
+repo = 'scrooloose/nerdcommenter'
+hook_add = '''
+source ~/.config/nvim/plugins/nerdcomenter.rc.vim
+'''
 
 [[plugins]]
 # toml syntax
@@ -80,31 +77,36 @@ hook_post_update = '''
 '''
 
 [[plugins]]
-# 補完(nvim用)
-repo = 'Shougo/deoplete.nvim'
+repo = 'thinca/vim-quickrun'
+
+# ==========================================================
+# linter
+# ==========================================================
+
+[[plugins]]
+repo = 'neomake/neomake'
 if = "has('nvim')"
-hook_post_source = '''
-let g:deoplete#enable_at_startup = 1
+hook_add = '''
+source ~/.config/nvim/plugins/neomake.rc.vim
 '''
 
 [[plugins]]
-repo = 'scrooloose/syntastic'
-hoos_add = '''
-  let g:syntastic_check_on_open = 0
-  let g:syntastic_check_on_save = 1
-  let g:syntastic_check_on_wq   = 0
+repo = 'vim-syntastic/syntastic'
+if = "!has('nvim')"
+hook_add = '''
+source ~/.config/nvim/plugins/syntastic.rc.vim
 '''
 
 # ==========================================================
 # terminal
 # ==========================================================
 
-#[[plugins]]
-#repo = 'kassio/neoterm'
-#if = "has('nvim')"
-#hook_add = '''
-#source ~/.config/nvim/plugins/neoterm.rc.vim
-#'''
+[[plugins]]
+repo = 'kassio/neoterm'
+if = "has('nvim')"
+hook_add = '''
+source ~/.config/nvim/plugins/neoterm.rc.vim
+'''
 
 [[plugins]]
 repo = 'Shougo/vimshell'

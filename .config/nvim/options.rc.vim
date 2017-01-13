@@ -20,6 +20,12 @@ set history=2000
 
 " マウス操作も許してあげる
 set mouse=a
+" クリップボードをWindowsと連携
+if has('nvim')
+  set clipboard+=unnamedplus
+else
+  set clipboard=unnamed,autoselect
+endif
 
 " ステータスラインを常に表示
 set laststatus=2

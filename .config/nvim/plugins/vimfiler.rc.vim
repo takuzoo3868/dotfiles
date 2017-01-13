@@ -8,7 +8,7 @@ call vimfiler#custom#profile('default', 'context', {
 let g:vimfiler_as_default_explorer = 1
 
 " Open filer
-noremap <silent> :tree :VimFiler -split -simple -winwidth=45 -no-quit
+noremap <silent> :tree :VimFiler -split -simple -winwidth=35 -no-quit
 
 " Don't let <CR> enter the directory but let it open the directory
 autocmd FileType vimfiler nmap <buffer> <CR> <Plug>(vimfiler_expand_or_edit)
