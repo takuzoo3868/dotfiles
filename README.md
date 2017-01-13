@@ -7,6 +7,7 @@ my configuration files
 - .gitconfig
 - .config/
   - nvim/
+  - fonts/
 
 
 ### setup
