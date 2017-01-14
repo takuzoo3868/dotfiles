@@ -4,4 +4,4 @@
   
 [submodule ".config/fonts"]
 	path = .config/fonts
-	url = https://github.com/powerline/fonts
+	url = https://github.com/powerline/fonts.git
