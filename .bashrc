@@ -135,5 +135,6 @@ export XDG_CONFIG_HOME=~/.config
 # fortune | cowsay | lolcat
 
 # powerline
+export PATH=~/.local/bin:$PATH 
 #powerline-daemon -q
 #. ~/.local/lib/python2.7/site-packages/powerline/bindings/bash/powerline.sh

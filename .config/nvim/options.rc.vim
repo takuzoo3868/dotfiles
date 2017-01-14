@@ -11,8 +11,6 @@ set showmatch
 
 " 入力中のコマンドをステータスに表示
 set showcmd
-" コマンドラインの表示行数
-set cmdheight=2
 " コマンドウィンドウの表示行数
 set cmdwinheight=4
 " コマンドの履歴の保存数
