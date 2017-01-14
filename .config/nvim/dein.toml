@@ -177,3 +177,10 @@ source ~/.config/nvim/plugins/vim-neko.rc.vim
 [[plugins]]
 # カレンダー
 repo = 'itchyny/calendar.vim'
+
+[[plugin]]
+# iconを追加
+#repo = 'ryanoasis/vim-devicons'
+#hook_add = '''
+#let g:airline_powerline_fonts = 1
+#'''

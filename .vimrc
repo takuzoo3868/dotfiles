@@ -21,6 +21,6 @@
 "
 "=====================================================================
 
-" Load neovim setting (unused)
+" Load neovim setting
 set runtimepath+=~/.config/nvim/
 runtime! init.vim
