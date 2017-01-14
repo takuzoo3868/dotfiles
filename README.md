@@ -7,7 +7,8 @@ my configuration files
 - .gitconfig
 - .config/
   - nvim/
-  - tmux
+  - tmux/
+    - tmux-powerline
   - fonts/
 
 
@@ -20,7 +21,7 @@ $ sh ./setup.sh
 
 #### Tips
 
-- nvim_install
+- nvim install
 ```bash
 $ sudo apt-get install software-properties-common
 $ sudo add-apt-repository ppa:neovim-ppa/unstable
