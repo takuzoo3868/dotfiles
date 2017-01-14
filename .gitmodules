@@ -1,7 +1,3 @@
 [submodule ".config/tmux/tmux-powerline"]
 	path = .config/tmux/tmux-powerline
 	url = https://github.com/erikw/tmux-powerline.git
-  
-[submodule ".config/fonts"]
-	path = .config/fonts
-	url = https://github.com/powerline/fonts.git
