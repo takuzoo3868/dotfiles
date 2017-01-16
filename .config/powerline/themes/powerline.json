@@ -14,9 +14,6 @@
 		"branch": {
 			"before": " "
 		},
-		"stash": {
-			"before": "⌆ "
-		},
 		"cwd": {
 			"args": {
 				"ellipsis": "⋯"
@@ -44,7 +41,8 @@
 		"powerline.segments.common.net.network_load": {
 			"args": {
 				"recv_format": "⬇ {value:>8}",
-				"sent_format": "⬆ {value:>8}"
+				"sent_format": "⬆ {value:>8}",
+        "interface": "en3"
 			}
 		},
 		"powerline.segments.common.net.hostname": {
@@ -117,10 +115,10 @@
 		},
 		"powerline.segments.vim.visual_range": {
 			"args": {
-				"CTRL_V_text": "↕{rows} ↔{vcols}",
-				"v_text_oneline": "↔{vcols}",
-				"v_text_multiline": "↕{rows}",
-				"V_text": "⇕{rows}"
+				"CTRL_V_text": "{rows} × {vcols}",
+				"v_text_oneline": "C:{vcols}",
+				"v_text_multiline": "L:{rows}",
+				"V_text": "L:{rows}"
 			}
 		},
 		"powerline.segments.vim.readonly_indicator": {
@@ -132,15 +130,6 @@
 			"args": {
 				"text": "+"
 			}
-		},
-
-		"powerline.segments.i3wm.scratchpad": {
-			"args": {
-				"icons": {
-					"fresh": "●",
-					"changed": "○"
-				}
-			}
-		}
+    }
 	}
 }

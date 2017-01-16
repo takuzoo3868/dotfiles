@@ -31,3 +31,22 @@ $ sudo apt-get install python-dev python-pip python3-dev python3-pip
 $ sudo pip2 install --user --upgrade neovim
 $ sudo pip3 install --user --upgrade neovim
 ```
+
+- powerline tmux
+```bash
+$ sudo pip install --user git+git://github.com/powerline/powerline
+$ sudo pip install psutil
+$ cp -R ~/.local/lib/python2.7/site-packages/powerline/config_files/* ~/.config/powerline/
+$ ln -s ~/.dotfiles/.config/powerline/themes/tmux/default.json ~/.dotfiles/.config/tmux/
+$ ln -s ~/.dotfiles/.config/powerline/themes/powerline.json ~/.dotfiles/.config/tmux/
+```
+
+- font patch
+```bash
+$ git clone https://github.com/ryanoasis/nerd-fonts.git
+$ sudo add-apt-repository ppa:fontforge/fontforge
+$ sudo apt-get update
+$ sudo apt-get install fontforge
+$ cd nerd-fonts
+$ fontforge -script ./font-patcher <path/to/font-file> -w  --fontawesome --fontawesomeextension --fontlinux  --octicons --powersymbols --pomicons
+```
