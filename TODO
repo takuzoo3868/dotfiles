@@ -2,10 +2,11 @@
 補完機能deo*の挙動改善
 
 # bash
-configをもうちょい見やすく
+configを見やすく
 
 # zsh
 bash から zshに切り替えたいよね
 
 # tmux
-powerlineの表示変更
+powerlineのカラースキーム変更
+クリップボードまわりをどうにかする
