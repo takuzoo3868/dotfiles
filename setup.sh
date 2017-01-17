@@ -43,8 +43,11 @@ setup() {
     install_package vim
   fi
   symlink "$dotfiles/.vimrc" "$HOME/.vimrc"
-  
+
+  # Neovimのセットアップ
   symlink "$dotfiles/.config/nvim" "$HOME/.config/nvim"
+
+  # Powerlineのセットアップ
 
 }
 

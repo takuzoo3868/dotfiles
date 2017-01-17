@@ -28,8 +28,9 @@ $ sudo add-apt-repository ppa:neovim-ppa/unstable
 $ sudo apt-get update
 $ sudo apt-get install neovim
 $ sudo apt-get install python-dev python-pip python3-dev python3-pip
-$ sudo pip2 install --user --upgrade neovim
-$ sudo pip3 install --user --upgrade neovim
+$ sudo pip2 install --upgrade neovim
+$ sudo pip3 install --upgrade neovim
+$ sudo apt install xclip xsel
 ```
 
 - powerline tmux
@@ -49,4 +50,14 @@ $ sudo apt-get update
 $ sudo apt-get install fontforge
 $ cd nerd-fonts
 $ fontforge -script ./font-patcher <path/to/font-file> -w  --fontawesome --fontawesomeextension --fontlinux  --octicons --powersymbols --pomicons
+```
+
+- istall with non-manager authority
+```bash
+$ mkdir scr
+$ cd scr | wget hoge | cd
+$ mkdir opt
+$ ./configure --prefix=$HOME/.local
+$ make
+$ make isntall
 ```
