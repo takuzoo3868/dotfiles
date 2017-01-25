@@ -1,4 +1,5 @@
 # nvim
+denite.nvimの勉強
 補完機能deo*の挙動改善
 
 # bash
@@ -6,7 +7,10 @@ configを見やすく
 
 # zsh
 bash から zshに切り替えたいよね
+.zshrcの作成
 
 # tmux
 powerlineのカラースキーム変更
 クリップボードまわりをどうにかする
+
+

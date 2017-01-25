@@ -5,7 +5,7 @@ set -u
 
 setup() {
   dotfiles=$HOME/.dotfiles
-  
+
   # パッケージの存在確認
   has() {
     type "$1" > /dev/null 2>&1
@@ -15,7 +15,7 @@ setup() {
     [ -e "$2" ] || ln -s "$1" "$2"
   }
 
-  
+
   install_package() {
     if [ -e /etc/arch-release ]; then
       yaourt -S $* 
@@ -37,7 +37,7 @@ setup() {
   fi
   symlink "$dotfiles/.gitconfig" "$HOME/.gitconfig"
 
-  
+
   # Vimのセットアップ
   if ! has vim; then
     install_package vim
@@ -45,9 +45,15 @@ setup() {
   symlink "$dotfiles/.vimrc" "$HOME/.vimrc"
 
   # Neovimのセットアップ
+  if ! has nvim; then
+    install_package neovim
+  fi
   symlink "$dotfiles/.config/nvim" "$HOME/.config/nvim"
 
   # Powerlineのセットアップ
+  if ! has powerline; then
+    install_package powerline
+  fi
 
 }
 
