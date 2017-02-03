@@ -31,9 +31,26 @@ setup() {
   update_repository() {
     sudo apt update
   }
+  
+  dotfiles_logo='
+   ██████╗  ██████╗ ████████╗███████╗██╗██╗     ███████╗███████╗
+ ██╔══██╗██╔═══██╗╚══██╔══╝██╔════╝██║██║     ██╔════╝██╔════╝
+ ██║  ██║██║   ██║   ██║   █████╗  ██║██║     █████╗  ███████╗
+ ██║  ██║██║   ██║   ██║   ██╔══╝  ██║██║     ██╔══╝  ╚════██║
+ ██████╔╝╚██████╔╝   ██║   ██║     ██║███████╗███████╗███████║
+ ╚═════╝  ╚═════╝    ╚═╝   ╚═╝     ╚═╝╚══════╝╚══════╝╚══════╝
+                                                              
+  *** WHAT IS INSIDE? ***
+  1. Download https://github.com/takuzoo3868/dotfiles.git
+  2. Symlinking dot files to your home directory
+  
+  See the README for documentation.
+  https://github.com/takuzoo3868/dotfiles
+  Licensed under the MIT license.
+'
 
   # dotfilesのセットアップ
-  echo "Hello, World!"
+  echo "$dotfiles_logo"
   if [ -d "$dotfiles" ]; then
     (cd "$dotfiles" && git pull --rebase)
   else
@@ -48,6 +65,7 @@ setup() {
 
 
   # Vimのセットアップ
+  echo ">>> neovim & vim"
   if ! has vim; then
     install_package vim
   fi
@@ -70,6 +88,7 @@ setup() {
   sudo pip2 install --upgrade neovim
   sudo pip3 install --upgrade neovim
   symlink "$dotfiles/.config/nvim" "$HOME/.config/nvim"
+  echo -e "<<< [\e[1;32m ok \e[m] neovim & vim"
 
   # Powerlineのセットアップ
   if ! has powerline; then
