@@ -3,15 +3,15 @@ denite.nvimの勉強
 補完機能deo*の挙動改善
 
 # bash
-configを見やすく
+bashrcの改善
 
 # zsh
 bash から zshに切り替え
-.zshrcの作成
+zshrcの作成
 
 # tmux
 powerline
 クリップボード
 
 # Arch linux
-setup
+setup.shからの起動

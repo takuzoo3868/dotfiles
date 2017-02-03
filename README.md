@@ -1,15 +1,18 @@
 # dotfiles
 Author: takuzoo  
-Date: 03/Feb/2017  
+Date: 04/Feb/2017  
 
 my configuration files
-- .vimrc
+- .vimrc -> init.vim
+- .bashrc
 - .gitconfig
+- .gitmodules
 - .config/
   - nvim/
   - tmux/
-    - tmux-powerline
   - fonts/
+    - Ubuntu Mono derivative Nerd Font
+  - powerline/
 
 
 ### setup

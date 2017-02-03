@@ -101,6 +101,7 @@ setup() {
   if ! has tmux; then
     install_package tmux
   fi
+  symlink "$dotfiles/.config/tmux/.tmux.conf" "$HOME/.tmux.conf"
   /bin/echo -e "<<< [\e[1;32m ok \e[m] "
 
   # Powerlineのセットアップ
