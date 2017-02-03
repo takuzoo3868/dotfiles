@@ -23,8 +23,17 @@ setup() {
       sudo apt install $*
     fi
   }
+  
+  add_repository() {
+    sudo add-apt-repository $*
+  }
+  
+  update_repository() {
+    sudo apt update
+  }
 
   # dotfilesのセットアップ
+  echo "Hello, World!"
   if [ -d "$dotfiles" ]; then
     (cd "$dotfiles" && git pull --rebase)
   else
@@ -46,7 +55,15 @@ setup() {
 
   # Neovimのセットアップ
   if ! has nvim; then
-    install_package neovim
+    if  [ -e /etc/arch-release ]; then
+      install_package python2-neovim python-neovim
+      install_package neovim
+    elif [ -e /etc/debian_version ] || [ -e /etc/debian_release ]; then
+      add_repository ppa:neovim-ppa/unstable
+      update_repository
+      install_package python-dev python-pip python3-dev python3-pip
+      install_package neovim
+    fi
   fi
   symlink "$dotfiles/.config/nvim" "$HOME/.config/nvim"
 
