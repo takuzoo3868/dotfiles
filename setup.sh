@@ -58,10 +58,12 @@ setup() {
   fi
 
   # Gitのセットアップ
+  echo ">>> git"
   if ! has git; then
     install_package git
   fi
   symlink "$dotfiles/.gitconfig" "$HOME/.gitconfig"
+  /bin/echo -e "<<< [\e[1;32m ok \e[m] git"
 
 
   # Vimのセットアップ
@@ -89,11 +91,20 @@ setup() {
   sudo pip3 install --upgrade neovim
   symlink "$dotfiles/.config/nvim" "$HOME/.config/nvim"
   /bin/echo -e "<<< [\e[1;32m ok \e[m] neovim & vim"
+  
+  # Tmuxのセットアップ
+  echo ">>> tmux"
+  if ! has tmux; then
+    install_package tmux
+  fi
+  /bin/echo -e "<<< [\e[1;32m ok \e[m] tmux"
 
   # Powerlineのセットアップ
+  echo ">>> powerline"
   if ! has powerline; then
     install_package powerline
   fi
+  /bin/echo -e "<<< [\e[1;32m ok \e[m] powerline"
 
 }
 
