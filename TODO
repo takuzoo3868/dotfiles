@@ -6,9 +6,9 @@ denite.nvimの勉強
 configを見やすく
 
 # zsh
-bash から zshに切り替えたいよね
+bash から zshに切り替え
 .zshrcの作成
 
 # tmux
-powerlineのカラースキーム変更
-クリップボードまわりをどうにかする
+powerline
+クリップボード
