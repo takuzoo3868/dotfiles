@@ -91,8 +91,8 @@ setup() {
       install_package xclip xsel
     fi
   fi
-  sudo pip2 install --upgrade neovim
-  sudo pip3 install --upgrade neovim
+  #sudo pip2 install --upgrade neovim
+  #sudo pip3 install --upgrade neovim
   symlink "$dotfiles/.config/nvim" "$HOME/.config/nvim"
   /bin/echo -e "<<< [\e[1;32m ok \e[m] "
   
