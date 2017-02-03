@@ -16,7 +16,7 @@ my configuration files
 ```bash  
 $ mkdir $HOME/.dotfiles
 $ git clone https://github.com/takuzoo3868/dotfiles $HOME/.dotfiles
-$ sh ./setup.sh
+$ ./setup.sh
 ```
 
 #### Tips
