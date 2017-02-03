@@ -1,6 +1,6 @@
 # dotfiles
 Author: takuzoo  
-Date: 12/Jan/2017  
+Date: 03/Feb/2017  
 
 my configuration files
 - .vimrc
