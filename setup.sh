@@ -59,12 +59,16 @@ setup() {
       install_package python2-neovim python-neovim
       install_package neovim
     elif [ -e /etc/debian_version ] || [ -e /etc/debian_release ]; then
+      install_package software-properties-common
       add_repository ppa:neovim-ppa/unstable
       update_repository
       install_package python-dev python-pip python3-dev python3-pip
       install_package neovim
+      install_package xclip xsel
     fi
   fi
+  sudo pip2 install --upgrade neovim
+  sudo pip3 install --upgrade neovim
   symlink "$dotfiles/.config/nvim" "$HOME/.config/nvim"
 
   # Powerlineのセットアップ
