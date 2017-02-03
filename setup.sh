@@ -11,10 +11,10 @@ setup() {
     type "$1" > /dev/null 2>&1
   }
 
+  # シンボリックリンク作成
   symlink() {
     [ -e "$2" ] || ln -s "$1" "$2"
   }
-
 
   install_package() {
     if [ -e /etc/arch-release ]; then
@@ -30,6 +30,10 @@ setup() {
   
   update_repository() {
     sudo apt update
+  }
+  
+  install_python() {
+    sudo pip install $*
   }
   
   dotfiles_logo='
@@ -63,7 +67,7 @@ setup() {
     install_package git
   fi
   symlink "$dotfiles/.gitconfig" "$HOME/.gitconfig"
-  /bin/echo -e "<<< [\e[1;32m ok \e[m] git"
+  /bin/echo -e "<<< [\e[1;32m ok \e[m] "
 
 
   # Vimのセットアップ
@@ -90,22 +94,23 @@ setup() {
   sudo pip2 install --upgrade neovim
   sudo pip3 install --upgrade neovim
   symlink "$dotfiles/.config/nvim" "$HOME/.config/nvim"
-  /bin/echo -e "<<< [\e[1;32m ok \e[m] neovim & vim"
+  /bin/echo -e "<<< [\e[1;32m ok \e[m] "
   
   # Tmuxのセットアップ
   echo ">>> tmux"
   if ! has tmux; then
     install_package tmux
   fi
-  /bin/echo -e "<<< [\e[1;32m ok \e[m] tmux"
+  /bin/echo -e "<<< [\e[1;32m ok \e[m] "
 
   # Powerlineのセットアップ
   echo ">>> powerline"
   if ! has powerline; then
-    install_package powerline
+    install_python --user git+git://github.com/powerline/powerline
+    install_python psutil
   fi
-  /bin/echo -e "<<< [\e[1;32m ok \e[m] powerline"
+  symlink "$dotfiles/.config/powerline" "$HOME/.config/powerline"
+  /bin/echo -e "<<< [\e[1;32m ok \e[m] "
 
 }
-
 setup
