@@ -1,4 +1,6 @@
 # dotfiles
+![](https://img.shields.io/badge/works%20on-Ubuntu-DD4814.svg)
+
 Author: takuzoo3868  
 Date: 04/Feb/2017  
 
