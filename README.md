@@ -7,7 +7,7 @@
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 
 Author: takuzoo3868  
-Date: 04/Feb/2017  
+Date: 05/Feb/2017  
 
 my configuration files
 - .vimrc -> init.vim
