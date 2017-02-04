@@ -1,5 +1,5 @@
 # dotfiles
-Author: takuzoo  
+Author: takuzoo3868  
 Date: 04/Feb/2017  
 
 my configuration files
@@ -14,15 +14,14 @@ my configuration files
     - Ubuntu Mono derivative Nerd Font
   - powerline/
 
-
-### setup
+## setup
 ```bash  
 $ mkdir $HOME/.dotfiles
 $ git clone https://github.com/takuzoo3868/dotfiles $HOME/.dotfiles
 $ ./setup.sh
 ```
 
-#### Tips
+## Tips
 - font patch
 ```bash
 $ git clone https://github.com/ryanoasis/nerd-fonts.git
