@@ -1,5 +1,6 @@
 # dotfiles
 ![](https://img.shields.io/badge/works%20on-Ubuntu-DD4814.svg)
+![](https://img.shields.io/badge/works%20on-ArchLinux-00AAD4.svg)
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 
 Author: takuzoo3868  

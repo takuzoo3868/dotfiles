@@ -11,7 +11,10 @@
 #      ~~            \/__/         \/__/         \/__/         \|__|         \/__/     
 #                                                                                      
 
-#~/.bashrc: executed by bash(1) for non-login shells.
+# Author: takuzoo3868
+# Last Modified: 05 Feb 2017.
+
+# ~/.bashrc: executed by bash(1) for non-login shells.
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 
 # If not running interactively, don't do anything
@@ -19,6 +22,11 @@ case $- in
     *i*) ;;
       *) return;;
 esac
+
+# Load bash local settings
+if [ -e "${HOME}/.bashrc_local" ]; then
+  source "${HOME}/.bashrc_local"
+fi
 
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
@@ -99,19 +107,15 @@ fi
 # colored GCC warnings and errors
 #export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
-# some more ls aliases
-alias ll='ls -alF'
-alias la='ls -A'
-alias l='ls -CF'
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
-# Alias definitions.
-# You may want to put all your additions into a separate file like
-# ~/.bash_aliases, instead of adding them here directly.
-# 訳:ここに直接aliasを書かないで".bash_aliases"使えばいいよ
+# alias 
+alias ll='ls -alF --color=auto'
+alias la='ls -A --color=auto'
+alias l='ls -CF --color=auto'
 
 if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
@@ -128,13 +132,8 @@ if ! shopt -oq posix; then
   fi
 fi
 
+# setting config dir
 export XDG_CONFIG_HOME=~/.config
-
-
-# other option
-# fortune | cowsay | lolcat
 
 # powerline
 export PATH=~/.local/bin:$PATH 
-#powerline-daemon -q
-#. ~/.local/lib/python2.7/site-packages/powerline/bindings/bash/powerline.sh

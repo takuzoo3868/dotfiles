@@ -4,14 +4,33 @@ denite.nvimの勉強
 
 # bash
 bashrcの改善
+bash_localの作成
 
 # zsh
 bash から zshに切り替え
 zshrcの作成
 
 # tmux
-powerline
-クリップボード
+powerlineの実行
+クリップボードの設定
+
+# powerline
+シンボリックリンクの作成
+tmuxの起動ファイルをなんとかしたい
+→現状:sourceの場所がディストリでいろいろ違う
+参考:https://powerline.readthedocs.io/en/2.4/usage/other.html#tmux-statusline
+配色を綺麗に
 
 # Arch linux
-setup.shからの起動
+setup.shからメイン環境の自動再現
+
+# other
+setup.shから各ディストリビューション毎のinstall.shを実行
+→OSの判定,yes/noで実行選択,configにあるフォントのインストール
+参考:https://github.com/daynin/dotfiles/blob/master/install.sh
+curlによるsetupの実行,gistに投稿
+参考:http://qiita.com/sonots/items/adae6cda0bb7a05f8905
+参考:https://github.com/sonots/.dotfiles
+setupのカラーコード改善
+sudo apt install taskの記述
+$task colorの実行結果をシェルスクリプトで実現
