@@ -8,13 +8,20 @@ repo = 'Shougo/dein.vim'
 
 [[plugins]]
 # 統合インターフェース
+repo = 'Shougo/denite.nvim'
+if = "has('nvim')"
+
+[[plugins]]
+# 統合インターフェース
 repo = 'Shougo/unite.vim'
+if = "!has('nvim')"
 hook_add = '''
 nnoremap <silent> unite :<C-u>Unite buffer<CR>
 '''
 
 [[plugins]]
 repo = 'Shougo/vimfiler.vim'
+if = "!has('nvim')"
 depends = 'unite.vim'
 hook_add = '''
 source ~/.config/nvim/plugins/vimfiler.rc.vim
@@ -40,13 +47,14 @@ hook_post_update = '''
 # basic
 # ==========================================================
 
-#[[plugins]]
+[[plugins]]
 # 補完 nvim用
-#repo = 'Shougo/deoplete.nvim'
-#if = "has('nvim')"
-#hook_source = '''
-#source ~/.config/nvim/plugins/deoplete.rc.vim
-#'''
+repo = 'Shougo/deoplete.nvim'
+depends = 'context_filetype.vim'
+if = "has('nvim')"
+hook_source = '''
+source ~/.config/nvim/plugins/deoplete.rc.vim
+'''
 
 [[plugins]]
 # 楽にコメントアウト

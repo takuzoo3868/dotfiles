@@ -11,7 +11,7 @@
 "       \/__/        ~~~~           \/__/       \/__/         \/__/         \/__/    
 
 " Author: takuzoo3868
-" Date: 13/Jan/2017
+" Date: 06/Feb/2017
 
 " Vi互換モードをオフ（Vimの拡張機能を有効化）
 if &compatible
