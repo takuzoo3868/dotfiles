@@ -12,7 +12,7 @@
 #                                                                                      
 
 # Author: takuzoo3868
-# Last Modified: 05 Feb 2017.
+# Last Modified: 05 Mar 2017.
 
 # ~/.bashrc: executed by bash(1) for non-login shells.
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
