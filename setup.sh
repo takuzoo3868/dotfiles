@@ -18,7 +18,7 @@ setup() {
 
   # シンボリックリンク作成
   symlink() {
-    [ -e "$2" ] || ln -si "$1" "$2"
+    [ -e "$2" ] || ln -s "$1" "$2"
   }
 
   # パッケージのインストール
@@ -71,7 +71,7 @@ setup() {
   # dotfilesのセットアップ
   echo "$dotfiles_logo"
   if [ -d "$dotfiles" ]; then
-    (cd "$dotfiles" && git pull --rebase)
+    (cd "$dotfiles" && git pull)
   else
     git clone https://github.com/takuzoo3868/dotfiles "$dotfiles"
   fi
