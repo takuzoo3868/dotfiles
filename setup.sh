@@ -21,6 +21,7 @@ setup() {
     [ -e "$2" ] || ln -s "$1" "$2"
   }
 
+  # パッケージのインストール
   install_package() {
     if [ -e /etc/arch-release ]; then
       yaourt -S $* 
@@ -29,14 +30,23 @@ setup() {
     fi
   }
   
+  # 非公式リポジトリの追加
   add_repository() {
-    sudo add-apt-repository $*
+    if [ -e /etc/debian_version ] || [ -e /etc/debian_release ]; then
+      sudo add-apt-repository $*
+    fi
   }
   
+  # パッケージの更新
   update_repository() {
-    sudo apt update
+    if [ -e /etc/arch-release ]; then
+      yaourt -Syua 
+    elif [ -e /etc/debian_version ] || [ -e /etc/debian_release ]; then
+      sudo apt update
+    fi
   }
   
+  # Pythonモジュールのインストール
   install_python() {
     sudo pip install $*
   }
@@ -65,6 +75,11 @@ setup() {
   else
     git clone https://github.com/takuzoo3868/dotfiles "$dotfiles"
   fi
+
+  # Bashのセットアップ
+  echo ">>> bash"
+  symlink "$dotfiles/.bashrc" "$HOME/.bashrc"
+  /bin/echo -e "<<< [\e[1;32m ok \e[m] "
 
   # Gitのセットアップ
   echo ">>> git"

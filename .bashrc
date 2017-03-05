@@ -23,11 +23,6 @@ case $- in
       *) return;;
 esac
 
-# Load bash local settings
-if [ -e "${HOME}/.bashrc_local" ]; then
-  source "${HOME}/.bashrc_local"
-fi
-
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
 HISTCONTROL=ignoreboth
@@ -96,8 +91,8 @@ esac
 if [ -x /usr/bin/dircolors ]; then
     test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
     alias ls='ls --color=auto'
-    #alias dir='dir --color=auto'
-    #alias vdir='vdir --color=auto'
+    alias dir='dir --color=auto'
+    alias vdir='vdir --color=auto'
 
     alias grep='grep --color=auto'
     alias fgrep='fgrep --color=auto'
@@ -132,8 +127,8 @@ if ! shopt -oq posix; then
   fi
 fi
 
-# setting config dir
-export XDG_CONFIG_HOME=~/.config
+# Load bash local settings
+if [ -e "${HOME}/.bashrc_local" ]; then
+  source "${HOME}/.bashrc_local"
+fi
 
-# powerline
-export PATH=~/.local/bin:$PATH 

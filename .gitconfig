@@ -1,15 +1,13 @@
 [user]
 	name = takuzoo3868
-	email = sata1121.kyudo@gmail.com
-# email$B$O(B.gitconfig.local$B$K=q$/(B
-
+	email = sata3868.k.serpentis@gmail.com
 [include]
-path = .gitconfig.local
+  path = .gitconfig.local
 [color]
 # colorの設定(以下のコマンドは自動で色つける)
-ui = auto
-status = auto
-diff = auto
-branch = auto
-interactive = auto
-grep = auto
+  ui = auto
+  status = auto
+  diff = auto
+  branch = auto
+  interactive = auto
+  grep = auto

@@ -19,10 +19,8 @@ my configuration files
   - powerline/
 
 ## setup
-```bash  
-$ mkdir $HOME/.dotfiles
-$ git clone https://github.com/takuzoo3868/dotfiles $HOME/.dotfiles
-$ ./setup.sh
+```bash
+$ bash -c "$(curl -fsSL https://github.com/takuzoo3868/dotfiles/blob/master/setup.sh)"
 ```
 
 ## Tips
