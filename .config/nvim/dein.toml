@@ -6,22 +6,22 @@ repo = 'Shougo/dein.vim'
 # filer
 # ==========================================================
 
-[[plugins]]
+#[[plugins]]
 # 統合インターフェース
-repo = 'Shougo/denite.nvim'
-if = "has('nvim')"
+#repo = 'Shougo/denite.nvim'
+#if = "has('nvim')"
 
 [[plugins]]
 # 統合インターフェース
 repo = 'Shougo/unite.vim'
-if = "!has('nvim')"
+#if = "!has('nvim')"
 hook_add = '''
-nnoremap <silent> unite :<C-u>Unite buffer<CR>
+nnoremap <silent> fb :<C-u>Unite buffer<CR>
 '''
 
 [[plugins]]
 repo = 'Shougo/vimfiler.vim'
-if = "!has('nvim')"
+#if = "!has('nvim')"
 depends = 'unite.vim'
 hook_add = '''
 source ~/.config/nvim/plugins/vimfiler.rc.vim

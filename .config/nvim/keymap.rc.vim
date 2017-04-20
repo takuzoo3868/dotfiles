@@ -28,7 +28,7 @@ noremap t6 6gt
 noremap t7 7gt
 noremap t8 8gt
 noremap t9 9gt
-noremap t0 :tablast<cr>
+noremap t0 :tablast<CR>
 
 
 " terminal
