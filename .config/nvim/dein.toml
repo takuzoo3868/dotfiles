@@ -63,6 +63,13 @@ hook_add = '''
 source ~/.config/nvim/plugins/nerdcomenter.rc.vim
 '''
 
+#[[plugins]]
+# 背景透過
+#repo = 'miyakogi/seiya.vim'
+#hook_add = '''
+#let g:seiya_auto_enable=1
+#'''
+
 [[plugins]]
 # toml syntax
 repo = 'cespare/vim-toml'
