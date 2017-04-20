@@ -70,10 +70,11 @@ setup() {
 
   # dotfilesのセットアップ
   echo "$dotfiles_logo"
-  if [ -d "$dotfiles" ]; then
-    (cd "$dotfiles" && git pull)
-  else
+  if [ ! -d "$dotfiles" ]; then
+    echo "Installing dotfiles for the first time"
     git clone https://github.com/takuzoo3868/dotfiles "$dotfiles"
+  else
+    echo "dofiles is already installed"
   fi
 
   # Bashのセットアップ
@@ -113,7 +114,7 @@ setup() {
   fi
   #sudo pip2 install --upgrade neovim
   #sudo pip3 install --upgrade neovim
-  symlink "$dotfiles/.config/nvim" "$HOME/.config/nvim"
+  symlink "$dotfiles/.config/nvim" "$HOME/.config/"
   /bin/echo -e "<<< [\e[1;32m ok \e[m] "
   
   # Tmuxのセットアップ
@@ -130,7 +131,7 @@ setup() {
     install_python --user git+git://github.com/powerline/powerline
     install_python psutil
   fi
-  symlink "$dotfiles/.config/powerline" "$HOME/.config/powerline"
+  symlink "$dotfiles/.config/powerline" "$HOME/.config/"
   /bin/echo -e "<<< [\e[1;32m ok \e[m] "
 
 }
