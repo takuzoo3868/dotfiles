@@ -6,7 +6,7 @@
 Author: takuzoo3868  
 Date: 05/Feb/2017 
 
-![shot01](https://raw.githubusercontent.com/takuzoo3868/dotfiles/blob/media/Screenshot%20from%202017-04-21%2001-30-47.png)
+![shot01](https://raw.githubusercontent.com/takuzoo3868/dotfiles/media/Screenshot%20from%202017-04-21%2001-30-47.png)
 
 my configuration files
 - .vimrc -> init.vim
