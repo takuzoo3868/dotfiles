@@ -20,9 +20,7 @@ my configuration files
 
 ## setup
 ```bash
-$ mkdir $HOME/.dotfiles
-$ git clone https://github.com/takuzoo3868/dotfiles $HOME/.dotfiles
-$ ./setup.sh
+$ sh -c "`curl -fsSL https://raw.githubusercontent.com/takuzoo3868/dotfiles/master/setup.sh `"
 ```
 
 ## Tips
