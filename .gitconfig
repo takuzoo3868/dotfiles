@@ -21,19 +21,37 @@
 [alias]
   # Check git alias 
   alias = !git config --get-regexp '^alias\\.' | sed 's/alias\\.\\([^ ]*\\) \\(.*\\)/\\1\\\t => \\2/' | sort
-  
-  # 
-  drag = pull --rebase
 
-  # View the current working tree status
-  s = status
-  
-  cm = commit -m
+  # add
+  a = add                           # add
 
-  ch = checkout
-  
-  # View abbreviated SHA, description, and history graph of the latest 20 commits
-  l = log -- graph --decorate --pretty=oneline -n 20 --abbrev-commit
+  # commit
+  c = commit -m                     # commit with message
+  ca = commit -am                   # commit all with message
+  ci = commit                       # commit
+  amend = commit --amend            # ammend your last commit
+ 
+  # checkout
+  ch = checkout                     # checkout
 
-  # Credit an author on the latest commit
-	credit = "!f() { git commit --amend --author \"$1 <$2>\" -C HEAD; }; f"
+  # diff
+  d = diff                          # diff unstaged changes
+  dc = diff --cached                # diff staged changes
+  last = diff HEAD^                 # diff last committed change
+  
+  # log
+  l = log --graph --date=short
+  tree = log --graph --branches --pretty=format:'%C(cyan)[%h]%Creset -%C(cyan bold)%d%Creset %s (%cr) %C(blue)<%an>%Creset'
+ 
+  # pull
+  pl = pull
+  drag = pull --rebase              # Pull using rebase mode (Not merge!!!)
+
+  # push
+  ps = push                         # push
+ 
+  # status
+  s = status                        # status
+  st = status                       # status
+  stat = status                     # status
+  
