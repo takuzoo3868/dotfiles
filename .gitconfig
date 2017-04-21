@@ -1,12 +1,11 @@
 [core]
   editor = nvim
-  excludesfile = $HOME/.gitignore
+  excludesfile = $HOME/.gitignore_global
   preloadindex = true
   fscache = true
 
 [include]
   path = $HOME/.gitconfig.local
-  path = $HOME/.gitignore.local
 
 [color]
   # Use colors in Git commands that are capable of colored output when

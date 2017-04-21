@@ -88,6 +88,7 @@ setup() {
     install_package git
   fi
   symlink "$dotfiles/.gitconfig" "$HOME/.gitconfig"
+  symlink "$dotfiles/.gitignore_global" "$HOME/.gitignore_global"
   /bin/echo -e "<<< [\e[1;32m ok \e[m] "
 
 
