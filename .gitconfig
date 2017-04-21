@@ -1,13 +1,40 @@
-[user]
-	name = takuzoo3868
-	email = sata1121.kyudo@gmail.com
+[core]
+  editor = nvim
+  excludesfile = $HOME/.gitignore
+  preloadindex = true
+  fscache = true
+
 [include]
-  path = .gitconfig.local
+  path = $HOME/.gitconfig.local
+  path = $HOME/.gitignore.local
+
 [color]
-# colorの設定(以下のコマンドは自動で色つける)
+  # Use colors in Git commands that are capable of colored output when
+	# outputting to the terminal. (This is the default setting in Git ≥ 1.8.4.)
   ui = auto
+
   status = auto
   diff = auto
   branch = auto
   interactive = auto
   grep = auto
+
+[alias]
+  # Check git alias 
+  alias = !git config --get-regexp '^alias\\.' | sed 's/alias\\.\\([^ ]*\\) \\(.*\\)/\\1\\\t => \\2/' | sort
+  
+  # 
+  drag = pull --rebase
+
+  # View the current working tree status
+  s = status
+  
+  cm = commit -m
+
+  ch = checkout
+  
+  # View abbreviated SHA, description, and history graph of the latest 20 commits
+  l = log -- graph --decorate --pretty=oneline -n 20 --abbrev-commit
+
+  # Credit an author on the latest commit
+	credit = "!f() { git commit --amend --author \"$1 <$2>\" -C HEAD; }; f"
