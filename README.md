@@ -4,7 +4,7 @@
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 
 Author: takuzoo3868  
-Date: 05/Feb/2017 
+Date: 22/Apr/2017 
 
 ![shot01](https://raw.githubusercontent.com/takuzoo3868/dotfiles/media/Screenshot%20from%202017-04-21%2001-30-47.png)
 
@@ -12,7 +12,7 @@ my configuration files
 - .vimrc -> init.vim
 - .bashrc
 - .gitconfig
-- .gitmodules
+- .gitignore
 - .config/
   - nvim/
   - tmux/

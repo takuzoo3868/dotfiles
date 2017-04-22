@@ -1,17 +1,16 @@
 [core]
   editor = nvim
-  excludesfile = $HOME/.gitignore_global
+  excludesfile = ~/.gitignore_global
   preloadindex = true
   fscache = true
 
 [include]
-  path = $HOME/.gitconfig.local
+  path = ~/.gitconfig.local
 
 [color]
   # Use colors in Git commands that are capable of colored output when
-	# outputting to the terminal. (This is the default setting in Git ≥ 1.8.4.)
+  # outputting to the terminal. (This is the default setting in Git ≥ 1.8.4.)
   ui = auto
-
   status = auto
   diff = auto
   branch = auto
