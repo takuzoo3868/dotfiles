@@ -155,7 +155,7 @@ source ~/.config/nvim/plugins/iceberg.rc.vim
 '''
 
 # ==========================================================
-# powerline
+# airline
 # ==========================================================
 
 [[plugins]]
@@ -178,6 +178,25 @@ hook_add = '''
 let g:airline_theme='luna'
 '''
 
+[[plugins]]
+repo = 'enricobacis/vim-airline-clock'
+
+[[plugins]]
+repo = 'Zuckonit/vim-airline-tomato'
+hook_add = '''
+let g:tomato#lang = 'english'
+'''
+
+[[plugins]]
+repo = 'mattn/webapi-vim'
+hook_add = '''
+let g:weather#area = 'hokkaido,japan'
+'''
+
+[[plugins]]
+repo = 'Wildog/airline-weather.vim'
+
+
 # ==========================================================
 # other
 # ==========================================================
@@ -192,10 +211,3 @@ source ~/.config/nvim/plugins/vim-neko.rc.vim
 [[plugins]]
 # カレンダー
 repo = 'itchyny/calendar.vim'
-
-[[plugin]]
-# iconを追加
-#repo = 'ryanoasis/vim-devicons'
-#hook_add = '''
-#let g:airline_powerline_fonts = 1
-#'''

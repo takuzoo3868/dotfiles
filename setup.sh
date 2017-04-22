@@ -90,6 +90,7 @@ setup() {
   set -e
   symlink "$dotfiles/.gitconfig" "$HOME/.gitconfig"
   symlink "$dotfiles/.gitignore_global" "$HOME/.gitignore_global"
+  symlink "$dotfiles/.gitmessage" "$HOME/.gitmessage"
   /bin/echo -e "<<< [\e[1;32m ok \e[m] "
 
 
