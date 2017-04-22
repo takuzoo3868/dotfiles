@@ -1,25 +1,25 @@
 
 
 # ==== Emojis ====
-#🎉	:tada:	Initial Commitやリリースなど
-#💩	:poop:	バグを修正
-#✨	:sparkles:	ファイル追加
-#🔥	:fire:	ファイル削除
-#♻️	:recycle:	リファクタリング(整理)
-#©️	:copyright:	ライセンスの変更や追加
-#🌐	:globe_with_meridians:	多言語対応
-#📝	:memo:	ドキュメント記述やREADME修正
-#🎨	:art:	コードの書式や構造を改善
-#👍	:+1:	機能改善
-#🚀	:rocket:	パフォーマンス改善
-#💚	:green_heart:	テストやCIの修正・改善
-#✅	:white_check_mark:	テストを追加
-#🐧	:penguin:	Linux
-#🍎	:apple:	Mac OS
-#💻	:computer:	Windows
-#🔒	:lock:	セキュリティ関連の改善
-#⬆️	:arrow_up:	依存関係をアップグレード
-#⬇️	:arrow_down:	依存関係をダウングレード
+#🎉	:tada: Initial Commitやリリースなど
+#💩	:poop: バグを修正
+#✨ :sparkles: ファイル追加
+#🔥 :fire: ファイル削除
+#♻️ :recycle: リファクタリング(整理)
+#©️ :copyright: ライセンスの変更や追加
+#🌐 :globe_with_meridians: 多言語対応
+#📝 :memo: ドキュメント記述やREADME修正
+#🎨 :art: コードの書式や構造を改善
+#👍 :+1: 機能改善
+#🚀 :rocket: パフォーマンス改善
+#💚 :green_heart: テストやCIの修正・改善
+#✅ :white_check_mark: テストを追加
+#🐧 :penguin: Linux
+#🍎 :apple: Mac OS
+#💻 :computer: Windows
+#🔒 :lock: セキュリティ関連の改善
+#⬆️ :arrow_up: 依存関係をアップグレード
+#⬇️ :arrow_down: 依存関係をダウングレード
 
 # ==== Format ====
 # :emoji: Subject
