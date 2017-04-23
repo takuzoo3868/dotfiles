@@ -71,7 +71,7 @@ setup() {
   echo "$dotfiles_logo"
   if [ ! -d "$dotfiles" ]; then
     echo "Installing dotfiles for the first time"
-    git clone https://github.com/takuzoo3868/dotfiles "$dotfiles"
+    git clone git@github.com:takuzoo3868/dotfiles.git "$dotfiles"
   else
     echo "dofiles is already installed"
   fi
