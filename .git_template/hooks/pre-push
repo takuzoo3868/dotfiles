@@ -16,6 +16,7 @@ do
     exit 1
   else
     aplay ~/Music/git_push.wav > /dev/null 2>&1 &
+    exit 0
   fi
 done
 
