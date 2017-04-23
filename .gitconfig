@@ -1,3 +1,6 @@
+[init]
+  templatedir = ~/.git_template
+
 [core]
   editor = nvim
   excludesfile = ~/.gitignore_global

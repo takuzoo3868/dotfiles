@@ -1,0 +1,3 @@
+#!/bin/sh
+
+#aplay ~/Music/hogehoge.wav > /dev/null 2>&1 &
