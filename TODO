@@ -2,17 +2,12 @@
 denite.nvimの勉強
 補完機能deopleteの挙動改善
 
-# bash
-bashrcの改善
-bash_localの作成
-
 # zsh
 bash から zshに切り替え
 zshrcの作成
 
 # tmux
 powerlineの実行
-クリップボードの設定
 ディストリ毎のconfファイル
 
 # powerline
@@ -26,12 +21,14 @@ tmuxの起動ファイルをなんとかしたい
 setup.shからメイン環境の自動再現
 
 # other
+root権限がない場合の設定
 setup.shから各ディストリビューション毎のinstall.shを実行
-→OSの判定,yes/noで実行選択,configにあるフォントのインストール
+OSの判定,yes/noで実行選択,configにあるフォントのインストール
 参考:https://github.com/daynin/dotfiles/blob/master/install.sh
-curlによるsetupの実行,gistに投稿
-参考:http://qiita.com/sonots/items/adae6cda0bb7a05f8905
-参考:https://github.com/sonots/.dotfiles
+
+#URL:http://qiita.com/sonots/items/adae6cda0bb7a05f8905
+#URL:https://github.com/sonots/.dotfiles
+
 setupのカラーコード改善
 sudo apt install taskの記述
 $task colorの実行結果をシェルスクリプトで実現
