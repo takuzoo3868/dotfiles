@@ -5,5 +5,5 @@ read PROJECT_PATH
 cd ~/$PROJECT_PATH
  
 # Copy scripts to hooks
-cp ~/.git_template/hooks/* .git/hooks/
+git init
 
