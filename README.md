@@ -15,6 +15,7 @@ my configuration files
 - .gitignore
 - .config/
   - nvim/
+  - nyaovim/
   - tmux/
   - fonts/
     - Ubuntu Mono derivative Nerd Font
