@@ -6,8 +6,14 @@
 set laststatus=2
 set showtabline=2
 
-" Powerline系フォントを利用する
-let g:airline_powerline_fonts = 1
+if exists('g:nyaovim_version')
+  let g:airline_powerline_fonts = 0
+  let g:airline_left_sep = ''
+  let g:airline_right_sep = ''
+else
+  " Powerline系フォントを利用する
+  let g:airline_powerline_fonts = 1
+endif
 
 " Tabにもairlineを適用
 let g:airline#extensions#tabline#enabled = 1

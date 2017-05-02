@@ -11,7 +11,7 @@
 "       \/__/        ~~~~           \/__/       \/__/         \/__/         \/__/    
 
 " Author: takuzoo3868
-" Date: 06/Feb/2017
+" Date: 03/May/2017
 
 " Vi互換モードをオフ（Vimの拡張機能を有効化）
 if &compatible
@@ -26,7 +26,11 @@ augroup END
 " dein settings {{{
 " dein自体の自動インストール
 let s:cache_home = empty($XDG_CACHE_HOME) ? expand('~/.cache') : $XDG_CACHE_HOME
-let s:dein_dir = s:cache_home . '/dein'
+if exists('g:nyaovim_version')
+  let s:dein_dir = s:cache_home . '/nyaovim/dein'
+else
+  let s:dein_dir = s:cache_home . '/dein'
+endif
 let s:dein_repo_dir = s:dein_dir . '/repos/github.com/Shougo/dein.vim'
 
 if &runtimepath !~# '/dein.vim'
@@ -37,7 +41,6 @@ if &runtimepath !~# '/dein.vim'
 endif
 
 " プラグイン読み込み＆キャッシュ作成
-
 if dein#load_state(s:dein_dir)
   call dein#begin(s:dein_dir)
 
@@ -47,6 +50,11 @@ if dein#load_state(s:dein_dir)
   
   call dein#load_toml(s:toml,      {'lazy': 0})
   call dein#load_toml(s:lazy_toml, {'lazy': 1})
+
+  if exists('g:nyaovim_version')
+    let s:nyao_toml = g:nvim_rc_dir . '/nyao.toml'
+    call dein#load_toml(s:nyao_toml, {'lazy': 0})
+  endif
   
   call dein#end()
   call dein#save_state()

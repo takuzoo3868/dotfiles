@@ -1,3 +1,9 @@
+" 起動メッセージ
+augroup InitialMessage
+  autocmd!
+  autocmd VimEnter * echo "(U^w^) < enjoy vimming!"
+augroup END
+
 " 行番号表示
 set number
 " タイトル表示

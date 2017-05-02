@@ -1,3 +1,8 @@
+# Tips
+# hook_addはプラグイン追加後
+# hook_sourceはプラグイン読み込み前
+# hook_post_sourceはプラグイン読み込み後
+
 [[plugins]]
 # プラグイン管理
 repo = 'Shougo/dein.vim'
