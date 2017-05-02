@@ -1,0 +1,12 @@
+[[plugins]]
+repo = 'rhysd/nyaovim-popup-tooltip'
+
+[[plugins]]
+repo = 'rhysd/nyaovim-markdown-preview'
+hook_add = '''
+let g:markdown_preview_auto = 1
+let g:markdown_preview_eager = 1
+'''
+
+[[plugins]]
+repo = 'rhysd/nyaovim-mini-browser'
