@@ -1,11 +1,7 @@
 #!/bin/sh
-GREEN='\033[0;32m'
-CYAN='\033[0;36m'
-NORMAL='\033[0m'
-YELLOW='\033[0;33m'
-SCRIPTPATH=`pwd -P`
 
-set -eu
+set -e
+set -u
 
 setup() {
   dotfiles=$HOME/.dotfiles
@@ -83,11 +79,9 @@ setup() {
 
   # Gitのセットアップ
   echo ">>> git"
-  set +e
   if ! has git; then
     install_package git || echo "Failed to install git"
   fi
-  set -e
   symlink "$dotfiles/.gitconfig" "$HOME/.gitconfig"
   symlink "$dotfiles/.gitignore_global" "$HOME/.gitignore_global"
   symlink "$dotfiles/.gitmessage" "$HOME/.gitmessage"
@@ -96,15 +90,12 @@ setup() {
 
   # Vimのセットアップ
   echo ">>> neovim & vim"
-  set +e
   if ! has vim; then
     install_package vim || echo "Failed to install vim"
   fi
-  set -e
   symlink "$dotfiles/.vimrc" "$HOME/.vimrc"
 
   # Neovimのセットアップ
-  set +e
   if ! has nvim; then
     if  [ -e /etc/arch-release ]; then
       install_package python2-neovim python-neovim
@@ -118,31 +109,31 @@ setup() {
       install_package xclip xsel
     fi
   fi
-  set -e
   #sudo pip2 install --upgrade neovim
   #sudo pip3 install --upgrade neovim
-  symlink "$dotfiles/.config/nvim" "$HOME/.config/"
+  symlink "$dotfiles/.config/nvim" "$HOME/.config/nvim"
+  /bin/echo -e "<<< [\e[1;32m ok \e[m] "
+
+  # Nyaovimのセットアップ
+  echo ">>> nyaovim"
+  symlink "$dotfiles/.config/nyaovim" "$HOME/.config/nyaovim"
   /bin/echo -e "<<< [\e[1;32m ok \e[m] "
   
   # Tmuxのセットアップ
   echo ">>> tmux"
-  set +e
   if ! has tmux; then
     install_package tmux || echo "Failed to install tmux"
   fi
-  set -e
   symlink "$dotfiles/.config/tmux/.tmux.conf" "$HOME/.tmux.conf"
   /bin/echo -e "<<< [\e[1;32m ok \e[m] "
 
   # Powerlineのセットアップ
   echo ">>> powerline"
-  set +e
   if ! has powerline; then
     install_python --user git+git://github.com/powerline/powerline
     install_python psutil
   fi
-  set -e
-  symlink "$dotfiles/.config/powerline" "$HOME/.config/"
+  symlink "$dotfiles/.config/powerline" "$HOME/.config/powerline"
   /bin/echo -e "<<< [\e[1;32m ok \e[m] "
 
 }
