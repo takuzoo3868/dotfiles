@@ -155,8 +155,15 @@ source ~/.config/nvim/plugins/vimshell.rc.vim
 
 [[plugins]]
 repo = 'cocopon/iceberg.vim'
+if = "has('nvim')"
 hook_add = '''
 source ~/.config/nvim/plugins/iceberg.rc.vim
+'''
+
+[[plugins]]
+repo = 'w0ng/vim-hybrid'
+hook_add = '''
+source ~/.config/nvim/plugins/hybird.rc.vim
 '''
 
 # ==========================================================
@@ -171,6 +178,7 @@ repo = 'tpope/vim-fugitive'
 
 [[plugins]]
 repo = 'vim-airline/vim-airline'
+if = "has('nvim')"
 depends = ['tagbar', 'vim-fugitive']
 hook_add = '''
 source ~/.config/nvim/plugins/airline.rc.vim

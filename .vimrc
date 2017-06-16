@@ -22,3 +22,6 @@
 " Load neovim setting
 set runtimepath+=~/.config/nvim/
 runtime! init.vim
+
+set background=dark
+colorscheme hybrid
