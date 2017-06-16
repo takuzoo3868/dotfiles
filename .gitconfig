@@ -2,7 +2,7 @@
   templatedir = ~/.git_template
 
 [core]
-  editor = nvim
+  editor = vim
   excludesfile = ~/.gitignore_global
   preloadindex = true
   fscache = true
