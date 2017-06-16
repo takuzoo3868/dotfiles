@@ -163,7 +163,7 @@ source ~/.config/nvim/plugins/iceberg.rc.vim
 [[plugins]]
 repo = 'w0ng/vim-hybrid'
 hook_add = '''
-source ~/.config/nvim/plugins/hybird.rc.vim
+source ~/.config/nvim/plugins/hybrid.rc.vim
 '''
 
 # ==========================================================
