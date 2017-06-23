@@ -23,5 +23,7 @@
 set runtimepath+=~/.config/nvim/
 runtime! init.vim
 
+syntax on
+set t_Co=256
 set background=dark
 colorscheme hybrid

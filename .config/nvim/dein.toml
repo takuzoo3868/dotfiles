@@ -68,13 +68,6 @@ hook_add = '''
 source ~/.config/nvim/plugins/nerdcomenter.rc.vim
 '''
 
-#[[plugins]]
-# 背景透過
-#repo = 'miyakogi/seiya.vim'
-#hook_add = '''
-#let g:seiya_auto_enable=1
-#'''
-
 [[plugins]]
 # toml syntax
 repo = 'cespare/vim-toml'
@@ -136,13 +129,6 @@ hook_add = '''
 source ~/.config/nvim/plugins/neoterm.rc.vim
 '''
 
-[[plugins]]
-repo = 'Shougo/vimshell'
-if = "!has('nvim')"
-hook_add = '''
-source ~/.config/nvim/plugins/vimshell.rc.vim
-'''
-
 # ==========================================================
 # colorscheme
 # ==========================================================
@@ -165,6 +151,9 @@ repo = 'w0ng/vim-hybrid'
 hook_add = '''
 source ~/.config/nvim/plugins/hybrid.rc.vim
 '''
+
+[[plugins]]
+repo = 'vim-scripts/Wombat'
 
 # ==========================================================
 # airline
@@ -195,12 +184,6 @@ let g:airline_theme='luna'
 repo = 'enricobacis/vim-airline-clock'
 
 [[plugins]]
-repo = 'Zuckonit/vim-airline-tomato'
-hook_add = '''
-let g:tomato#lang = 'english'
-'''
-
-[[plugins]]
 repo = 'mattn/webapi-vim'
 hook_add = '''
 let g:weather#area = 'hokkaido,japan'
@@ -208,6 +191,9 @@ let g:weather#area = 'hokkaido,japan'
 
 [[plugins]]
 repo = 'Wildog/airline-weather.vim'
+hook_add = '''
+source ~/.config/nvim/plugins/airline-weather.rc.vim
+'''
 
 
 # ==========================================================
