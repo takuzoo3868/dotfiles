@@ -181,9 +181,6 @@ let g:airline_theme='luna'
 '''
 
 [[plugins]]
-repo = 'enricobacis/vim-airline-clock'
-
-[[plugins]]
 repo = 'mattn/webapi-vim'
 hook_add = '''
 let g:weather#area = 'hokkaido,japan'
