@@ -1,65 +1,70 @@
 #!/bin/sh
 
-# Get OS bit
-# 32bit : i686
-# 64bit : x86_64
-get_os_bit() {
-    echo $(uname -m);
+OS=`uname -s`
+REV=`uname -r`
+MACH=`uname -m`
+
+GetVersionFromFile() {
+	VERSION="$(tr "\n" ' ' < cat "$1" | sed s/.*VERSION.*=\ // )"
 }
 
-# Get Linux distribution name
-get_os_distribution() {
-    if   [ -e /etc/debian_version ] ||
-         [ -e /etc/debian_release ]; then
-        # Check Ubuntu or Debian
-        if [ -e /etc/lsb-release ]; then
-            # Ubuntu
-            distri_name="ubuntu"
-        else
-            # Debian
-            distri_name="debian"
-        fi
-    elif [ -e /etc/fedora-release ]; then
-        # Fedra
-        distri_name="fedora"
-    elif [ -e /etc/redhat-release ]; then
-        if [ -e /etc/oracle-release ]; then
-            # Oracle Linux
-            distri_name="oracle"
-        else
-            # Red Hat Enterprise Linux
-            distri_name="redhat"
-        fi
-    elif [ -e /etc/arch-release ]; then
-        # Arch Linux
-        distri_name="arch"
-    elif [ -e /etc/turbolinux-release ]; then
-        # Turbolinux
-        distri_name="turbol"
-    elif [ -e /etc/SuSE-release ]; then
-        # SuSE Linux
-        distri_name="suse"
-    elif [ -e /etc/mandriva-release ]; then
-        # Mandriva Linux
-        distri_name="mandriva"
-    elif [ -e /etc/vine-release ]; then
-        # Vine Linux
-        distri_name="vine"
-    elif [ -e /etc/gentoo-release ]; then
-        # Gentoo Linux
-        distri_name="gentoo"
-    else
-        # Other
-        echo "unkown distribution"
-        distri_name="unkown"
-    fi
 
-    echo ${distri_name}
-}
+if [ "${OS}" = "SunOS" ] ; then
+	OS=Solaris
+	ARCH=$(uname -p)
+	OSSTR="${OS} ${REV}(${ARCH} $(uname -v)"
+  echo ${OSSTR}
+  return
 
-# Get distribution and bit
-get_os_info() {
-   echo $(get_os_distribution) $(get_os_bit)
-}
+elif [ "${OS}" = "AIX" ] ; then
+	OSSTR="${OS} $(oslevel) ($(oslevel -r)"
+  echo ${OSSTR}
+  return
 
-get_os_info
+elif [ "${OS}" = "Linux" ] ; then
+	KERNEL=$(uname -r)
+	if [ -f /etc/redhat-release ] ; then
+		DIST='RedHat'
+		PSUEDONAME=$(sed s/.*\(// < /etc/redhat-release | sed s/\)//)
+		REV=$(sed s/.*release\ // < /etc/redhat-release | sed s/\ .*//)
+	elif [ -f /etc/SuSE-release ] ; then
+		DIST=$(tr "\n" ' ' < /etc/SuSE-release | sed s/VERSION.*//)
+		REV=$(tr "\n" ' ' < /etc/SuSE-release| sed s/.*=\ //)
+	elif [ -f /etc/mandrake-release ] ; then
+		DIST='Mandrake'
+		PSUEDONAME=$(sed s/.*\(// < /etc/mandrake-release | sed s/\)//)
+		REV=$(sed s/.*release\ // < /etc/mandrake-release | sed s/\ .*//)
+	elif [ -f /etc/debian_version ] ; then	
+		if [ "$(awk -F= '/DISTRIB_ID/ {print $2}' /etc/lsb-release)" = "Ubuntu" ]; then
+			DIST="Ubuntu"
+		else
+			DIST="Debian $(cat /etc/debian_version)"
+			REV=""
+		fi
+	elif [ -f /etc/arch-release ] ; then
+		DIST="Arch"
+	fi
+	if [ -f /etc/UnitedLinux-release ] ; then
+		DIST="${DIST}[$(tr "\n" ' ' < /etc/UnitedLinux-release | sed s/VERSION.*//)]"
+	fi
+	OSSTR="${OS} ${DIST} ${REV}(${PSUEDONAME} ${KERNEL} ${MACH})"
+  echo ${OSSTR}
+  return
+
+elif [ "${OS}" == "Darwin" ]; then
+  type -p sw_vers &>/dev/null
+  [ $? -eq 0 ] && {
+    OS=`sw_vers | grep 'ProductName' | cut -f 2`
+    VER=`sw_vers | grep 'ProductVersion' | cut -f 2`
+    BUILD=`sw_vers | grep 'BuildVersion' | cut -f 2`
+    OSSTR="Darwin ${OS} ${VER} ${BUILD}"
+  } || {
+    OSSTR="MacOSX"
+  }
+  echo ${OSSTR}
+  return
+
+fi
+
+echo "Your platform ($(uname -a)) is not supported."
+exit 1
