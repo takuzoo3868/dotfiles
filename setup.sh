@@ -1,4 +1,5 @@
 #!/bin/sh
+#/data/data/com.termux/files/usr/bin/sh
 
 set -e
 set -u
