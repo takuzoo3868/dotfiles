@@ -3,20 +3,49 @@
 set -e
 set -u
 
+# use colors on terminal
+tput=$(which tput)
+if [ -n "$tput" ]; then
+    ncolors=$($tput colors)
+fi
+if [ -t 1 ] && [ -n "$ncolors" ] && [ "$ncolors" -ge 8 ]; then
+  RED="$(tput setaf 1)"
+  GREEN="$(tput setaf 2)"
+  YELLOW="$(tput setaf 3)"
+  BLUE="$(tput setaf 4)"
+  BOLD="$(tput bold)"
+  NORMAL="$(tput sgr0)"
+else
+  RED=""
+  GREEN=""
+  YELLOW=""
+  BLUE=""
+  BOLD=""
+  NORMAL=""
+fi
+
+# fix sed comand diff between GNU & BSD
+if sed --version 2>/dev/null | grep -q GNU; then
+  alias sedi='sed -i '
+else
+  alias sedi='sed -i "" '
+fi
+
+
 setup() {
   dotfiles=$HOME/.dotfiles
 
-  # パッケージの存在確認
+  # check package
   has() {
     type "$1" > /dev/null 2>&1
   }
 
-  # シンボリックリンク作成
+  # create symlink
   symlink() {
     [ -e "$2" ] || ln -sf "$1" "$2"
   }
 
-  # パッケージのインストール
+  # install package if it doesn`t exist
   install_package() {
     if [ -e /etc/arch-release ]; then
       yaourt -S $* 
@@ -25,14 +54,14 @@ setup() {
     fi
   }
   
-  # 非公式リポジトリの追加
+  # add non-suported repository
   add_repository() {
     if [ -e /etc/debian_version ] || [ -e /etc/debian_release ]; then
       sudo add-apt-repository $*
     fi
   }
   
-  # パッケージの更新
+  # check update
   update_repository() {
     if [ -e /etc/arch-release ]; then
       yaourt -Syua 
@@ -41,11 +70,15 @@ setup() {
     fi
   }
   
-  # Pythonモジュールのインストール
+  # install python module
   install_python() {
     sudo pip install $*
   }
   
+
+
+  ### Start install
+
   dotfiles_logo='
    ██████╗  ██████╗ ████████╗███████╗██╗██╗     ███████╗███████╗
  ██╔══██╗██╔═══██╗╚══██╔══╝██╔════╝██║██║     ██╔════╝██╔════╝
@@ -61,10 +94,14 @@ setup() {
   See the README for documentation.
   https://github.com/takuzoo3868/dotfiles
   Licensed under the MIT license.
+
+  (U^w^) < Start install the dotfiles
 '
 
-  # dotfilesのセットアップ
+  printf "${BOLD}${GREEN}"
   echo "$dotfiles_logo"
+  printf "${NORMAL}"
+
   if [ ! -d "$dotfiles" ]; then
     echo "Installing dotfiles for the first time"
     git clone git@github.com:takuzoo3868/dotfiles.git "$dotfiles"
@@ -75,7 +112,8 @@ setup() {
   # Bashのセットアップ
   echo ">>> bash"
   symlink "$dotfiles/.bashrc" "$HOME/.bashrc"
-  /bin/echo -e "<<< [\e[1;32m ok \e[m] "
+  printf "<<< [ ${BOLD}${GREEN}ok${NORMAL} ]\n"
+
 
   # Gitのセットアップ
   echo ">>> git"
@@ -86,7 +124,8 @@ setup() {
   symlink "$dotfiles/.gitignore_global" "$HOME/.gitignore_global"
   symlink "$dotfiles/.gitmessage" "$HOME/.gitmessage"
   mkdir -p $HOME/.git_template/hooks
-  /bin/echo -e "<<< [\e[1;32m ok \e[m] "
+  printf "<<< [ ${BOLD}${GREEN}ok${NORMAL} ]\n"
+
 
 
   # Vimのセットアップ
@@ -113,20 +152,20 @@ setup() {
   #sudo pip2 install --upgrade neovim
   #sudo pip3 install --upgrade neovim
   symlink "$dotfiles/.config/nvim" "$HOME/.config/nvim"
-  /bin/echo -e "<<< [\e[1;32m ok \e[m] "
+  printf "<<< [ ${BOLD}${GREEN}ok${NORMAL} ]\n"
 
   # Nyaovimのセットアップ
   echo ">>> nyaovim"
   symlink "$dotfiles/.config/nyaovim" "$HOME/.config/nyaovim"
-  /bin/echo -e "<<< [\e[1;32m ok \e[m] "
-  
+  printf "<<< [ ${BOLD}${GREEN}ok${NORMAL} ]\n"
+
   # Tmuxのセットアップ
   echo ">>> tmux"
   if ! has tmux; then
     install_package tmux || echo "Failed to install tmux"
   fi
   symlink "$dotfiles/.config/tmux/.tmux.conf" "$HOME/.tmux.conf"
-  /bin/echo -e "<<< [\e[1;32m ok \e[m] "
+  printf "<<< [ ${BOLD}${GREEN}ok${NORMAL} ]\n"
 
   # Powerlineのセットアップ
   echo ">>> powerline"
@@ -135,7 +174,8 @@ setup() {
     install_python psutil
   fi
   symlink "$dotfiles/.config/powerline" "$HOME/.config/powerline"
-  /bin/echo -e "<<< [\e[1;32m ok \e[m] "
+  printf "<<< [ ${BOLD}${GREEN}ok${NORMAL} ]\n"
 
 }
+
 setup
