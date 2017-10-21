@@ -15,20 +15,15 @@ powerlineの実行
 tmuxの起動ファイルをなんとかしたい
 →現状:sourceの場所がディストリでいろいろ違う
 参考:https://powerline.readthedocs.io/en/2.4/usage/other.html#tmux-statusline
-配色を綺麗に
-
-# Arch linux
-setup.shからメイン環境の自動再現
 
 # other
-root権限がない場合の設定
-setup.shから各ディストリビューション毎のinstall.shを実行
-OSの判定,yes/noで実行選択,configにあるフォントのインストール
+root権限がない場合どうするｱｲﾌﾙ
+setup.shから各ディストリ毎のinstall.shを実行
+yes/noで実行選択
 参考:https://github.com/daynin/dotfiles/blob/master/install.sh
 
 #URL:http://qiita.com/sonots/items/adae6cda0bb7a05f8905
 #URL:https://github.com/sonots/.dotfiles
 
-setupのカラーコード改善
-sudo apt install taskの記述
+install taskwarriorの記述
 $task colorの実行結果をシェルスクリプトで実現
