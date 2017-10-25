@@ -172,7 +172,7 @@ elif [[ $(uname) = "Linux" ]]; then
 
     info "yaourt -S $LIST_OF_APPS & $ADD_APP_ARCH"
     yaourt -S $LIST_OF_APPS
-    yaourt -S SADD_APP_ARCH
+    yaourt -S $ADD_APP_ARCH
 
     if ! has nvim; then
       echo ""
