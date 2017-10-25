@@ -168,11 +168,11 @@ elif [[ $(uname) = "Linux" ]]; then
     ADD_APP_ARCH="task"
 
     info "yaourt update"
-    yaourt -Syua
+    yaourt -Syua --noconfirm
 
     info "yaourt -S $LIST_OF_APPS & $ADD_APP_ARCH"
-    yaourt -S $LIST_OF_APPS
-    yaourt -S $ADD_APP_ARCH
+    yaourt -S --needed $LIST_OF_APPS
+    yaourt -S --needed $ADD_APP_ARCH
 
     if ! has nvim; then
       echo ""
