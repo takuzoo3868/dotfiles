@@ -1,3 +1,8 @@
 # Local config files
 .bashrc_tmp
 .config/fonts/**
+
+# IntelliJ project files
+.idea
+out
+gen
