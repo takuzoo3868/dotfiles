@@ -15,7 +15,7 @@ dotfiles=$HOME/.dotfiles
 # use colors on terminal
 tput=$(which tput)
 if [ -n "$tput" ]; then
-    ncolors=$($tput colors)
+  ncolors=$($tput colors)
 fi
 if [ -t 1 ] && [ -n "$ncolors" ] && [ "$ncolors" -ge 8 ]; then
   RED="$(tput setaf 1)"
@@ -88,21 +88,21 @@ symlink() {
 ### Start install script
 
 dotfiles_logo='
-   ██████╗  ██████╗ ████████╗███████╗██╗██╗     ███████╗███████╗
- ██╔══██╗██╔═══██╗╚══██╔══╝██╔════╝██║██║     ██╔════╝██╔════╝
- ██║  ██║██║   ██║   ██║   █████╗  ██║██║     █████╗  ███████╗
- ██║  ██║██║   ██║   ██║   ██╔══╝  ██║██║     ██╔══╝  ╚════██║
- ██████╔╝╚██████╔╝   ██║   ██║     ██║███████╗███████╗███████║
- ╚═════╝  ╚═════╝    ╚═╝   ╚═╝     ╚═╝╚══════╝╚══════╝╚══════╝
-                                                              
-  *** WHAT IS INSIDE? ***
-  1. Download my dotfiles from https://github.com/takuzoo3868/dotfiles
-  2. Symlinking dotfiles to your home directory
-  3. Install packages
-  
-  *** HOW TO INSTALL? ***
-  See the README for documentation.
-  Licensed under the MIT license.  
+██████╗  ██████╗ ████████╗███████╗██╗██╗     ███████╗███████╗
+██╔══██╗██╔═══██╗╚══██╔══╝██╔════╝██║██║     ██╔════╝██╔════╝
+██║  ██║██║   ██║   ██║   █████╗  ██║██║     █████╗  ███████╗
+██║  ██║██║   ██║   ██║   ██╔══╝  ██║██║     ██╔══╝  ╚════██║
+██████╔╝╚██████╔╝   ██║   ██║     ██║███████╗███████╗███████║
+╚═════╝  ╚═════╝    ╚═╝   ╚═╝     ╚═╝╚══════╝╚══════╝╚══════╝
+
+*** WHAT IS INSIDE? ***
+1. Download my dotfiles from https://github.com/takuzoo3868/dotfiles
+2. Symlinking dotfiles to your home directory
+3. Install packages
+
+*** HOW TO INSTALL? ***
+See the README for documentation.
+Licensed under the MIT license.  
 '
 
 printf "${BOLD}"
@@ -141,20 +141,20 @@ LIST_OF_APPS="coreutils bash vim git python3 tmux taskwarrior curl"
 
 
 if [ $(uname -o) = "Android" ]; then
-	ADD_APP_ANDROID="ncurses-utils binutils coreutils file grep wget"
+  ADD_APP_ANDROID="ncurses-utils binutils coreutils file grep wget"
 
   info "apt update"
-	apt update -q
+  apt update -q
 
-	info "apt install $LIST_OF_APPS & $ADD_APP_ANDROID"
-	apt install -q -y "$ADD_APP_ANDROID"
+  info "apt install $LIST_OF_APPS & $ADD_APP_ANDROID"
+  apt install -q -y "$ADD_APP_ANDROID"
   apt install -q -y "$LIST_OF_APPS"
 
   info "pkg install neovim"
   pkg install neovim
 
-	#info "termux-setup-storage"
-	#termux-setup-storage
+  #info "termux-setup-storage"
+  #termux-setup-storage
 
 elif [[ $(uname) = "Linux" ]]; then
 
@@ -178,14 +178,14 @@ elif [[ $(uname) = "Linux" ]]; then
       info "Installed neovim!!!"
     fi
 
-  ## Ubuntu / Debian
+    ## Ubuntu / Debian
   elif [ -f /etc/debian_version ] || [ -f /etc/debian_release ]; then
     info "sudo apt update"
     sudo apt update -q
 
     info "sudo apt install $LIST_OF_APPS"
     sudo apt install -q -y $LIST_OF_APPS
-    
+
     if ! has nvim; then
       echo ""
       info "Hasnt installed neovim yet. installing..."
@@ -201,24 +201,24 @@ elif [[ $(uname) = "Linux" ]]; then
   fi
 
 elif [[ $(uname) = "Darwin" ]]; then
-	ADD_APP_MAC="task trash"
+  ADD_APP_MAC="task trash"
 
-	info "xcode-select --install"
-	xcode-select --install
+  info "xcode-select --install"
+  xcode-select --install
 
-	if ! hash brew 2> /dev/null; then
-		info "Homebrew"
-		/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-	fi
+  if ! hash brew 2> /dev/null; then
+    info "Homebrew"
+    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+  fi
 
-	info "brew install $LIST_OF_APPS & $ADD_APP_MAC"
-	brew install $LIST_OF_APPS
+  info "brew install $LIST_OF_APPS & $ADD_APP_MAC"
+  brew install $LIST_OF_APPS
   brew install $ADD_APP_MAC
 
 else
   # F0ck wind0ws. G0 t0 he11!
-	error "Your platform ($(uname -a)) is not supported."
-	exit 1
+  error "Your platform ($(uname -a)) is not supported."
+  exit 1
 fi
 
 
