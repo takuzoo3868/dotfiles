@@ -144,11 +144,11 @@ if [ $(uname -o) = "Android" ]; then
   ADD_APP_ANDROID="ncurses-utils binutils coreutils file grep wget"
 
   info "apt update"
-  apt update -q
+  pkg update
 
   info "apt install $LIST_OF_APPS & $ADD_APP_ANDROID"
-  apt install -q -y "$ADD_APP_ANDROID"
-  apt install -q -y "$LIST_OF_APPS"
+  pkg install "$ADD_APP_ANDROID"
+  pkg install "$LIST_OF_APPS"
 
   info "pkg install neovim"
   pkg install neovim
