@@ -66,5 +66,7 @@ elif [ "${OS}" == "Darwin" ]; then
 
 fi
 
+
+# F0ck wind0ws. G0 t0 he11!
 echo "Your platform ($(uname -a)) is not supported."
 exit 1
