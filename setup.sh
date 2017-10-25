@@ -1,15 +1,16 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Author: takuzoo3868
-# Last Modified: 23 Oct 2017.
+# Last Modified: 24 Oct 2017.
 
 # If you use termux on Android, try this.
-#/data/data/com.termux/files/usr/bin/sh
+#/data/data/com.termux/files/usr/bin/bash
 
-set -eu
+set -euo pipefail
 
 # set dotfiles path
 dotfiles=$HOME/.dotfiles
+
 
 # use colors on terminal
 tput=$(which tput)
@@ -31,6 +32,7 @@ else
   BOLD=""
   NORMAL=""
 fi
+
 
 ### functions
 # info: output terminal green
@@ -70,46 +72,17 @@ else
   alias sedi='sed -i "" '
 fi
 
+
 # check package
 has() {
   type "$1" > /dev/null 2>&1
 }
 
+
 # create symlink
 symlink() {
   [ -e "$2" ] || ln -sf "$1" "$2"
 }
-
-# install package if it dose not exist
-install_package() {
-  if [ -e /etc/arch-release ]; then
-    yaourt -S $* 
-  elif [ -e /etc/debian_version ] || [ -e /etc/debian_release ]; then
-    sudo apt install $*
-  fi
-}
-  
-# add non-suported repository
-add_repository() {
-  if [ -e /etc/debian_version ] || [ -e /etc/debian_release ]; then
-    sudo add-apt-repository $*
-  fi
-}
-  
-# check update
-update_repository() {
-  if [ -e /etc/arch-release ]; then
-    yaourt -Syua 
-  elif [ -e /etc/debian_version ] || [ -e /etc/debian_release ]; then
-    sudo apt update
-  fi
-}
-  
-# install python module
-install_python() {
-  sudo pip install $*
-}
-  
 
 
 ### Start install script
@@ -140,7 +113,7 @@ log "*** ATTENTION ***"
 log "This script can change your entire setup."
 log "I recommend to read first. You can even copy commands one by one."
 echo ""
-read -p "$(warn 'Are you sure you want to install it? [y/N] ')" -n 1 -r
+read -p "$(warn '(U^w^) < Are you sure you want to install it? [y/N] ')" -n 1 -r
 
 
 if [[ ! $REPLY =~ ^[Yy]$ ]]; then
@@ -150,84 +123,149 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
 fi
 
 echo ""
-info "(U^w^) < Start install the dotfiles. Your important files will move into ~/.backup."
-
+info "Start install the dotfiles."
 
 if [ ! -d "$dotfiles" ]; then
-  info "(U^q^) < Installing dotfiles for the first time..."
+  info "Installing dotfiles for the first time..."
   git clone git@github.com:takuzoo3868/dotfiles.git "$dotfiles"
 else
-  info "(U^w^) < dofiles is already installed!!!"
+  info "The dofiles is already installed!!!"
 fi
+
+## install packages
+echo ""
+info "Installing packages..."
+
+# package list
+LIST_OF_APPS="coreutils bash vim git python3 tmux taskwarrior curl"
+
+
+if [ $(uname -o) = "Android" ]; then
+	ADD_APP_ANDROID="ncurses-utils binutils coreutils file grep wget"
+
+  info "apt update"
+	apt update -q
+
+	info "apt install $LIST_OF_APPS & $ADD_APP_ANDROID"
+	apt install -q -y "$ADD_APP_ANDROID"
+  apt install -q -y "$LIST_OF_APPS"
+
+  info "pkg install neovim"
+  pkg install neovim
+
+	#info "termux-setup-storage"
+	#termux-setup-storage
+
+elif [[ $(uname) = "Linux" ]]; then
+
+  ## Arch Linux
+  if [ -f /etc/arch-release ]; then
+    if ! has yaourt; then
+      warn "yaort has not installed yet. Please visit wiki: https://wiki.archlinux.jp/index.php/Yaourt"
+      exit 1
+    fi
+
+    info "yaourt update"
+    yaourt -Syua
+
+    info "yaourt -S $LIST_OF_APPS"
+    yaourt -S $LIST_OF_APPS
+
+    if ! has nvim; then
+      echo ""
+      info "Hasnt installed neovim yet. installing..."
+      sudo pacman -S neovim
+      info "Installed neovim!!!"
+    fi
+
+  ## Ubuntu / Debian
+  elif [ -f /etc/debian_version ] || [ -f /etc/debian_release ]; then
+    info "sudo apt update"
+    sudo apt update -q
+
+    info "sudo apt install $LIST_OF_APPS"
+    sudo apt install -q -y $LIST_OF_APPS
+    
+    if ! has nvim; then
+      echo ""
+      info "Hasnt installed neovim yet. installing..."
+      sudo apt install software-properties-common
+      sudo add-apt-repository ppa:neovim-ppa/unstable
+      sudo apt update -q
+      sudo apt install python-dev python-pip python3-dev python3-pip
+      sudo apt install neovim
+      sudo apt install xclip xsel
+      info "Installed neovim!!!"
+    fi
+
+  fi
+
+elif [[ $(uname) = "Darwin" ]]; then
+	ADD_APP_MAC="task trash"
+
+	info "xcode-select --install"
+	xcode-select --install
+
+	if ! hash brew 2> /dev/null; then
+		info "Homebrew"
+		/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+	fi
+
+	info "brew install $LIST_OF_APPS & $ADD_APP_MAC"
+	brew install $LIST_OF_APPS
+  brew install $ADD_APP_MAC
+
+else
+  # F0ck wind0ws. G0 t0 he11!
+	error "Your platform ($(uname -a)) is not supported."
+	exit 1
+fi
+
+
+## other packages
+if ! has powerline; then
+  echo ""
+  info "Hasnt installed powerline yet. Installing..."
+  sudo pip install --user git+git://github.com/powerline/powerline
+  sudo pip install psutil
+  info "Installed powerline!!!"
+fi
+
+## create symbolic link
+echo ""
+info "Creating symbolic link..."
+echo ""
 
 # Bash
-echo ">>> bash"
+info "bashrc"
 symlink "$dotfiles/.bashrc" "$HOME/.bashrc"
-printf "<<< [ ${BOLD}${GREEN}ok${NORMAL} ]\n"
-
 
 # Git
-echo ">>> git"
-if ! has git; then
-  install_package git || echo "Failed to install git"
-fi
+info "gitconfig"
 symlink "$dotfiles/.gitconfig" "$HOME/.gitconfig"
 symlink "$dotfiles/.gitignore_global" "$HOME/.gitignore_global"
 symlink "$dotfiles/.gitmessage" "$HOME/.gitmessage"
 mkdir -p $HOME/.git_template/hooks
-printf "<<< [ ${BOLD}${GREEN}ok${NORMAL} ]\n"
-
 
 # Vim
-echo ">>> neovim & vim"
-if ! has vim; then
-  install_package vim || echo "Failed to install vim"
-fi
+info "vimrc"
 symlink "$dotfiles/.vimrc" "$HOME/.vimrc"
 
 # Neovim
-if ! has nvim; then
-  if  [ -e /etc/arch-release ]; then
-    install_package python2-neovim python-neovim
-    install_package neovim
-  elif [ -e /etc/debian_version ] || [ -e /etc/debian_release ]; then
-    install_package software-properties-common
-    add_repository ppa:neovim-ppa/unstable
-    update_repository
-    install_package python-dev python-pip python3-dev python3-pip
-    install_package neovim
-    install_package xclip xsel
-  fi
-fi
-#sudo pip2 install --upgrade neovim
-#sudo pip3 install --upgrade neovim
+info "config about neovim"
 symlink "$dotfiles/.config/nvim" "$HOME/.config/nvim"
-printf "<<< [ ${BOLD}${GREEN}ok${NORMAL} ]\n"
 
 # Nyaovim
-echo ">>> nyaovim"
+info "config about nyaovim"
 symlink "$dotfiles/.config/nyaovim" "$HOME/.config/nyaovim"
-printf "<<< [ ${BOLD}${GREEN}ok${NORMAL} ]\n"
-
 
 # Tmux
-echo ">>> tmux"
-if ! has tmux; then
-  install_package tmux || echo "Failed to install tmux"
-fi
+info "tmux.conf"
 symlink "$dotfiles/.config/tmux/.tmux.conf" "$HOME/.tmux.conf"
-printf "<<< [ ${BOLD}${GREEN}ok${NORMAL} ]\n"
-
 
 # Powerline
-echo ">>> powerline"
-if ! has powerline; then
-  install_python --user git+git://github.com/powerline/powerline
-  install_python psutil
-fi
+info "config about powerline"
 symlink "$dotfiles/.config/powerline" "$HOME/.config/powerline"
-printf "<<< [ ${BOLD}${GREEN}ok${NORMAL} ]\n"
 
-
-
-
+echo ""
+info "Installation completed."
