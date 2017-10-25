@@ -29,6 +29,6 @@ dotfiles/
 ## setup
 Just copy and execute this !!!
 ```bash
-$ sh -c "`curl -fsSL https://raw.githubusercontent.com/takuzoo3868/dotfiles/master/setup.sh `"
+$ bash -c "`curl -fsSL https://raw.githubusercontent.com/takuzoo3868/dotfiles/master/setup.sh `"
 ```
 
