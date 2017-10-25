@@ -1,12 +1,11 @@
 # dotfiles
 ![](https://img.shields.io/badge/works%20on-Ubuntu-DD4814.svg)
 ![](https://img.shields.io/badge/works%20on-ArchLinux-00AAD4.svg)
+![](https://img.shields.io/badge/works%20on-MacOS-lightgrey.svg)
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 
 Author: takuzoo3868  
-Date: 22/Dec/2017 
-
-![shot01](https://raw.githubusercontent.com/takuzoo3868/dotfiles/media/Screenshot%20from%202017-04-21%2001-30-47.png)
+Date: 25/Dec/2017 
 
 my configuration files
 
