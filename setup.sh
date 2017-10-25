@@ -137,11 +137,11 @@ echo ""
 info "Installing packages..."
 
 # package list
-LIST_OF_APPS="coreutils bash vim git python tmux taskwarrior curl"
+LIST_OF_APPS="coreutils bash vim git python tmux curl"
 
 
 if [ $(uname -o) = "Android" ]; then
-  ADD_APP_ANDROID="ncurses-utils binutils coreutils file grep wget"
+  ADD_APP_ANDROID="ncurses-utils binutils coreutils file grep wget taskwarrior"
 
   info "apt update"
   pkg update
@@ -165,11 +165,14 @@ elif [[ $(uname) = "Linux" ]]; then
       exit 1
     fi
 
+    ADD_APP_ARCH="task"
+
     info "yaourt update"
     yaourt -Syua
 
-    info "yaourt -S $LIST_OF_APPS"
+    info "yaourt -S $LIST_OF_APPS & $ADD_APP_ARCH"
     yaourt -S $LIST_OF_APPS
+    yaourt -S SADD_APP_ARCH
 
     if ! has nvim; then
       echo ""
@@ -180,11 +183,14 @@ elif [[ $(uname) = "Linux" ]]; then
 
     ## Ubuntu / Debian
   elif [ -f /etc/debian_version ] || [ -f /etc/debian_release ]; then
+    ADD_APP_DEBIAN="taskwarrior"
+
     info "sudo apt update"
     sudo apt update -q
 
-    info "sudo apt install $LIST_OF_APPS"
+    info "sudo apt install $LIST_OF_APPS & $ADD_APP_DEBIAN"
     sudo apt install -q -y $LIST_OF_APPS
+    sudo apt install -q -y $ADD_APP_DEBIAN
 
     if ! has nvim; then
       echo ""
