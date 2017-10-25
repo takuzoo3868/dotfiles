@@ -137,7 +137,7 @@ echo ""
 info "Installing packages..."
 
 # package list
-LIST_OF_APPS="coreutils bash vim git python3 tmux taskwarrior curl"
+LIST_OF_APPS="coreutils bash vim git python tmux taskwarrior curl"
 
 
 if [ $(uname -o) = "Android" ]; then
