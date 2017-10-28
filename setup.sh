@@ -88,21 +88,21 @@ symlink() {
 ### Start install script
 
 dotfiles_logo='
-██████╗  ██████╗ ████████╗███████╗██╗██╗     ███████╗███████╗
-██╔══██╗██╔═══██╗╚══██╔══╝██╔════╝██║██║     ██╔════╝██╔════╝
-██║  ██║██║   ██║   ██║   █████╗  ██║██║     █████╗  ███████╗
-██║  ██║██║   ██║   ██║   ██╔══╝  ██║██║     ██╔══╝  ╚════██║
-██████╔╝╚██████╔╝   ██║   ██║     ██║███████╗███████╗███████║
-╚═════╝  ╚═════╝    ╚═╝   ╚═╝     ╚═╝╚══════╝╚══════╝╚══════╝
+  ██████╗  ██████╗ ████████╗███████╗██╗██╗     ███████╗███████╗
+  ██╔══██╗██╔═══██╗╚══██╔══╝██╔════╝██║██║     ██╔════╝██╔════╝
+  ██║  ██║██║   ██║   ██║   █████╗  ██║██║     █████╗  ███████╗
+  ██║  ██║██║   ██║   ██║   ██╔══╝  ██║██║     ██╔══╝  ╚════██║
+  ██████╔╝╚██████╔╝   ██║   ██║     ██║███████╗███████╗███████║
+  ╚═════╝  ╚═════╝    ╚═╝   ╚═╝     ╚═╝╚══════╝╚══════╝╚══════╝
 
-*** WHAT IS INSIDE? ***
-1. Download my dotfiles from https://github.com/takuzoo3868/dotfiles
-2. Symlinking dotfiles to your home directory
-3. Install packages
+  *** WHAT IS INSIDE? ***
+  1. Download my dotfiles from https://github.com/takuzoo3868/dotfiles
+  2. Symlinking dotfiles to your home directory
+  3. Install packages
 
-*** HOW TO INSTALL? ***
-See the README for documentation.
-Licensed under the MIT license.  
+  *** HOW TO INSTALL? ***
+  See the README for documentation.
+  Licensed under the MIT license.  
 '
 
 printf "${BOLD}"
