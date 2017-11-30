@@ -196,10 +196,9 @@ elif [[ $(uname) = "Linux" ]]; then
       echo ""
       info "Hasnt installed neovim yet. installing..."
       sudo apt install software-properties-common
-      sudo add-apt-repository ppa:neovim-ppa/unstable
+      sudo apt install neovim
       sudo apt update -q
       sudo apt install python-dev python-pip python3-dev python3-pip
-      sudo apt install neovim
       sudo apt install xclip xsel
       info "Installed neovim!!!"
     fi
