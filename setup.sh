@@ -88,21 +88,21 @@ symlink() {
 ### Start install script
 
 dotfiles_logo='
-  ██████╗  ██████╗ ████████╗███████╗██╗██╗     ███████╗███████╗
-  ██╔══██╗██╔═══██╗╚══██╔══╝██╔════╝██║██║     ██╔════╝██╔════╝
-  ██║  ██║██║   ██║   ██║   █████╗  ██║██║     █████╗  ███████╗
-  ██║  ██║██║   ██║   ██║   ██╔══╝  ██║██║     ██╔══╝  ╚════██║
-  ██████╔╝╚██████╔╝   ██║   ██║     ██║███████╗███████╗███████║
-  ╚═════╝  ╚═════╝    ╚═╝   ╚═╝     ╚═╝╚══════╝╚══════╝╚══════╝
+██████╗  ██████╗ ████████╗███████╗██╗██╗     ███████╗███████╗
+██╔══██╗██╔═══██╗╚══██╔══╝██╔════╝██║██║     ██╔════╝██╔════╝
+██║  ██║██║   ██║   ██║   █████╗  ██║██║     █████╗  ███████╗
+██║  ██║██║   ██║   ██║   ██╔══╝  ██║██║     ██╔══╝  ╚════██║
+██████╔╝╚██████╔╝   ██║   ██║     ██║███████╗███████╗███████║
+╚═════╝  ╚═════╝    ╚═╝   ╚═╝     ╚═╝╚══════╝╚══════╝╚══════╝
 
-  *** WHAT IS INSIDE? ***
-  1. Download my dotfiles from https://github.com/takuzoo3868/dotfiles
-  2. Symlinking dotfiles to your home directory
-  3. Install packages
+*** WHAT IS INSIDE? ***
+1. Download my dotfiles from https://github.com/takuzoo3868/dotfiles
+2. Symlinking dotfiles to your home directory
+3. Install packages
 
-  *** HOW TO INSTALL? ***
-  See the README for documentation.
-  Licensed under the MIT license.  
+*** HOW TO INSTALL? ***
+See the README for documentation.
+Licensed under the MIT license.  
 '
 
 printf "${BOLD}"
@@ -196,8 +196,9 @@ elif [[ $(uname) = "Linux" ]]; then
       echo ""
       info "Hasnt installed neovim yet. installing..."
       sudo apt install software-properties-common
-      sudo apt install neovim
+      sudo add-apt-repository ppa:neovim-ppa/stable
       sudo apt update -q
+      sudo apt-get install neovim
       sudo apt install python-dev python-pip python3-dev python3-pip
       sudo apt install xclip xsel
       info "Installed neovim!!!"
