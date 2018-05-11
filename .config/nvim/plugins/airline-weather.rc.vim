@@ -1,3 +1,8 @@
+let g:weather#area = 'hokkaido,japan'
+let g:weather#unit = 'metric'
+let g:weather#cache_file = '~/.cache/.weather'
+let g:weather#cache_ttl = '3600'
+
 let g:weather#status_map = {
   \ "01d": " ",
   \ "02d": " ",
@@ -18,3 +23,4 @@ let g:weather#status_map = {
   \ "13n": " ",
   \ "50n": " ",
   \}
+

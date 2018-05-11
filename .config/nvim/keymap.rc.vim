@@ -3,10 +3,10 @@
 "nnoremap : ;
 
 " change display mapping
-nmap <Down> <C-w>j
-nmap <Up> <C-w>k
-nmap <Left> <C-w>h
-nmap <Right> <C-w>l
+nmap wj <C-w>j
+nmap wk <C-w>k
+nmap wh <C-w>h
+nmap wl <C-w>l
 
 " Vertical size adjust '<' '>'
 "nnoremap <silent>< <C-w><

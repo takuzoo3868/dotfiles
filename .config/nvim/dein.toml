@@ -11,55 +11,23 @@ repo = 'Shougo/dein.vim'
 # filer
 # ==========================================================
 
-#[[plugins]]
-# 統合インターフェース
-#repo = 'Shougo/denite.nvim'
-#if = "has('nvim')"
-
 [[plugins]]
 # 統合インターフェース
 repo = 'Shougo/unite.vim'
-#if = "!has('nvim')"
 hook_add = '''
 nnoremap <silent> fb :<C-u>Unite buffer<CR>
 '''
 
 [[plugins]]
 repo = 'Shougo/vimfiler.vim'
-#if = "!has('nvim')"
 depends = 'unite.vim'
 hook_add = '''
 source ~/.config/nvim/plugins/vimfiler.rc.vim
 '''
 
-[[plugins]]
-# 重い作業時の非同期処理
-repo = 'Shougo/vimproc.vim'
-hook_post_update = '''
-  if dein#util#_is_windows()
-    let cmd = 'tools\\update-dll-mingw'
-  elseif dein#util#_is_cygwin()
-    let cmd = 'make -f make_cygwin.mak'
-  elseif executable('gmake')
-    let cmd = 'gmake'
-  else
-    let cmd = 'make'
-  endif
-  let g:dein#plugin.build = cmd
-'''
-
 # ==========================================================
 # basic
 # ==========================================================
-
-[[plugins]]
-# 補完 nvim用
-repo = 'Shougo/deoplete.nvim'
-depends = 'context_filetype.vim'
-if = "has('nvim')"
-hook_source = '''
-source ~/.config/nvim/plugins/deoplete.rc.vim
-'''
 
 [[plugins]]
 # 楽にコメントアウト
@@ -69,11 +37,6 @@ source ~/.config/nvim/plugins/nerdcomenter.rc.vim
 '''
 
 [[plugins]]
-# toml syntax
-repo = 'cespare/vim-toml'
-on_ft = 'toml'
-
-[[plugins]]
 # カッコを自動で閉じる
 repo = 'Townk/vim-autoclose'
 
@@ -81,14 +44,32 @@ repo = 'Townk/vim-autoclose'
 # 貼り付け時に自動でペーストモードにする
 repo = 'ConradIrwin/vim-bracketed-paste'
 
+# ==========================================================
+# linter
+# ==========================================================
+
 [[plugins]]
-# 非同期処理
+repo = 'w0rp/ale'
+hook_add = '''
+source ~/.config/nvim/plugins/ale.rc.vim
+'''
+
+# ==========================================================
+# terminal
+# ==========================================================
+
+[[plugins]]
+# 重い作業時の非同期処理
 repo = 'Shougo/vimproc.vim'
+if = "!has('nvim')"
+build = 'make'
 hook_post_update = '''
   if dein#util#_is_windows()
     let cmd = 'tools\\update-dll-mingw'
   elseif dein#util#_is_cygwin()
     let cmd = 'make -f make_cygwin.mak'
+  elseif dein#util#_is_mac()
+    let cmd = 'make -f make_mac.mak'
   elseif executable('gmake')
     let cmd = 'gmake'
   else
@@ -98,36 +79,21 @@ hook_post_update = '''
 '''
 
 [[plugins]]
-repo = 'thinca/vim-quickrun'
-
-# ==========================================================
-# linter
-# ==========================================================
-
-[[plugins]]
-repo = 'neomake/neomake'
-if = "has('nvim')"
-hook_add = '''
-source ~/.config/nvim/plugins/neomake.rc.vim
-'''
-
-[[plugins]]
-repo = 'vim-syntastic/syntastic'
-if = "!has('nvim')"
-hook_add = '''
-source ~/.config/nvim/plugins/syntastic.rc.vim
-'''
-
-# ==========================================================
-# terminal
-# ==========================================================
-
-[[plugins]]
 repo = 'kassio/neoterm'
 if = "has('nvim')"
 hook_add = '''
 source ~/.config/nvim/plugins/neoterm.rc.vim
 '''
+
+[[plugins]]
+repo = 'Shougo/vimshell'
+if = "!has('nvim')"
+hook_add = '''
+source ~/.config/nvim/plugins/vimshell.rc.vim
+'''
+
+[[plugins]]
+repo = 'thinca/vim-quickrun'
 
 # ==========================================================
 # colorscheme
@@ -182,16 +148,36 @@ let g:airline_theme='luna'
 
 [[plugins]]
 repo = 'mattn/webapi-vim'
-hook_add = '''
-let g:weather#area = 'hokkaido,japan'
-'''
+
+# [[plugins]]
+# repo = 'Wildog/airline-weather.vim'
+# hook_add = '''
+# source ~/.config/nvim/plugins/airline-weather.rc.vim
+# '''
 
 [[plugins]]
-repo = 'Wildog/airline-weather.vim'
+repo = 'gcmt/taboo.vim'
+depends = 'vim-airline'
 hook_add = '''
-source ~/.config/nvim/plugins/airline-weather.rc.vim
+if !has('nvim')
+  set guioptions-=e
+  set sessionoptions+=tabpages,globals
+endif
+let g:taboo_tab_format=' t%N %f%m '
+let g:taboo_tabline = 0
 '''
 
+# ==========================================================
+# for vim8 compatible neovim
+# ==========================================================
+
+[[plugins]]
+repo = "roxma/vim-hug-neovim-rpc"
+if = "!has('nvim')"
+
+[[plugins]]
+repo = "roxma/nvim-yarp"
+if = "!has('nvim')"
 
 # ==========================================================
 # other
@@ -207,3 +193,25 @@ source ~/.config/nvim/plugins/vim-neko.rc.vim
 [[plugins]]
 # カレンダー
 repo = 'itchyny/calendar.vim'
+
+[[plugins]]
+repo = 'ryanoasis/vim-devicons'
+
+# ==========================================================
+# LSP
+# ==========================================================
+
+[[plugins]]
+repo = 'autozimu/LanguageClient-neovim'
+rev = 'next'
+build = 'bash install.sh'
+hook_add = '''
+set hidden
+let g:LanguageClient_serverCommands = {
+    \ 'vue': ['vls'],
+    \ 'rust': ['rls'],
+    \ }
+'''
+
+# [[plugins]]
+# repo = 'Shougo/context_filetype.vim'
