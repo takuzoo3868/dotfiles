@@ -160,19 +160,19 @@ elif [[ $(uname) = "Linux" ]]; then
 
   ## Arch Linux
   if [ -f /etc/arch-release ]; then
-    if ! has yaourt; then
-      warn "yaort has not installed yet. Please visit wiki: https://wiki.archlinux.jp/index.php/Yaourt"
+    if ! has yay; then
+      warn "yay has not installed yet."
       exit 1
     fi
 
     ADD_APP_ARCH="task"
 
-    info "yaourt update"
-    yaourt -Syua --noconfirm
+    info "yay update"
+    yay -Syu --noconfirm
 
-    info "yaourt -S $LIST_OF_APPS & $ADD_APP_ARCH"
-    yaourt -S --needed $LIST_OF_APPS
-    yaourt -S --needed $ADD_APP_ARCH
+    info "yay -S $LIST_OF_APPS & $ADD_APP_ARCH"
+    yay -S --needed $LIST_OF_APPS
+    yay -S --needed $ADD_APP_ARCH
 
     if ! has nvim; then
       echo ""
@@ -181,7 +181,7 @@ elif [[ $(uname) = "Linux" ]]; then
       info "Installed neovim!!!"
     fi
 
-    ## Ubuntu / Debian
+  ## Ubuntu / Debian
   elif [ -f /etc/debian_version ] || [ -f /etc/debian_release ]; then
     ADD_APP_DEBIAN="taskwarrior"
 
