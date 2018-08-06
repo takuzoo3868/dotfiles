@@ -11,7 +11,7 @@ let g:vimfiler_as_default_explorer = 1
 nnoremap <silent> fe :<C-u>VimFilerBufferDir -quit<CR>
 
 " Open filer
-noremap <C-e> :<C-u>VimFilerBufferDir -split -winwidth=48 -toggle -no-quit<CR>
+noremap <f2> :<C-u>VimFilerBufferDir -split -winwidth=50 -toggle -no-quit<CR>
 
 " Don't let <CR> enter the directory but let it open the directory
 "autocmd FileType vimfiler nmap <buffer> <CR> <Plug>(vimfiler_expand_or_edit)

@@ -184,6 +184,24 @@ if = "!has('nvim')"
 # ==========================================================
 
 [[plugins]]
+# twitter for neovim
+repo = 'lycoris0731/tweet.nvim'
+
+[[plugins]]
+# twitter for vim8
+repo = 'twitvim/twitvim'
+if = "!has('nvim')"
+hook_add = '''
+let twitvim_enable_python3 = 1
+let twitvim_browser_cmd = 'open'
+let twitvim_force_ssl = 1
+let twitvim_count = 100
+nnoremap <Space>tt :FriendsTwitter<CR>
+nnoremap <Space>tp :PosttoTwitter<CR>
+nnoremap <Space>tr :UserTwitter<CR>
+'''
+
+[[plugins]]
 # にゃーん
 repo = 'rtakasuke/vim-neko'
 hook_add = '''

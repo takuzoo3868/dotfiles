@@ -8,6 +8,12 @@ nmap wk <C-w>k
 nmap wh <C-w>h
 nmap wl <C-w>l
 
+nnoremap ss :<C-u>sp<CR>
+nnoremap sv :<C-u>vs<CR>
+
+" ESC
+inoremap jj <ESC>
+
 " Vertical size adjust '<' '>'
 "nnoremap <silent>< <C-w><
 "nnoremap <silent>> <C-w>>
@@ -36,6 +42,14 @@ if has('nvim')
   " Esc to cmd mode
   tnoremap <silent> <ESC> <C-\><C-n>
 endif
+
+" word highlight using [SPACE]
+nnoremap <silent> <Space><Space> "zyiw:let @/ = '\<' . @z . '\>'<CR>:set hlsearch<CR>
+" word highlight replace using [SPACE] [s]
+nmap <Space>s <Space><Space>:%s/<C-r>///g<Left><Left>
+
+" save as superuser
+cmap w!! w !sudo tee > /dev/null %
 
 " c.f. keymap {{{
 " ---------------------------------------------------------

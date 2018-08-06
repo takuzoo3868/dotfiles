@@ -78,6 +78,12 @@ if dein#check_install()
 endif
 " }}}
 
+" ~/.vimrc.localが存在する場合のみ設定を読み込む
+let s:local_vimrc = expand('~/.vimrc.local')
+if filereadable(s:local_vimrc)
+  execute 'source ' . s:local_vimrc
+endif
+
 syntax enable
 filetype plugin indent on
 

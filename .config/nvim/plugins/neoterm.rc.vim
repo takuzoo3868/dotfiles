@@ -13,5 +13,5 @@ vnoremap <silent> ,rl :TREPLSendSelection<cr>
 " kills the current job (send a <c-c>)
 "nnoremap <silent> ,tc :call neoterm#kill()<cr>
 
-nnoremap <silent> tt :Ttoggle<cr>
+nnoremap <silent> tt :Tnew<cr>
 "nnoremap <silent> vs :terminal<cr>

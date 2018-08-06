@@ -71,7 +71,7 @@ set whichwrap=b,s,h,l,<,>,[,],~
 set timeout
 set timeoutlen=1000
 " キーコード受付時間
-set ttimeoutlen=300
+set ttimeoutlen=200
 
 " 不要なデフォルトプラグインを停止
 let g:loaded_gzip              = 1
