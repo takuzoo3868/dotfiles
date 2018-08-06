@@ -141,5 +141,3 @@ fi
 if [ -e "${HOME}/.bashrc_local" ]; then
   source "${HOME}/.bashrc_local"
 fi
-
-
