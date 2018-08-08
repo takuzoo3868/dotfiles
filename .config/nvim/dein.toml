@@ -183,9 +183,9 @@ if = "!has('nvim')"
 # other
 # ==========================================================
 
-[[plugins]]
-# twitter for neovim
-repo = 'lycoris0731/tweet.nvim'
+#[[plugins]]
+## twitter for neovim
+#repo = 'lycoris0731/tweet.nvim'
 
 [[plugins]]
 # twitter for vim8
