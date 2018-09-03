@@ -210,7 +210,13 @@ elif [[ $(uname) = "Darwin" ]]; then
   ADD_APP_MAC="task trash"
 
   info "xcode-select --install"
-  xcode-select --install
+  touch /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress;
+  PROD=$(softwareupdate -l |
+    grep "\*.*Command Line" |
+    head -n 1 | awk -F"*" '{print $2}' |
+    sed -e 's/^ *//' |
+    tr -d '\n')
+  softwareupdate -i "$PROD" -v;
 
   if ! hash brew 2> /dev/null; then
     info "Homebrew"
