@@ -49,7 +49,7 @@ nnoremap <silent> <Space><Space> "zyiw:let @/ = '\<' . @z . '\>'<CR>:set hlsearc
 nmap <Space>s <Space><Space>:%s/<C-r>///g<Left><Left>
 
 " save as superuser
-cmap w!! w !sudo tee > /dev/null %
+cnoremap w!! w !sudo tee > /dev/null %<CR> :e!<CR>
 
 " c.f. keymap {{{
 " ---------------------------------------------------------
