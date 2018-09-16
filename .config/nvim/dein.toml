@@ -7,16 +7,15 @@
 # プラグイン管理
 repo = 'Shougo/dein.vim'
 
-# ==========================================================
-# filer
-# ==========================================================
-
 [[plugins]]
-# 統合インターフェース
 repo = 'Shougo/unite.vim'
 hook_add = '''
 nnoremap <silent> fb :<C-u>Unite buffer<CR>
 '''
+
+[[plugins]]
+repo = 'osyo-manga/unite-quickfix'
+depends = 'unite.vim'
 
 [[plugins]]
 repo = 'Shougo/vimfiler.vim'
@@ -94,6 +93,12 @@ source ~/.config/nvim/plugins/vimshell.rc.vim
 
 [[plugins]]
 repo = 'thinca/vim-quickrun'
+hook_add = '''
+source ~/.config/nvim/plugins/quickrun.rc.vim
+'''
+
+[[plugins]]
+repo = 'osyo-manga/shabadou.vim'
 
 # ==========================================================
 # colorscheme
@@ -165,6 +170,18 @@ if !has('nvim')
 endif
 let g:taboo_tab_format=' t%N %f%m '
 let g:taboo_tabline = 0
+'''
+
+# ==========================================================
+# Git
+# ==========================================================
+
+[[plugins]]
+repo = 'airblade/vim-gitgutter'
+hook_add = '''
+let g:gitgutter_sign_added = '+'
+let g:gitgutter_sign_modified = '*'
+let g:gitgutter_sign_removed = '-'
 '''
 
 # ==========================================================

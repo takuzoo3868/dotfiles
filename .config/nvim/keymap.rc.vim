@@ -2,6 +2,9 @@
 "nnoremap ; :
 "nnoremap : ;
 
+nnoremap j gj
+nnoremap k gk
+
 " change display mapping
 nmap wj <C-w>j
 nmap wk <C-w>k
@@ -47,6 +50,8 @@ endif
 nnoremap <silent> <Space><Space> "zyiw:let @/ = '\<' . @z . '\>'<CR>:set hlsearch<CR>
 " word highlight replace using [SPACE] [s]
 nmap <Space>s <Space><Space>:%s/<C-r>///g<Left><Left>
+" word highlight off
+nmap <silent> <Esc><Esc> :nohlsearch<CR>
 
 " save as superuser
 cnoremap w!! w !sudo tee > /dev/null %<CR> :e!<CR>

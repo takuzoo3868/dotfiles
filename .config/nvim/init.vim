@@ -43,15 +43,7 @@ endif
 " プラグイン読み込み＆キャッシュ作成
 if dein#load_state(s:dein_dir)
   " vimprocのビルド
-  call dein#add('Shougo/vimproc.vim', {
-        \ 'build': {
-        \     'windows' : 'tools\\update-dll-mingw',
-        \     'cygwin'  : 'make -f make_cygwin.mak',
-        \     'mac'     : 'make -f make_mac.mak',
-        \     'linux'   : 'make',
-        \     'unix'    : 'gmake',
-        \    },
-        \ })
+  call dein#add('Shougo/vimproc.vim', {'build' : 'make'})
 
   " toml読み込み
   call dein#begin(s:dein_dir)

@@ -1,7 +1,7 @@
 " 起動メッセージ
 augroup InitialMessage
   autocmd!
-  autocmd VimEnter * echo "(U^w^) < enjoy vimming!"
+  autocmd VimEnter * echo "(U^w^) < enjoy vimming! NO MORE emacs!!!"
 augroup END
 
 " 行番号表示

@@ -20,6 +20,21 @@ let g:ale_linters = {
 \   'html': [],
 \}
 
+let g:ale_fixers = {
+\   'c': ['clang-format'],
+\   'cpp': ['clang-format'],
+\   'vue': ['prettier', 'eslint'],
+\   'javascript': ['prettier', 'eslint'],
+\   'typescript': ['prettier', 'eslint'],
+\   'json': ['prettier'],
+\   'css': ['prettier'],
+\   'less': ['prettier'],
+\   'scss': ['prettier'],
+\   'python': ['autopep8'],
+\}
+
+let g:ale_fix_on_save = 1
+
 " Ctrl + kで次の指摘へ、Ctrl + jで前の指摘へ移動
 nmap <silent> <C-k> <Plug>(ale_previous_wrap)
 nmap <silent> <C-j> <Plug>(ale_next_wrap)
