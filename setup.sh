@@ -242,6 +242,7 @@ echo ""
 # Bash
 info "bashrc"
 symlink "$dotfiles/.bashrc" "$HOME/.bashrc"
+symlink "$dotfiles/.bashrc_prompt" "$HOME/.bashrc_prompt"
 
 # Git
 info "gitconfig"

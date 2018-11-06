@@ -141,3 +141,8 @@ fi
 if [ -e "${HOME}/.bashrc_local" ]; then
   source "${HOME}/.bashrc_local"
 fi
+
+### Load bash prompt settings
+if [ -e "${HOME}/.bashrc_prompt" ]; then
+  source "${HOME}/.bashrc_prompt"
+fi
