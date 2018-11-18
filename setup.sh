@@ -137,7 +137,7 @@ echo ""
 info "Installing packages..."
 
 # package list
-LIST_OF_APPS="coreutils bash vim git python tmux curl"
+LIST_OF_APPS="coreutils bash vim git python tmux curl fish"
 
 
 if [ $(uname -o) = "Android" ]; then
@@ -236,40 +236,8 @@ fi
 
 ## create symbolic link
 echo ""
-info "Creating symbolic link..."
+warn "[Deprecated] Creating symbolic link... :RUN symlink.sh "
 echo ""
-
-# Bash
-info "bashrc"
-symlink "$dotfiles/.bashrc" "$HOME/.bashrc"
-symlink "$dotfiles/.bashrc_prompt" "$HOME/.bashrc_prompt"
-
-# Git
-info "gitconfig"
-symlink "$dotfiles/.gitconfig" "$HOME/.gitconfig"
-symlink "$dotfiles/.gitignore_global" "$HOME/.gitignore_global"
-symlink "$dotfiles/.gitmessage" "$HOME/.gitmessage"
-mkdir -p $HOME/.git_template/hooks
-
-# Vim
-info "vimrc"
-symlink "$dotfiles/.vimrc" "$HOME/.vimrc"
-
-# Neovim
-info "config about neovim"
-symlink "$dotfiles/.config/nvim" "$HOME/.config/nvim"
-
-# Nyaovim
-info "config about nyaovim"
-symlink "$dotfiles/.config/nyaovim" "$HOME/.config/nyaovim"
-
-# Tmux
-info "tmux.conf"
-symlink "$dotfiles/.config/tmux/.tmux.conf" "$HOME/.tmux.conf"
-
-# Powerline
-info "config about powerline"
-symlink "$dotfiles/.config/powerline" "$HOME/.config/powerline"
 
 echo ""
 info "Installation completed."

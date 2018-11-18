@@ -1,15 +1,13 @@
 #!/usr/bin/env bash
 
 # Author: takuzoo3868
-# Last Modified: 24 Oct 2017.
+# Last Modified: 19 Nov 2018.
+
 
 set -euo pipefail
-
-# set dotfiles path
 dotfiles=$HOME/.dotfiles
 
 
-# use colors on terminal
 tput=$(which tput)
 if [ -n "$tput" ]; then
   ncolors=$($tput colors)
@@ -31,8 +29,6 @@ else
 fi
 
 
-### functions
-# info: output terminal green
 info() { 
   printf "${GREEN}"
   echo -n "  info  "
@@ -40,40 +36,12 @@ info() {
   echo "$1"
 }
 
-# error: output terminal red
-error() {
-  printf "${RED}"
-  echo -n "  error "
-  printf "${NORMAL}"
-  echo "$1"
-}
 
-# warn: output terminal yellow
-warn() {
-  printf "${YELLOW}"
-  echo -n "  warn  "
-  printf "${NORMAL}"
-  echo "$1"
-}
-
-# log: out put termial normal
-log() { 
-  echo "  $1" 
-}
-
-
-# fix sed command diff between GNU & BSD
-if sed --version 2>/dev/null | grep -q GNU; then
-  alias sedi='sed -i '
-else
-  alias sedi='sed -i "" '
-fi
-
-
-# create symlink
 symlink() {
   [ -e "$2" ] || ln -sf "$1" "$2"
 }
+
+
 ## create symbolic link
 echo ""
 info "Creating symbolic link..."
@@ -83,6 +51,12 @@ echo ""
 info "bashrc"
 symlink "$dotfiles/.bashrc" "$HOME/.bashrc"
 symlink "$dotfiles/.bashrc_prompt" "$HOME/.bashrc_prompt"
+
+# fish
+info "fish"
+symlink "$dotfiles/.config/fish/config.fish" "$HOME/.config/fish/config.fish"
+symlink "$dotfiles/.config/fish/fishfile" "$HOME/.config/fish/fishfile"
+symlink "$dotfiles/.config/fish/functions/fish_greeting.fish" "$HOME/.config/fish/functions/fish_greeting.fish"
 
 # Git
 info "gitconfig"
@@ -98,3 +72,12 @@ symlink "$dotfiles/.vimrc" "$HOME/.vimrc"
 # Neovim
 info "config about neovim"
 symlink "$dotfiles/.config/nvim" "$HOME/.config/nvim"
+
+# Nyaovim
+info "config about nyaovim"
+symlink "$dotfiles/.config/nyaovim" "$HOME/.config/nyaovim"
+
+# Tmux
+info "tmux.conf"
+symlink "$dotfiles/.config/tmux/.tmux.conf" "$HOME/.tmux.conf"
+symlink "$dotfiles/.config/tmux/.tmux.conf.local" "$HOME/.tmux.conf.local"

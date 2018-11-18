@@ -146,3 +146,6 @@ fi
 if [ -e "${HOME}/.bashrc_prompt" ]; then
   source "${HOME}/.bashrc_prompt"
 fi
+
+### USE fish as default shell
+#exec fish
