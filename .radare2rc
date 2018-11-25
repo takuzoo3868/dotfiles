@@ -1,0 +1,12 @@
+e scr.utf8 = true
+e scr.utf8.curvy = true
+eco lima
+
+# Show comments at right of disassembly if they fit in screen
+e asm.cmt.right=true
+
+# Shows pseudocode in disassembly. Eg mov eax, str.ok = > eax = str.ok
+e asm.pseudo = true
+
+# Change decompile command to r2dec
+e cmd.pdc = pdd
