@@ -1,8 +1,6 @@
 #!/bin/sh
-
-###
+#
 # Copy and rename the file on home directory
-###
 
 backupDotFiles () {
   TARGET_FILE_NAME=$HOME/$1

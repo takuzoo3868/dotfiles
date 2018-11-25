@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # Powerline Extra Symbols (37 icons, 3 aliases)
 # Codepoints: E0A0-E0A3 E0B0-E0BF E0C0-E0C8 E0CC-E0CF E0D0-E0D2 E0D4
 test -n "$__i_ple_loaded" && return || __i_ple_loaded=1
@@ -33,7 +34,7 @@ i='' i_ple_pixelated_squares_small_mirrored=$i
 i='' i_ple_pixelated_squares_big=$i
 i='' i_ple_pixelated_squares_big_mirrored=$i
 i='' i_ple_ice_waveform=$i
-#i='' i_ple_ice_waveform_mirrored=$i # @todo: missing from Nerd Fonts
+i='' i_ple_ice_waveform_mirrored=$i
 i='' i_ple_honeycomb=$i
 i='' i_ple_honeycomb_outline=$i
 i='' i_ple_lego_separator=$i

@@ -1,9 +1,0 @@
-#!/bin/sh
-
-echo -n "Input project directry PATH : "
-read PROJECT_PATH
-cd ~/$PROJECT_PATH
- 
-# Copy scripts to hooks
-git init
-

@@ -1,5 +1,8 @@
-# Seti-UI + Custom (50 icons, 6 aliases)
-# Codepoints: E5FA-E62B
+#!/usr/bin/env bash
+# Seti-UI + Custom (53 icons, 6 aliases)
+# Codepoints: E5FA-E62E
+# Nerd Fonts Version: 2.0.0
+# Script Version: 1.1.0
 test -n "$__i_seti_loaded" && return || __i_seti_loaded=1
 i='' i_custom_folder_npm=$i
 i='' i_custom_folder_git=$i
@@ -57,4 +60,7 @@ i='' i_seti_typescript=$i
 i='' i_custom_msdos=$i
 i='' i_custom_windows=$i
 i='' i_custom_vim=$i
+i='' i_custom_elm=$i
+i='' i_custom_elixir=$i
+i='' i_custom_electron=$i
 unset i
