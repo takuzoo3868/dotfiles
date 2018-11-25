@@ -1,0 +1,7 @@
+# go --> GOPATH --> ghq,peco,hub --> alias
+# python --> tmuxp --> alias mux
+# weechat install scripts go,iset,buffer_autoset,emoji_aliases,
+
+# to rc local
+# export PATH="$HOME/.local/bin:$PATH"
+# export PATH="/opt/local/bin:/opt/local/sbin:$PATH"

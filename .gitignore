@@ -1,8 +1,9 @@
 # Local config files
-.bashrc_tmp
+.bashrc_local
 .config/fonts/**
 
 # IntelliJ project files
 .idea
+.vscode
 out
 gen

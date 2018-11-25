@@ -3,14 +3,10 @@
 # Author: takuzoo3868
 # Last Modified: 24 Oct 2017.
 
-# If you use termux on Android, try this.
-#/data/data/com.termux/files/usr/bin/bash
-
 set -euo pipefail
 
 # set dotfiles path
 dotfiles=$HOME/.dotfiles
-
 
 # use colors on terminal
 tput=$(which tput)
@@ -42,7 +38,6 @@ info() {
   printf "${NORMAL}"
   echo "$1"
 }
-
 # error: output terminal red
 error() {
   printf "${RED}"
@@ -50,7 +45,6 @@ error() {
   printf "${NORMAL}"
   echo "$1"
 }
-
 # warn: output terminal yellow
 warn() {
   printf "${YELLOW}"
@@ -58,7 +52,6 @@ warn() {
   printf "${NORMAL}"
   echo "$1"
 }
-
 # log: out put termial normal
 log() { 
   echo "  $1" 
@@ -99,6 +92,7 @@ dotfiles_logo='
 1. Download my dotfiles from https://github.com/takuzoo3868/dotfiles
 2. Symlinking dotfiles to your home directory
 3. Install packages
+   [coreutils bash vim git python tmux curl fish]
 
 *** HOW TO INSTALL? ***
 See the README for documentation.
@@ -112,6 +106,8 @@ printf "${NORMAL}"
 log "*** ATTENTION ***"
 log "This script can change your entire setup."
 log "I recommend to read first. You can even copy commands one by one."
+log "If you use termux on Android, try this."
+log "$ /data/data/com.termux/files/usr/bin/bash"
 echo ""
 read -p "$(warn '(U^w^) < Are you sure you want to install it? [y/N] ')" -n 1 -r
 
@@ -128,6 +124,7 @@ info "Start install the dotfiles."
 if [ ! -d "$dotfiles" ]; then
   info "Installing dotfiles for the first time..."
   git clone git@github.com:takuzoo3868/dotfiles.git "$dotfiles"
+  info "The dofiles is installed!!!"
 else
   info "The dofiles is already installed!!!"
 fi
@@ -137,7 +134,7 @@ echo ""
 info "Installing packages..."
 
 # package list
-LIST_OF_APPS="coreutils bash vim git python tmux curl fish"
+LIST_OF_APPS="coreutils bash vim git python tmux curl openssh fish"
 
 
 if [ $(uname -o) = "Android" ]; then
@@ -162,10 +159,11 @@ elif [[ $(uname) = "Linux" ]]; then
   if [ -f /etc/arch-release ]; then
     if ! has yay; then
       warn "yay has not installed yet."
-      exit 1
+      git clone https://aur.archlinux.org/yay.git
+      cd yay && makepkg -si
     fi
 
-    ADD_APP_ARCH="task"
+    ADD_APP_ARCH="task phq peco hub sakura fzf p7zip neovim python2-neovim python-neovim llvm baobab radare2 weechat ranger"
 
     info "yay update"
     yay -Syu --noconfirm
@@ -173,13 +171,6 @@ elif [[ $(uname) = "Linux" ]]; then
     info "yay -S $LIST_OF_APPS & $ADD_APP_ARCH"
     yay -S --needed $LIST_OF_APPS
     yay -S --needed $ADD_APP_ARCH
-
-    if ! has nvim; then
-      echo ""
-      info "Hasnt installed neovim yet. installing..."
-      sudo pacman -S neovim
-      info "Installed neovim!!!"
-    fi
 
   ## Ubuntu / Debian
   elif [ -f /etc/debian_version ] || [ -f /etc/debian_release ]; then
@@ -207,7 +198,7 @@ elif [[ $(uname) = "Linux" ]]; then
   fi
 
 elif [[ $(uname) = "Darwin" ]]; then
-  ADD_APP_MAC="task trash"
+  ADD_APP_MAC="task trash exiftool peco screenfetch neovim wget bat binutils p7zip tree llvm ranger"
 
   info "xcode-select --install"
   touch /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress;
@@ -219,8 +210,10 @@ elif [[ $(uname) = "Darwin" ]]; then
   softwareupdate -i "$PROD" -v;
 
   if ! hash brew 2> /dev/null; then
-    info "Homebrew"
+    info "Homebrew is not instaled!!!"
     /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+    brew tap caskroom/cask
+    brew cask --version
   fi
 
   info "brew install $LIST_OF_APPS & $ADD_APP_MAC"
@@ -236,7 +229,7 @@ fi
 
 ## create symbolic link
 echo ""
-warn "[Deprecated] Creating symbolic link... :RUN symlink.sh "
+warn "[Deprecated] RUN symlink.sh "
 echo ""
 
 echo ""

@@ -45,6 +45,7 @@ symlink() {
 ## create symbolic link
 echo ""
 info "Creating symbolic link..."
+symlink "$dotfiles/symlink" "$HOME/.local/bin/symlink"
 echo ""
 
 # Bash
@@ -56,13 +57,16 @@ symlink "$dotfiles/.bashrc_prompt" "$HOME/.bashrc_prompt"
 info "fish"
 symlink "$dotfiles/.config/fish/config.fish" "$HOME/.config/fish/config.fish"
 symlink "$dotfiles/.config/fish/fishfile" "$HOME/.config/fish/fishfile"
-symlink "$dotfiles/.config/fish/functions/fish_greeting.fish" "$HOME/.config/fish/functions/fish_greeting.fish"
+for i in $dotfiles/.config/fish/functions/*.fish
+do
+  ln -sf $i $HOME/.config/fish/functions/
+done
 
 # Git
 info "gitconfig"
-symlink "$dotfiles/.gitconfig" "$HOME/.gitconfig"
-symlink "$dotfiles/.gitignore_global" "$HOME/.gitignore_global"
-symlink "$dotfiles/.gitmessage" "$HOME/.gitmessage"
+symlink "$dotfiles/.config/git/.gitconfig" "$HOME/.gitconfig"
+symlink "$dotfiles/.config/git/.gitignore_global" "$HOME/.gitignore_global"
+symlink "$dotfiles/.config/git/.gitmessage" "$HOME/.gitmessage"
 mkdir -p $HOME/.git_template/hooks
 
 # Vim
@@ -70,14 +74,45 @@ info "vimrc"
 symlink "$dotfiles/.vimrc" "$HOME/.vimrc"
 
 # Neovim
-info "config about neovim"
+info "neovim"
 symlink "$dotfiles/.config/nvim" "$HOME/.config/nvim"
 
 # Nyaovim
-info "config about nyaovim"
+info "nyaovim"
 symlink "$dotfiles/.config/nyaovim" "$HOME/.config/nyaovim"
 
 # Tmux
 info "tmux.conf"
+if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
+  git clone https://github.com/tmux-plugins/tpm $HOME/.tmux/plugins/tpm
+fi
 symlink "$dotfiles/.config/tmux/.tmux.conf" "$HOME/.tmux.conf"
-symlink "$dotfiles/.config/tmux/.tmux.conf.local" "$HOME/.tmux.conf.local"
+symlink "$dotfiles/.config/tmux/.tmux_local.conf" "$HOME/.tmux_local.conf"
+symlink "$dotfiles/.config/tmux/bin" "$HOME/.tmux/bin"
+symlink "$dotfiles/.config/tmux/work.yaml" "$HOME/.tmux/work.yaml"
+
+# radare2
+info "radare2"
+symlink "$dotfiles/.radare2rc" "$HOME/.radare2rc"
+
+# ranger
+info "ranger"
+symlink "$dotfiles/.config/ranger/rc.conf" "$HOME/.config/ranger/rc.conf"
+
+# weechat
+info "weechat"
+for i in $dotfiles/.weechat/*.conf
+do
+  ln -sf $i $HOME/.weechat/
+done
+
+# local binary
+info "binary"
+info "NEED:"
+info 'export PATH="$HOME/.local/bin:$PATH'
+info 'export PATH="/opt/local/bin:/opt/local/sbin:$PATH"'
+for i in $dotfiles/bin/*
+do
+  ln -sf $i $HOME/.local/bin/
+done
+
