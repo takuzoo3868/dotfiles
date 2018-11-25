@@ -126,6 +126,9 @@ source ~/.config/nvim/plugins/hybrid.rc.vim
 [[plugins]]
 repo = 'vim-scripts/Wombat'
 
+[[plugins]]
+repo = 'cocopon/colorswatch.vim'
+
 # ==========================================================
 # airline
 # ==========================================================
