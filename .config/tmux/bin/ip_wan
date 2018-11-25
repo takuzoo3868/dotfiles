@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+#
+# Author: takuzoo3868
+# Last Modified: 25 Nov 2018.
+
+# Check OS
+ostype() { echo $OSTYPE | tr '[A-Z]' '[a-z]'; }
+
+export SHELL_PLATFORM='unknown'
+
+case "$(ostype)" in
+	*'linux'*	) SHELL_PLATFORM='linux'	;;
+	*'darwin'*	) SHELL_PLATFORM='osx'		;;
+	*'bsd'*		) SHELL_PLATFORM='bsd'		;;
+esac
+
+shell_is_linux() { [[ $SHELL_PLATFORM == 'linux' || $SHELL_PLATFORM == 'bsd' ]]; }
+shell_is_osx()   { [[ $SHELL_PLATFORM == 'osx' ]]; }
+shell_is_bsd()   { [[ $SHELL_PLATFORM == 'bsd' || $SHELL_PLATFORM == 'osx' ]]; }
+
+export -f shell_is_linux
+export -f shell_is_osx
+export -f shell_is_bsd
+
+# Path tmp file
+export DIR_TEMPORARY="/tmp/tmux-weather_${USER}"
+if [ ! -d "$DIR_TEMPORARY" ]; then
+	mkdir -p "$DIR_TEMPORARY"
+fi
+
+__run_wan() {
+	local tmp_file="${DIR_TEMPORARY}/wan_ip.txt"
+	local wan_ip
+
+	if [ -f "$tmp_file" ]; then
+		if shell_is_osx || shell_is_bsd; then
+			stat >/dev/null 2>&1 && is_gnu_stat=false || is_gnu_stat=true
+			if [ "$is_gnu_stat" == "true" ];then
+				last_update=$(stat -c "%Y" ${tmp_file})
+			else
+				last_update=$(stat -f "%m" ${tmp_file})
+			fi
+		elif shell_is_linux || [ -z $is_gnu_stat]; then
+			last_update=$(stat -c "%Y" ${tmp_file})
+		fi
+
+		time_now=$(date +%s)
+		update_period=900
+		up_to_date=$(echo "(${time_now}-${last_update}) < ${update_period}" | bc)
+
+		if [ "$up_to_date" -eq 1 ]; then
+			wan_ip=$(cat ${tmp_file})
+		fi
+	fi
+
+	if [ -z "$wan_ip" ]; then
+		wan_ip=$(curl --max-time 2 -s http://whatismyip.akamai.com/)
+
+		if [ "$?" -eq "0" ]; then
+			echo "${wan_ip}" > $tmp_file
+		elif [ -f "${tmp_file}" ]; then
+			wan_ip=$(cat "$tmp_file")
+		fi
+	fi
+
+	if [ -n "$wan_ip" ]; then
+		echo "ⓦ ${wan_ip}"
+	fi
+
+	return 0
+}
+
+__run_wan

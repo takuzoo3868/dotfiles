@@ -1,0 +1,21 @@
+tmux_options: -2
+session_name: benQ
+root: ~/
+
+windows:
+- window_name: main
+  layout: 86f2,151x37,0,0{84x37,0,0[84x22,0,0,2,84x14,0,23,6],66x37,85,0[66x10,85,0,3,66x26,85,11,4]}
+  panes:
+    - screenfetch
+    - gotop -c solarized -m
+    - ranger
+    - mpsyt pl PLBFICLTzW2LckbdM1Ri6BBfpeSPwRYzXe
+- window_name: chat
+  panes:
+    - weechat
+- window_name: work
+  focus: true
+  layout: cab4,151x37,0,0{92x37,0,0,6,58x37,93,0,7}
+  panes:
+    - nvim ~/.bashrc
+    - pane
