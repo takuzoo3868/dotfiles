@@ -101,16 +101,13 @@ symlink "$dotfiles/.config/ranger/rc.conf" "$HOME/.config/ranger/rc.conf"
 
 # weechat
 info "weechat"
-for i in $dotfiles/.weechat/*.conf
-do
-  ln -sf $i $HOME/.weechat/
-done
+echo "  see install sheet. --> doc/weechat.md"
 
 # local binary
 info "binary"
-info "NEED:"
-info 'export PATH="$HOME/.local/bin:$PATH'
-info 'export PATH="/opt/local/bin:/opt/local/sbin:$PATH"'
+echo "  add in bashrc"
+echo '  export PATH="$HOME/.local/bin:$PATH'
+echo '  export PATH="/opt/local/bin:/opt/local/sbin:$PATH"'
 for i in $dotfiles/bin/*
 do
   ln -sf $i $HOME/.local/bin/

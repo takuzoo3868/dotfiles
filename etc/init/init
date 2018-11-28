@@ -65,6 +65,11 @@ else
   alias sedi='sed -i "" '
 fi
 
+# check package & return flag
+is_exists() {
+    which "$1" >/dev/null 2>&1
+    return $?
+}
 
 # check package
 has() {
@@ -79,6 +84,8 @@ symlink() {
 
 
 ### Start install script
+
+DOTFILES_GITHUB="https://github.com/takuzoo3868/dotfiles.git"
 
 dotfiles_logo='
 ██████╗  ██████╗ ████████╗███████╗██╗██╗     ███████╗███████╗
@@ -122,9 +129,32 @@ echo ""
 info "Start install the dotfiles."
 
 if [ ! -d "$dotfiles" ]; then
-  info "Installing dotfiles for the first time..."
-  git clone git@github.com:takuzoo3868/dotfiles.git "$dotfiles"
-  info "The dofiles is installed!!!"
+  if is_exists "git"; then
+    info "Installing dotfiles for the first time..."
+    git clone "$DOTFILES_GITHUB" "$dotfiles"
+    info "The dofiles is installed!!!"
+
+  elif is_exists "curl" || is_exists "wget"; then
+    local zip_url="https://github.com/takuzoo3868/dotfiles/archive/master.zip"
+
+    if is_exists "curl"; then
+      curl -L "$zip_url"
+
+    elif is_exists "wget"; then
+      wget -O - "$zip_url"
+    fi | tar xvz
+    
+    if [ ! -d dotfiles-master ]; then
+      error "dotfiles-master: not found"
+      exit 1
+    fi
+    mv -f dotfiles-master "$dotfiles"
+    info "The dofiles is installed!!!"
+
+  else
+    error "curl or wget required"
+    exit 1
+  fi
 else
   info "The dofiles is already installed!!!"
 fi
