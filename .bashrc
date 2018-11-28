@@ -31,8 +31,8 @@ HISTCONTROL=ignoreboth
 shopt -s histappend
 
 ### for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-HISTSIZE=1000
-HISTFILESIZE=2000
+HISTSIZE=3000
+HISTFILESIZE=5000
 
 ### check the window size after each command and, if necessary,
 ### update the values of LINES and COLUMNS.
@@ -115,7 +115,7 @@ alias la='ls -A --color=auto'
 alias l='ls -CF --color=auto'
 ;;
 darwin*)
-alias ll='ls -alFG'
+alias ll='ls -alFG --color=auto'
 alias la='ls -AG'
 alias l='ls -CFG'
 ;;
