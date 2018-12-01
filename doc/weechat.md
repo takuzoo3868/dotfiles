@@ -1,7 +1,7 @@
 # init weechat sheet
 
 ```
-/set buffers.look.indenting on
+/set irc.look.server_buffer independent
 /set irc.look.new_channel_position near_server
 /set irc.look.new_pv_position near_server
 /set weechat.look.save_layout_on_exit all

@@ -1,6 +1,10 @@
 # Local config files
 .bashrc_local
-.config/fonts/**
+
+# Local font
+**/*.otf
+**/*.ttf
+**/*.sfd
 
 # IntelliJ project files
 .idea

@@ -55,6 +55,7 @@ symlink "$dotfiles/.bashrc_prompt" "$HOME/.bashrc_prompt"
 
 # fish
 info "fish"
+mkdir -p $HOME/.config/fish/functions
 symlink "$dotfiles/.config/fish/config.fish" "$HOME/.config/fish/config.fish"
 symlink "$dotfiles/.config/fish/fishfile" "$HOME/.config/fish/fishfile"
 for i in $dotfiles/.config/fish/functions/*.fish
@@ -97,6 +98,7 @@ symlink "$dotfiles/.radare2rc" "$HOME/.radare2rc"
 
 # ranger
 info "ranger"
+mkdir -p $HOME/.config/ranger
 symlink "$dotfiles/.config/ranger/rc.conf" "$HOME/.config/ranger/rc.conf"
 
 # weechat
@@ -105,7 +107,6 @@ echo "  see install sheet. --> doc/weechat.md"
 
 # local binary
 info "binary"
-echo "  add in bashrc"
 echo '  export PATH="$HOME/.local/bin:$PATH'
 echo '  export PATH="/opt/local/bin:/opt/local/sbin:$PATH"'
 for i in $dotfiles/bin/*
