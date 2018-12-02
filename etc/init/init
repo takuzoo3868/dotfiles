@@ -164,7 +164,7 @@ echo ""
 info "Installing packages..."
 
 # package list
-LIST_OF_APPS="coreutils bash vim git python tmux curl openssh fish"
+LIST_OF_APPS="coreutils bash vim git python tmux curl fish"
 
 
 if [ $(uname -o) = "Android" ]; then
@@ -193,7 +193,7 @@ elif [[ $(uname) = "Linux" ]]; then
       cd yay && makepkg -si
     fi
 
-    ADD_APP_ARCH="task phq peco hub sakura fzf p7zip neovim python2-neovim python-neovim llvm baobab radare2 weechat ranger"
+    ADD_APP_ARCH="phq peco hub sakura fzf p7zip neovim python2-neovim python-neovim llvm baobab radare2 weechat ranger"
 
     info "yay update"
     yay -Syu --noconfirm
@@ -204,7 +204,7 @@ elif [[ $(uname) = "Linux" ]]; then
 
   ## Ubuntu / Debian
   elif [ -f /etc/debian_version ] || [ -f /etc/debian_release ]; then
-    ADD_APP_DEBIAN="taskwarrior"
+    ADD_APP_DEBIAN="openssh-server"
 
     info "sudo apt update"
     sudo apt update -q
