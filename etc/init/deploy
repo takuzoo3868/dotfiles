@@ -45,7 +45,7 @@ symlink() {
 ## create symbolic link
 echo ""
 info "Creating symbolic link..."
-symlink "$dotfiles/symlink" "$HOME/.local/bin/symlink"
+symlink "$dotfiles/etc/init/deploy" "$HOME/.local/bin/deploy"
 echo ""
 
 # Bash
