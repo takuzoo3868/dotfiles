@@ -1,6 +1,37 @@
 #!/usr/bin/env bash
+
+# Author: takuzoo3868
+# Last Modified: 07 Dec 2018.
+
+# Check Nerd fonts drawing on terminal.
 # Nerd Fonts Version: 2.0.0
 # Script Version: 1.0.0
+
+PROGNAME=$(basename $0)
+VERSION="1.0.0"
+
+
+usage() {
+  echo "usage: ${PROGNAME} [--font_option]"
+  echo ""
+  echo "Check Nerd fonts v.2.0.0 drawing on terminal."
+  echo ""
+  echo "optional arguments:"
+  echo "  -h, --help            show this help message and exit"
+  echo "  --dev                 Font Devicon"
+  echo "  --fa                  Font Awesome"
+  echo "  --fae                 Font Awesome Extension"
+  echo "  --iec                 IEC Power Symbols"
+  echo "  --linux, --fontlogos  Font Linux and other open source Glyphs"
+  echo "  --material, --mdi     Material Design Icon"
+  echo "  --oct                 Octicons"
+  echo "  --pl                  Powerline"
+  echo "  --ple                 Powerline Extra"
+  echo "  --pom                 Pomicon"
+  echo "  --seti                Seti-UI + Custom"
+  echo "  --weather             Weather Icons"
+  exit 1
+}
 
 # Given an array of decimal numbers print all unicode codepoint.
 function print-decimal-unicode-range() {
@@ -107,55 +138,94 @@ function print-unicode-ranges() {
 
 }
 
-function test-fonts() {
-  echo "Nerd Fonts - Pomicons"
-  #print-unicode-ranges e000 e00d
-  echo; echo
 
-  echo "Nerd Fonts - Powerline"
-  #print-unicode-ranges e0a0 e0a2 e0b0 e0b3
-  echo; echo
+for OPT in "$@"
+do
+  case $OPT in
+    '-h' | '--help' )
+      usage
+      ;;
 
-  echo "Nerd Fonts - Powerline Extra"
-  #print-unicode-ranges e0a3 e0a3 e0b4 e0c8 e0cc e0d2 e0d4 e0d4
-  echo; echo
+    '--dev' )
+      echo "Nerd Fonts - Devicons"
+      print-unicode-ranges e700 e7c5
+      echo; echo
+      ;;
 
-  echo "Nerd Fonts - Symbols original"
-  #print-unicode-ranges e5fa e62b
-  echo; echo
+    '--fa' )
+      echo "Nerd Fonts - Font awesome" 
+      print-unicode-ranges f000 f2e0
+      echo; echo
+      ;;
 
-  echo "Nerd Fonts - Devicons"
-  #print-unicode-ranges e700 e7c5
-  echo; echo
+    '--fae' )
+      echo "Nerd Fonts - Font awesome extension" 
+      print-unicode-ranges e200 e2a9
+      echo; echo
+      ;;
 
-  echo "Nerd Fonts - Font awesome"
-  #print-unicode-ranges f000 f2e0
-  echo; echo
+    '--ice' )
+      echo "Nerd Fonts - Font Power Symbols"
+      print-unicode-ranges 23fb 23fe 2b58 2b58
+      echo; echo
+      ;;
 
-  echo "Nerd Fonts - Font awesome extension"
-  #print-unicode-ranges e200 e2a9
-  echo; echo
+    '--linux' | '--fontlogos')
+      echo "Nerd Fonts - Font Linux"
+      print-unicode-ranges f300 f31c
+      echo; echo
+      ;;
 
-  echo "Nerd Fonts - Octicons"
-  #print-unicode-ranges f400 f4a8 2665 2665 26A1 26A1 f27c f27c
-  echo; echo
+    '--material' | '--mdi')
+      echo "Nerd Fonts - Material Design Icons"
+      print-unicode-ranges f500 fd46
+      echo; echo
+      ;;
 
-  echo "Nerd Fonts - Font Linux"
-  #print-unicode-ranges f300 f313
-  echo; echo
+    '--oct' )
+      echo "Nerd Fonts - Octicons"
+      print-unicode-ranges 2665 2665 26A1 26A1 f400 f4a8 f67c f67c
+      echo; echo
+      ;;
 
-  echo "Nerd Fonts - Font Power Symbols"
-  #print-unicode-ranges 23fb 23fe 2b58 2b58
-  echo; echo
+    '--pl' )
+      echo "Nerd Fonts - Powerline"
+      print-unicode-ranges e0a0 e0a2 e0b0 e0b3
+      echo; echo
+      ;;
 
-  echo "Nerd Fonts - Material Design Icons"
-  print-unicode-ranges f500 fd46
-  echo; echo
+    '--ple' )
+      echo "Nerd Fonts - Powerline Extra"
+      print-unicode-ranges e0a3 e0a3 e0b4 e0c8 e0cc e0d2 e0d4 e0d4
+      echo; echo
+      ;;
 
-  echo "Nerd Fonts - All"
-  #print-unicode-ranges e000 e00d e0a0 e0a2 e0b0 e0b3 e0a3 e0a3 e0b4 e0c8 e0cc e0d2 e0d4 e0d4 e5fa e62b e700 e7c5 f000 f2e0 e200 e2a9 f400 f4a8 2665 2665 26A1 26A1 f27c f27c f300 f313 23fb 23fe 2b58 2b58 f500 fd46
+    '--pom' )
+      echo "Nerd Fonts - Pomicons"
+      print-unicode-ranges e000 e00a
+      echo; echo
+      ;;
 
-  echo; echo
-}
+    '--seti' )
+      echo "Nerd Fonts - Symbols original"
+      print-unicode-ranges e5fa e62e
+      echo; echo
+      ;;
 
-test-fonts
+    '--weather' )
+      echo "Nerd Fonts - Weather Icons"
+      print-unicode-ranges e300 e3eb
+      echo; echo
+      ;;
+
+    -*)
+      echo "$PROGNAME: illegal option -- '$(echo $1 | sed 's/^-*//')'" 1>&2
+      exit 1
+      ;;
+
+    *)
+      usage
+      ;;
+  esac
+done
+

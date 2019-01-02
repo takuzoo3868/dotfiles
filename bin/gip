@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+# Author: takuzoo3868
+# Last Modified: 07 Dec 2018.
+
+# Check my global IP
+
+GLOBAL_IP_ADDR=$(curl -s http://myip.enix.org/REMOTE_ADDR)
+
+[ "$GLOBAL_IP_ADDR" ] || {
+  echo "Sorry, I could not figure out my public IP address."
+  echo "(I use http://myip.enix.org/REMOTE_ADDR/ for that purpose.)"
+  exit 1
+}

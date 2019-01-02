@@ -45,6 +45,9 @@ symlink() {
 ## create symbolic link
 echo ""
 info "Creating symbolic link..."
+if [ ! -d "$HOME/.local/bin" ]; then
+  mkdir -p $HOME/.local/bin
+fi
 symlink "$dotfiles/etc/init/deploy" "$HOME/.local/bin/deploy"
 echo ""
 
@@ -55,7 +58,9 @@ symlink "$dotfiles/.bashrc_prompt" "$HOME/.bashrc_prompt"
 
 # fish
 info "fish"
-mkdir -p $HOME/.config/fish/functions
+if [ ! -d "$HOME/.config/fish/functions" ]; then
+  mkdir -p $HOME/.config/fish/functions
+fi
 symlink "$dotfiles/.config/fish/config.fish" "$HOME/.config/fish/config.fish"
 symlink "$dotfiles/.config/fish/fishfile" "$HOME/.config/fish/fishfile"
 for i in $dotfiles/.config/fish/functions/*.fish
@@ -98,7 +103,9 @@ symlink "$dotfiles/.radare2rc" "$HOME/.radare2rc"
 
 # ranger
 info "ranger"
-mkdir -p $HOME/.config/ranger
+if [ ! -d "$HOME/.config/ranger" ]; then
+  mkdir -p $HOME/.config/ranger
+fi
 symlink "$dotfiles/.config/ranger/rc.conf" "$HOME/.config/ranger/rc.conf"
 
 # weechat

@@ -15,7 +15,13 @@
 /set irc.server.0x00sec.autoconnect on
 /set irc.server.0x00sec.autojoin "#0x00sec"
 
-/server add freenode irc.freenode.net/6697
+/server add freenode chat.freenode.net
+/set irc.server.freenode.nicks "tak3z_0o0"
+# /msg nickserv register [password] [email]
+# /msg NickServ VERIFY REGISTER tak3z_0o0 [code]
+/set irc.server.freenode.command "/msg nickserv identify [password]"
+/set irc.server.freenode.autoconnect on
+/set irc.server.0x00sec.autojoin "#dwarffortress"
 
 /script install iset.pl
 /script install buffer_autoset.py

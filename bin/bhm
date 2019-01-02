@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+
+# Author: takuzoo3868
+# Last Modified: 07 Dec 2018.
+
+# Backs up a user's home directory
+
+PROGNAME=$(basename $0)
+VERSION="1.0.0"
+
+
+usage(){
+  echo "usage: ${PROGNAME} --option [argument]"
+  echo ""
+  echo "Back up a user's home directory"
+  echo ""
+  echo "optional arguments:"
+  echo "  --backup    Backs up a user's entire home directory."
+  echo "              Requires the username passed as an argument."
+  echo ""
+  echo "  --restore   Restores a user's home directory from backup."
+  echo "              Requires the username passed as an argument."
+  echo ""
+  echo "  -h, --help  Provides usage information for the script."
+  echo "              Hint: You're reading it :)"
+  exit 1
+}
+
+for OPT in "$@"
+do
+  case $OPT in
+    '--backup' )
+      if [[ -z $2 ]]; then
+	      echo -e "Please specify the username you would like to backup."
+	      echo -e "For usage information, use: --help"
+	      exit 1
+	    fi
+      
+      OUTPUT_DIR="/home/$2/backups/"
+      OUTPUT_FILE="backup-$(date +%Y%m%d).tar.gz"
+
+      echo -e "Backing up $2's home directory, please wait..."
+      
+      if [ ! -d $OUTPUT_DIR ]; then
+        echo -e "Creating backup directory $OUTPUT_DIR..."
+	      mkdir -p $OUTPUT_DIR
+      fi
+
+	    echo -e "Compressing $2's home directory contents..."
+
+	    tar -pzcf $OUTPUT_DIR$OUTPUT_FILE /home/$2/ --exclude "/home/$2/backups"
+
+	    echo -e "Backup completed!"
+	    echo -e ""
+    	echo -e "It is recommended that you copy the compressed backup file, located"
+	    echo -e "in /home/$2/backups, to an external device for safe keeping."
+      ;;
+
+    '--restore' )
+      if [[ -z $2 ]]; then
+        echo -e "Please specify the backup file you would like to restore."
+        echo -e "For usage information, use: --help"
+        exit 1
+      fi
+      
+      echo -e "Sorry, this ability has not yet been implemented."
+      ;;
+
+    '-h' | '--help' )
+      usage
+      ;;
+
+    -*)
+      echo "$PROGNAME: illegal option -- '$(echo $1 | sed 's/^-*//')'" 1>&2
+      exit 1
+      ;;
+
+    *)
+      usage
+      ;;
+  esac
+done
