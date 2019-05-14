@@ -9,9 +9,8 @@ set -euo pipefail
 GIT_CONFIG_FILE=$HOME/.gitconfig.local
 
 if [[ $(uname) = "Linux" ]]; then
-  MY_SSID=$(iwgetid -r)
 
-  if test "${MY_SSID}" = "UECWireless" || test "${MY_SSID}" = "netarch2_5G"; then
+  if [[ $(iwgetid -r) == "UECWireless" ]] || [[ $(iwgetid -r) == "netarch2_5G" ]] || [[ $(uname -n) == "Sco-Alniyat" ]]; then
     export http_proxy=http://proxy.uec.ac.jp:8080/
     export https_proxy=https://proxy.uec.ac.jp:8080/
     export ALL_PROXY=http://proxy.uec.ac.jp:8080/
