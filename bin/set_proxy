@@ -15,8 +15,8 @@ if [[ $(uname) = "Linux" ]]; then
     export http_proxy=http://proxy.uec.ac.jp:8080/
     export https_proxy=https://proxy.uec.ac.jp:8080/
     export ALL_PROXY=http://proxy.uec.ac.jp:8080/
-    git config --file $GIT_CONFIG_FILE http.proxy proxy-server
-    git config --file $GIT_CONFIG_FILE https.proxy proxy-server
+    git config --file $GIT_CONFIG_FILE http.proxy $http_proxy
+    git config --file $GIT_CONFIG_FILE https.proxy $https_proxy
     git config --file $GIT_CONFIG_FILE url."https://".insteadOf git://
     echo "set UEC proxy!!!"
   else
@@ -36,8 +36,8 @@ elif [[ $(uname) = "Darwin" ]]; then
     export http_proxy=http://proxy.uec.ac.jp:8080/
     export https_proxy=https://proxy.uec.ac.jp:8080/
     export ALL_PROXY=http://proxy.uec.ac.jp:8080/
-    git config --file $GIT_CONFIG_FILE http.proxy proxy-server
-    git config --file $GIT_CONFIG_FILE https.proxy proxy-server
+    git config --file $GIT_CONFIG_FILE http.proxy $http_proxy
+    git config --file $GIT_CONFIG_FILE https.proxy $https_proxy
     git config --file $GIT_CONFIG_FILE url."https://".insteadOf git://
     echo "set UEC proxy!!!"
   else
