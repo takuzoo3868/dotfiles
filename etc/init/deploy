@@ -3,49 +3,21 @@
 # Author: takuzoo3868
 # Last Modified: 19 Nov 2018.
 
-
+trap 'echo Error: $0:$LINENO stopped; exit 1' ERR INT
 set -euo pipefail
 dotfiles=$HOME/.dotfiles
 
-
-tput=$(which tput)
-if [ -n "$tput" ]; then
-  ncolors=$($tput colors)
-fi
-if [ -t 1 ] && [ -n "$ncolors" ] && [ "$ncolors" -ge 8 ]; then
-  RED="$(tput setaf 1)"
-  GREEN="$(tput setaf 2)"
-  YELLOW="$(tput setaf 3)"
-  BLUE="$(tput setaf 4)"
-  BOLD="$(tput bold)"
-  NORMAL="$(tput sgr0)"
-else
-  RED=""
-  GREEN=""
-  YELLOW=""
-  BLUE=""
-  BOLD=""
-  NORMAL=""
-fi
-
-
-info() { 
-  printf "${GREEN}"
-  echo -n "  info  "
-  printf "${NORMAL}"
-  echo "$1"
-}
-
-
-symlink() {
-  [ -e "$2" ] || ln -sf "$1" "$2"
-}
+# load lib script (functions)
+. $dotfiles/etc/lib/header.sh
 
 
 ## create symbolic link
 echo ""
 info "Creating symbolic link..."
-symlink "$dotfiles/symlink" "$HOME/.local/bin/symlink"
+if [ ! -d "$HOME/.local/bin" ]; then
+  mkdir -p $HOME/.local/bin
+fi
+symlink "$dotfiles/etc/init/deploy" "$HOME/.local/bin/deploy"
 echo ""
 
 # Bash
@@ -55,7 +27,9 @@ symlink "$dotfiles/.bashrc_prompt" "$HOME/.bashrc_prompt"
 
 # fish
 info "fish"
-mkdir -p $HOME/.config/fish/functions
+if [ ! -d "$HOME/.config/fish/functions" ]; then
+  mkdir -p $HOME/.config/fish/functions
+fi
 symlink "$dotfiles/.config/fish/config.fish" "$HOME/.config/fish/config.fish"
 symlink "$dotfiles/.config/fish/fishfile" "$HOME/.config/fish/fishfile"
 for i in $dotfiles/.config/fish/functions/*.fish
@@ -98,7 +72,9 @@ symlink "$dotfiles/.radare2rc" "$HOME/.radare2rc"
 
 # ranger
 info "ranger"
-mkdir -p $HOME/.config/ranger
+if [ ! -d "$HOME/.config/ranger" ]; then
+  mkdir -p $HOME/.config/ranger
+fi
 symlink "$dotfiles/.config/ranger/rc.conf" "$HOME/.config/ranger/rc.conf"
 
 # weechat
@@ -114,3 +90,5 @@ do
   ln -sf $i $HOME/.local/bin/
 done
 
+echo ""
+info "Installation(deploy) completed."

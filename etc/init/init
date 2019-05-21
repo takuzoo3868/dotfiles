@@ -3,6 +3,7 @@
 # Author: takuzoo3868
 # Last Modified: 24 Oct 2017.
 
+trap 'echo Error: $0:$LINENO stopped; exit 1' ERR INT
 set -euo pipefail
 
 # set dotfiles path
@@ -28,7 +29,6 @@ else
   BOLD=""
   NORMAL=""
 fi
-
 
 ### functions
 # info: output terminal green
@@ -67,15 +67,14 @@ fi
 
 # check package & return flag
 is_exists() {
-    which "$1" >/dev/null 2>&1
-    return $?
+  which "$1" >/dev/null 2>&1
+  return $?
 }
 
 # check package
 has() {
   type "$1" > /dev/null 2>&1
 }
-
 
 # create symlink
 symlink() {
@@ -164,7 +163,7 @@ echo ""
 info "Installing packages..."
 
 # package list
-LIST_OF_APPS="coreutils bash vim git python tmux curl openssh fish"
+LIST_OF_APPS="coreutils bash vim git python tmux curl fish"
 
 
 if [ $(uname -o) = "Android" ]; then
@@ -181,7 +180,7 @@ if [ $(uname -o) = "Android" ]; then
   pkg install neovim
 
   #info "termux-setup-storage"
-  #termux-setup-storage
+  termux-setup-storage
 
 elif [[ $(uname) = "Linux" ]]; then
 
@@ -193,7 +192,7 @@ elif [[ $(uname) = "Linux" ]]; then
       cd yay && makepkg -si
     fi
 
-    ADD_APP_ARCH="task phq peco hub sakura fzf p7zip neovim python2-neovim python-neovim llvm baobab radare2 weechat ranger"
+    ADD_APP_ARCH="phq peco hub sakura fzf p7zip neovim python2-neovim python-neovim llvm baobab radare2 weechat ranger"
 
     info "yay update"
     yay -Syu --noconfirm
@@ -204,7 +203,7 @@ elif [[ $(uname) = "Linux" ]]; then
 
   ## Ubuntu / Debian
   elif [ -f /etc/debian_version ] || [ -f /etc/debian_release ]; then
-    ADD_APP_DEBIAN="taskwarrior"
+    ADD_APP_DEBIAN="openssh-server"
 
     info "sudo apt update"
     sudo apt update -q
@@ -263,4 +262,4 @@ warn "[Deprecated] RUN symlink.sh "
 echo ""
 
 echo ""
-info "Installation completed."
+info "Installation(init) completed."

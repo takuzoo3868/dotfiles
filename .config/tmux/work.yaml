@@ -1,15 +1,17 @@
 tmux_options: -2
 session_name: work
-root: ~/CTF/
 
 windows:
 - window_name: main
   layout: 86f2,151x37,0,0{84x37,0,0[84x22,0,0,2,84x14,0,23,6],66x37,85,0[66x10,85,0,3,66x26,85,11,4]}
   panes:
     - screenfetch
-    - gotop -m
-    - ranger
+    - gotop -c solarized -m
+    - vis
     - mpsyt pl PLBFICLTzW2LckbdM1Ri6BBfpeSPwRYzXe
+- window_name: file
+  panes:
+    - ranger
 - window_name: chat
   panes:
     - weechat
