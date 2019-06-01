@@ -65,6 +65,7 @@ symlink "$dotfiles/.config/tmux/.tmux.conf" "$HOME/.tmux.conf"
 symlink "$dotfiles/.config/tmux/.tmux_local.conf" "$HOME/.tmux_local.conf"
 symlink "$dotfiles/.config/tmux/bin" "$HOME/.tmux/bin"
 symlink "$dotfiles/.config/tmux/work.yaml" "$HOME/.tmux/work.yaml"
+symlink "$dotfiles/.config/tmux/uec.yaml" "$HOME/.tmux/uec.yaml"
 
 # radare2
 info "radare2"

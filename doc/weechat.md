@@ -11,24 +11,34 @@
 /set irc.server.root_me.autoconnect on
 /set irc.server.root_me.autojoin "#root-me"
 
-/server add 0x00sec irc.0x00sec.org
-/set irc.server.0x00sec.autoconnect on
-/set irc.server.0x00sec.autojoin "#0x00sec"
-
 /server add freenode chat.freenode.net
 /set irc.server.freenode.nicks "tak3z_0o0"
 # /msg nickserv register [password] [email]
 # /msg NickServ VERIFY REGISTER tak3z_0o0 [code]
 /set irc.server.freenode.command "/msg nickserv identify [password]"
 /set irc.server.freenode.autoconnect on
-/set irc.server.0x00sec.autojoin "#dwarffortress"
+/set irc.server.freenode.autojoin "#security,#vulnhub,#r_netsec,#networking,#offsec,#metasploit,#dwarffortress"
 
 /script install iset.pl
 /script install buffer_autoset.py
 /script install go.py
 /script install emoji_aliases.py
+/script install slack.py
+/script install grep.py
 
 /key bind ctrl-B /bar toggle buflist
 /key bind ctrl-G /go
 /set alias.cmd.b = "/buffer"
+```
+
+### UEC proxy
+
+```
+/proxy add <name> <protocol> hoge.uec.ac.jp 8080
+```
+
+### 設定の確認
+
+```
+/fset
 ```

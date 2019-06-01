@@ -1,5 +1,5 @@
 tmux_options: -2
-session_name: work
+session_name: UEC
 
 windows:
 - window_name: main
@@ -13,10 +13,7 @@ windows:
   layout: 2a1b,238x68,0,0[238x41,0,0,5,238x26,0,42,9]
   panes:
     - ranger
-    - pene
-- window_name: chat
-  panes:
-    - weechat
+    - pane
 - window_name: work
   focus: true
   layout: f026,238x68,0,0{136x68,0,0,7,101x68,137,0[101x43,137,0,8,101x24,137,44,10]}
