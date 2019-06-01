@@ -17,6 +17,9 @@ windows:
 - window_name: chat
   panes:
     - weechat
+- window_name: web
+  panes:
+    - echo "If you start CUI browser... browsh"
 - window_name: work
   focus: true
   layout: f026,238x68,0,0{136x68,0,0,7,101x68,137,0[101x43,137,0,8,101x24,137,44,10]}

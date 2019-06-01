@@ -13,13 +13,6 @@ GIT_CONFIG_FILE=$HOME/.gitconfig.local
 CURL_RC=$HOME/.curlrc
 
 environment_on(){
-  sudo sed -i.bak '/http[s]::proxy/Id' /etc/apt/apt.conf
-  sudo sed -i.bak '/ftp::proxy/Id' /etc/apt/apt.conf
-  sudo tee -a /etc/apt/apt.conf <<EOF
-Acquire::ftp::proxy "ftp://$HTTP_PROXY_HOST:$HTTP_PROXY_PORT/";
-Acquire::http::proxy "http://$HTTP_PROXY_HOST:$HTTP_PROXY_PORT/";
-Acquire::https::proxy "https://$HTTPS_PROXY_HOST:$HTTPS_PROXY_PORT/";
-EOF
   sudo sed -i.bak "/all_proxy/Id" /etc/environment
   sudo sed -i.bak "/ALL_PROXY/Id" /etc/environment
   sudo sed -i.bak "/http_proxy/Id" /etc/environment
@@ -42,9 +35,6 @@ EOF
 }
 
 environment_off(){
-  sudo sed -i.bak "/http::proxy/Id" /etc/apt/apt.conf
-  sudo sed -i.bak "/https::proxy/Id" /etc/apt/apt.conf
-  sudo sed -i.bak "/ftp::proxy/Id" /etc/apt/apt.conf
   sudo sed -i.bak "/all_proxy/Id" /etc/environment
   sudo sed -i.bak "/ALL_PROXY/Id" /etc/environment
   sudo sed -i.bak "/http_proxy/Id" /etc/environment
