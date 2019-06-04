@@ -6,7 +6,7 @@ windows:
   layout: d305,238x68,0,0{132x68,0,0[132x47,0,0,1,132x20,0,48,2],105x68,133,0[105x20,133,0,3,105x47,133,21,4]}
   panes:
     - gotop -c solarized
-    - dry
+    - lnav
     - screenfetch
     - mpsyt pl PLBFICLTzW2LckbdM1Ri6BBfpeSPwRYzXe
 - window_name: file
