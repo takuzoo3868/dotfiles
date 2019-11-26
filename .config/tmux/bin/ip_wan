@@ -23,7 +23,7 @@ export -f shell_is_osx
 export -f shell_is_bsd
 
 # Path tmp file
-export DIR_TEMPORARY="/tmp/tmux-weather_${USER}"
+export DIR_TEMPORARY="/tmp/tmux-wan_${USER}"
 if [ ! -d "$DIR_TEMPORARY" ]; then
 	mkdir -p "$DIR_TEMPORARY"
 fi

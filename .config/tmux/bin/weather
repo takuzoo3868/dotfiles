@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 #
 # Author: takuzoo3868
-# Last Modified: 25 Nov 2018.
-# API: http://developer.yahoo.com/weather
+# Last Modified: 27 Nov 2019.
+# API: https://openweathermap.org/current
 #
-# osx need coreutils
+# NEED API KEY in .bashrc_local: WEATHER_API
 
-# Check OS
 ostype() { echo $OSTYPE | tr '[A-Z]' '[a-z]'; }
 
 export SHELL_PLATFORM='unknown'
@@ -32,15 +31,23 @@ if [ ! -d "$DIR_TEMPORARY" ]; then
 fi
 
 # DEFAULT
-WEATHER_DATA_PROVIDER_DEFAULT="yahoo"
-WEATHER_UNIT_DEFAULT="c"
+WEATHER_DATA_PROVIDER_DEFAULT="openweathermap"
+WEATHER_UNIT_DEFAULT="metric" # metric:Celsius, imperial:Fahrenheit
 WEATHER_UPDATE_PERIOD_DEFAULT="600"
-# input your woeid https://lab.syncer.jp/Tool/WOEID-Lookup/
-WEATHER_LOCATION_DEFAULT="1118108"
+WEATHER_LOCATION_DEFAULT="1864518" #chofu
 
 export WEATHER_DATA_PROVIDER="${WEATHER_DATA_PROVIDER_DEFAULT}"
-# What unit to use. Can be any of {c,f,k}.
 export WEATHER_UNIT="${WEATHER_UNIT_DEFAULT}"
+case "$WEATHER_UNIT" in
+    "metric")
+      export WEATHER_UNIT_CASE="c"
+      ;;
+    "imperial")
+      export WEATHER_UNIT_CASE="f"
+      ;;
+    *)
+      export WEATHER_UNIT_CASE="k"
+esac
 # How often to update the weather in seconds.
 export WEATHER_UPDATE_PERIOD="${WEATHER_UPDATE_PERIOD_DEFAULT}"
 # Name of GNU grep binary if in PATH, or path to it.
@@ -77,10 +84,10 @@ __default_settings() {
 # Run status line in tmux
 __run_weather() {
   __default_settings
-  local tmp_file="${DIR_TEMPORARY}/weather_yahoo.txt"
+  local tmp_file="${DIR_TEMPORARY}/weather_openweathermap.json"
   local weather
   case "$WEATHER_DATA_PROVIDER" in
-    "yahoo") weather=$(__yahoo_weather) ;;
+    "openweathermap") weather=$(__openweathermap_weather) ;;
     *)
       echo "Unknown weather provider [${$WEATHER_DATA_PROVIDER}]";
       return 1
@@ -90,9 +97,8 @@ __run_weather() {
   fi
 }
 
-# Get the weather from Yahoo!
-__yahoo_weather() {
-  degree=""
+# Get the weather from OpenWeatherMap
+__openweathermap_weather() {
   if [ -f "$tmp_file" ]; then
     if shell_is_bsd; then
       last_update=$(stat -f "%m" ${tmp_file})
@@ -107,117 +113,110 @@ __yahoo_weather() {
     fi
   fi
 
+  degree=""
   if [ -z "$degree" ]; then
-    weather_data=$(curl --max-time 4 -s "https://query.yahooapis.com/v1/public/yql?format=xml&q=SELECT%20*%20FROM%20weather.forecast%20WHERE%20u=%27${WEATHER_UNIT}%27%20AND%20woeid%20=%20%27${WEATHER_LOCATION}%27")
+    weather_data=$(curl --max-time 4 -s "http://api.openweathermap.org/data/2.5/weather?id=${WEATHER_LOCATION}&units=${WEATHER_UNIT}&appid=${WEATHER_API}")
+    # echo "$weather_data"
     if [ "$?" -eq "0" ]; then
-      error=$(echo "$weather_data" | grep "problem_cause\|DOCTYPE");
-      if [ -n "$error" ]; then
-        echo "error"
-        exit 1
-      fi
-
-      # Assume latest grep is in PATH
-      gnugrep="${WEATHER_GREP}"
-
-      # <yweather:units temperature="F" distance="mi" pressure="in" speed="mph"/>
-      unit=$(echo "$weather_data" | "$gnugrep" -Zo "<yweather:units [^<>]*/>" | sed 's/.*temperature="\([^"]*\)".*/\1/')
-      condition=$(echo "$weather_data" | "$gnugrep" -Zo "<yweather:condition [^<>]*/>")
-      # <yweather:condition  text="Clear"  code="31"  temp="66"  date="Mon, 01 Oct 2012 8:00 pm CST" />
-      degree=$(echo "$condition" | sed 's/.*temp="\([^"]*\)".*/\1/')
-      condition=$(echo "$condition" | sed 's/.*text="\([^"]*\)".*/\1/')
-      # Pull the times for sunrise and sunset so we know when to change the day/night indicator
-      # <yweather:astronomy sunrise="6:56 am"   sunset="6:21 pm"/>
+      degree=$(echo "$weather_data" | jq .main.temp)
+      condition=$(echo "$weather_data" | jq -r '.weather[] | .description')
+      sunrise_unixtime=$(echo "$weather_data" | jq .sys.sunrise)
+      sunset_unixtime=$(echo "$weather_data" | jq .sys.sunset)
+ 
       if shell_is_bsd; then
         date_arg='-j -f "%H:%M %p "'
       else
         date_arg='-d'
       fi
-      sunrise=$(date ${date_arg}"$(echo "$weather_data" | "$gnugrep" "yweather:astronomy" | sed 's/^\(.*\)sunset.*/\1/' | sed 's/^.*sunrise="\(.*m\)".*/\1/')" +%H%M)
-      sunset=$(date ${date_arg}"$(echo "$weather_data" | "$gnugrep" "yweather:astronomy" | sed 's/^.*sunset="\(.*m\)".*/\1/')" +%H%M)
+      sunrise=$(date ${date_arg} @${sunrise_unixtime} +%H%M)
+      sunset=$(date ${date_arg} @${sunset_unixtime} +%H%M)
     elif [ -f "${tmp_file}" ]; then
       __read_tmp_file
     fi
   fi
 
   if [ -n "$degree" ]; then
-    if [ "$WEATHER_UNIT" == "k" ]; then
+    if [ "$WEATHER_UNIT_CASE" == "k" ]; then
       degree=$(echo "${degree} + 273.15" | bc)
     fi
-    condition_symbol=$(__get_weather_image "$condition" "$sunrise" "$sunset") 
-    echo "${condition_symbol} ${degree}°$(echo "$WEATHER_UNIT" | tr '[:lower:]' '[:upper:]')" | tee "${tmp_file}"
+    condition_symbol=$(__get_weather_image "$condition" "$sunrise" "$sunset" "$degree") 
+    echo "${condition_symbol} ${degree}°$(echo "$WEATHER_UNIT_CASE" | tr '[:lower:]' '[:upper:]')" | tee "${tmp_file}"
   fi
 }
 
 # Get symbol for condition. 
-# Available conditions: http://developer.yahoo.com/weather/#codes
+# Available conditions: https://openweathermap.org/weather-conditions
 __get_weather_image() {
-  local condition=$(echo "$1" | tr '[:upper:]' '[:lower:]')
+  local condition=$(echo "$1")
   local sunrise="$2"
   local sunset="$3"
+  local degree="$4"
+
   case "$condition" in
+    ## Group 800: Clear
+    "clear sky")
+      time_forecast=$(date +%H%M)
+      if [ "$time_forecast" -ge "$sunset" -o "$time_forecast" -le "$sunrise" ]; then
+        if [ "$degree" -le 5 ]; then
+          echo ""
+        else
+          echo ""
+        fi
+      else
+        if [ "$degree" -ge 25 ]; then
+          echo "" # weather_hot
+        else
+          echo ""
+        fi
+      fi
+      ;;
+
+    ## Group 80x: Clouds
+    "few clouds")
+      echo ""
+      ;;
+    "scattered clouds")
+      echo ""
+      ;;
+    "broken clouds" | "overcast clouds")
+      echo "" # fa_cloud
+      ;;
+
+    ## Group 7xx: Atmosphere
+    "dust" | "Haze" | "Smoke" | "sand" | "dust whirls")
+      echo "" # weather_dust
+      ;;
+    "fog" | "mist")
+      echo "" # weather_fog
+      ;;
+    "volcanic ash")
+      echo ""
+      ;;
     "tornado" | "tropical storm" | "hurricane")
       echo "" # weather_hurricane
       ;;
-    "sunny" | "fair")
-      time_forecast=$(date +%H%M)
-      if [ "$time_forecast" -ge "$sunset" -o "$time_forecast" -le "$sunrise" ]; then
-        echo ""
-      else
-        echo "滛" # mdi_weather_sunny
-      fi
-      ;;
-    "hot")
-      time_forecast=$(date +%H%M)
-      if [ "$time_forecast" -ge "$sunset" -o "$time_forecast" -le "$sunrise" ]; then
-        echo ""
-      else
-        echo "" # weather_hot
-      fi
-      ;;
-    "rain" | "light rain" | "drizzle" | "light drizzle")
+
+    ## Group 5xx: Rain & Group 3xx: Drizzle
+    "rain" | "light rain"  | "moderate rain" | "heavy intensity rain" | "drizzle" | "light intensity drizzle" | "heavy intensity drizzle" | "light intensity drizzle rain" | "drizzle rain")
       echo ""
       ;;
-    "showers" | "scattered showers")
+    "shower rain" | "scattered showers" | "very heavy rain" | "extreme rain" | "light intensity shower rain" | "heavy intensity shower rain" | "ragged shower rain" | "heavy intensity drizzle rain" | "shower rain and drizzle" | "heavy shower rain and drizzle" | "shower drizzle" | "squalls")
       echo "" # weather_showers
       ;;
-    "mixed rain and snow" | "mixed rain and sleet" | "freezing drizzle" | "freezing rain" | "mixed rain and hail" | "rain and snow")
+    "mixed rain and snow" | "mixed rain and sleet" | "freezing drizzle" | "freezing rain" | "mixed rain and hail" | "Light rain and snow" | "Rain and snow")
       echo "" # weather_rain_mix
       ;;
-    "light rain with thunder")
-      echo "朗" # mdi_weather_lightning
-      ;;
-    "snow" | "mixed snow and sleet" | "snow flurries" | "light snow showers" | "blowing snow" | "sleet" | "heavy snow" | "scattered snow showers" | "snow showers" | "light snow" | "snow grains")
+    
+    ## Group 6xx: Snow
+    "Snow" | "light snow" | "Heavy snow" | "Sleet" | "Light shower sleet" | "Shower sleet" | "Light shower snow" | "Shower snow" | "Heavy shower snow")
       echo ""
       ;;
-    "hail")
-      echo "晴" # mdi_weather_hail
-      ;;
-    "cloudy" | "mostly cloudy")
-      echo "" # fa_cloud
-      ;;
-    "partly cloudy")
-      echo "杖" # mdi_weather_partlycloudy
-      ;;
-    "severe thunderstorms" | "thunderstorms" | "isolated thunderstorms" | "scattered thunderstorms" | "isolated thundershowers" | "thundershowers")
+    
+    ## Group 2xx: Thunderstorm
+    "thunderstorm with light rain" | "thunderstorm with rain" | "thunderstorm with heavy rain" | "light thunderstorm" | "thunderstorm" | "heavy thunderstorm" | "ragged thunderstorm" | "thunderstorm with light drizzle" | "thunderstorm with drizzle" | "thunderstorm with heavy drizzle")
       echo "" # weather_lightning
       ;;
-    "dust" | "fog" | "haze" | "smoky")
-      echo "" # weather_dust
-      ;;
-    "fog" | "foggy" | "mist")
-      echo "" # weather_fog
-      ;;
-    "windy" | "blustery" | "breezy")
-      echo "煮" # mdi_weather_windy
-      ;;
-    "clear" | "cold")
-      time_forecast=$(date +%H%M)
-      if [ "$time_forecast" -ge "$sunset" -o "$time_forecast" -le "$sunrise" ]; then
-        echo "望" # mdi_weather_night
-      else
-        echo ""
-      fi
-      ;;
+    
     "not available")
       echo "" 
       ;;

@@ -19,5 +19,5 @@ windows:
   layout: f026,238x68,0,0{136x68,0,0,7,101x68,137,0[101x43,137,0,8,101x24,137,44,10]}
   panes:
     - pane
-    - pane
+    - echo "IED machine: <student ID> [at] remote.ied.inf.uec.ac.jp"
     - echo "Do your BEST. No output, No life." | octocatsay | lolcat
