@@ -1,186 +1,203 @@
 #!/usr/bin/env bash
 #
 # Author: takuzoo3868
-# Last Modified: 25 Nov 2018.
+# Last Modified: 06 Dec 2019.
 
-# Check OS
-ostype() { echo $OSTYPE | tr '[A-Z]' '[a-z]'; }
+ostype() { echo $OSTYPE | tr '[:upper:]' '[:lower:]'; }
 
 export SHELL_PLATFORM='unknown'
 
 case "$(ostype)" in
-	*'linux'*	) SHELL_PLATFORM='linux'	;;
-	*'darwin'*	) SHELL_PLATFORM='osx'		;;
-	*'bsd'*		) SHELL_PLATFORM='bsd'		;;
+  *'linux'*  ) SHELL_PLATFORM='linux'  ;;
+  *'darwin'*  ) SHELL_PLATFORM='osx'    ;;
+  *'bsd'*    ) SHELL_PLATFORM='bsd'    ;;
 esac
 
 shell_is_linux() { [[ $SHELL_PLATFORM == 'linux' || $SHELL_PLATFORM == 'bsd' ]]; }
 shell_is_osx()   { [[ $SHELL_PLATFORM == 'osx' ]]; }
-shell_is_bsd()   { [[ $SHELL_PLATFORM == 'bsd' || $SHELL_PLATFORM == 'osx' ]]; }
+shell_is_bsd()   { [[ $SHELL_PLATFORM == 'bsd' ]]; }
 
 export -f shell_is_linux
 export -f shell_is_osx
 export -f shell_is_bsd
 
 # Path tmp file
-export DIR_TEMPORARY="/tmp/tmux-earthquake_${USER}"
-if [ ! -d "$DIR_TEMPORARY" ]; then
-	mkdir -p "$DIR_TEMPORARY"
+export EARTHQUAKE_DIR_TEMPORARY="/tmp/tmux-earthquake_${USER}"
+if [ ! -d "$EARTHQUAKE_DIR_TEMPORARY" ]; then
+  mkdir -p "$EARTHQUAKE_DIR_TEMPORARY"
 fi
 
 # DEFAULT
-EARTHQUAKE_DATA_PROVIDER_DEFAULT="goo"
-EARTHQUAKE_UPDATE_PERIOD_DEFAULT="600"
-EARTHQUAKE_ALERT_TIME_WINDOW_DEFAULT="60"
-EARTHQUAKE_TIME_FORMAT_DEFAULT='(%H:%M)'
-EARTHQUAKE_MIN_MAGNITUDE_DEFAULT='1'
+EARTHQUAKE_DATA_PROVIDER_DEFAULT="p2pquake"
+UPDATE_PERIOD_DEFAULT="200"
+ALERT_TIME_WINDOW_DEFAULT="30" # min
+EARTHQUAKE_GET_DATA_LIMIT_DEFAULT='1'
+EARTHQUAKE_MIN_SCALE_DEFAULT='20'
 
-# The data provider to use. Currently only "goo" is supported.
 export EARTHQUAKE_DATA_PROVIDER="${EARTHQUAKE_DATA_PROVIDER_DEFAULT}"
-# If this is too often, goo may decide to ban you form their server
-export EARTHQUAKE_UPDATE_PERIOD="${EARTHQUAKE_UPDATE_PERIOD_DEFAULT}"
-# Only display information when earthquakes are within this many minutes
-export EARTHQUAKE_ALERT_TIME_WINDOW="${EARTHQUAKE_ALERT_TIME_WINDOW_DEFAULT}"
-# Display time with this format
-export EARTHQUAKE_TIME_FORMAT=”${EARTHQUAKE_TIME_FORMAT_DEFAULT}”
-# Display only if magnitude is greater or equal to this number
-export EARTHQUAKE_MIN_MAGNITUDE="${EARTHQUAKE_MIN_MAGNITUDE_DEFAULT}"
+export UPDATE_PERIOD="${UPDATE_PERIOD_DEFAULT}"
+export ALERT_TIME_WINDOW="${ALERT_TIME_WINDOW_DEFAULT}"
+export EARTHQUAKE_GET_DATA_LIMIT="${EARTHQUAKE_GET_DATA_LIMIT_DEFAULT}"
+export EARTHQUAKE_MIN_SCALE="${EARTHQUAKE_MIN_SCALE_DEFAULT}"
 
 __default_settings() {
-	if [ -z "$EARTHQUAKE_DATA_PROVIDER" ]; then
-		export EARTHQUAKE_DATA_PROVIDER="${EARTHQUAKE_DATA_PROVIDER_DEFAULT}"
-	fi
-	if [ -z "$EARTHQUAKE_UPDATE_PERIOD" ]; then
-		export EARTHQUAKE_UPDATE_PERIOD="${EARTHQUAKE_UPDATE_PERIOD_DEFAULT}"
-	fi
-	if [ -z "$EARTHQUAKE_ALERT_TIME_WINDOW" ]; then
-		export EARTHQUAKE_ALERT_TIME_WINDOW="${EARTHQUAKE_ALERT_TIME_WINDOW_DEFAULT}"
-	fi
-	if [ -z "$EARTHQUAKE_TIME_FORMAT" ]; then
-		export EARTHQUAKE_TIME_FORMAT="${EARTHQUAKE_TIME_FORMAT_DEFAULT}"
-	fi
-	if [ -z "$EARTHQUAKE_MIN_MAGNITUDE" ]; then
-		export EARTHQUAKE_MIN_MAGNITUDE="${EARTHQUAKE_MIN_MAGNITUDE_DEFAULT}"
-	fi
+  if [ -z "$EARTHQUAKE_DATA_PROVIDER" ]; then
+    export EARTHQUAKE_DATA_PROVIDER="${EARTHQUAKE_DATA_PROVIDER_DEFAULT}"
+  fi
+  if [ -z "$UPDATE_PERIOD" ]; then
+    export UPDATE_PERIOD="${UPDATE_PERIOD_DEFAULT}"
+  fi
+  if [ -z "$ALERT_TIME_WINDOW" ]; then
+    export ALERT_TIME_WINDOW="${ALERT_TIME_WINDOW_DEFAULT}"
+  fi
+  if [ -z "$EARTHQUAKE_GET_DATA_LIMIT" ]; then
+    export EARTHQUAKE_GET_DATA_LIMIT="${EARTHQUAKE_GET_DATA_LIMIT_DEFAULT}"
+  fi
+  if [ -z "$EARTHQUAKE_MIN_SCALE" ]; then
+    export EARTHQUAKE_MIN_SCALE="${EARTHQUAKE_MIN_SCALE_DEFAULT}"
+  fi
 }
 
 # Run status line in tmux
 __run_earthquake() {
-	__default_settings
-	local tmp_file="${DIR_TEMPORARY}/earthquake.txt"
-	local earthquake
-	case "$EARTHQUAKE_DATA_PROVIDER" in
-		"goo") earthquake=$(__goo_earthquake) ;;
-		*)
-			echo "Unknown earthquake-information provider [${$EARTHQUAKE_DATA_PROVIDER}]";
-			return 1
-	esac
-	if [ -n "$earthquake" ]; then
-		echo "${earthquake}"
-	fi
+  __default_settings
+  local tmp_file="${EARTHQUAKE_DIR_TEMPORARY}/earthquake.txt"
+  local earthquake
+  case "$EARTHQUAKE_DATA_PROVIDER" in
+    "p2pquake") earthquake=$(__p2pquake_earthquake) ;;
+    *)
+      echo "Unknown earthquake-information provider [${EARTHQUAKE_DATA_PROVIDER}]";
+      return 1
+  esac
+  if [ -n "$earthquake" ]; then
+    echo "${earthquake}"
+  fi
 }
 
-# Get earthquake information from goo
-__goo_earthquake() {
-	location=""
-	magnitude=""
-	magnitude_number=""
-	timestamp=""
-	if [[ -f "$tmp_file" ]]; then
-		if shell_is_osx || shell_is_bsd; then
-			last_update=$(stat -f "%m" ${tmp_file})
-		elif shell_is_linux; then
-			last_update=$(stat -c "%Y" ${tmp_file})
-		fi
-		time_now=$(date +%s)
+# Get earthquake information from p2pquake
+__p2pquake_earthquake() {
+  if [[ -f "$tmp_file" ]]; then
+    if shell_is_bsd; then
+      last_update=$(stat -f "%m" ${tmp_file})
+    elif shell_is_linux || shell_is_osx; then
+      last_update=$(stat -c "%Y" ${tmp_file})
+    fi
+    time_now=$(date +%s)
 
-		up_to_date=$(echo "(${time_now}-${last_update}) < ${EARTHQUAKE_UPDATE_PERIOD}" | bc)
-		if [ "$up_to_date" -eq 1 ]; then
-			__read_tmp_file
-		fi
-	fi
+    up_to_date=$(echo "(${time_now} - ${last_update}) < ${UPDATE_PERIOD}" | bc)
+    if [ "$up_to_date" -eq 1 ]; then
+      __read_tmp_file
+    fi
+  fi
 
-	if [ -z "$magnitude" ]; then
-		# get the rss file
-		earthquake_data=$(curl --max-time 4 -s "http://weather.goo.ne.jp/earthquake/index.rdf" | iconv -f EUC-JP -t UTF-8 | tr -d "\r")
-		if [ "$?" -eq "0" ]; then
-			# we grab the data from the title of the first item (most recent earthquake)
-			earthquake_data=${earthquake_data#*item\><title>}
-			# end our data at the end of the approx. time
-			earthquake_data=${earthquake_data%%頃*}
+  magnitude=""
+  if [ -z "$magnitude" ]; then
+    # get the rss file
+    data=$(curl --max-time 4 -s "https://api.p2pquake.net/v2/jma/quake?limit=${EARTHQUAKE_GET_DATA_LIMIT}&min_scale=${EARTHQUAKE_MIN_SCALE}")
+    
+    if [ "$?" -eq "0" ]; then
+      location=$(echo $data | jq -r .[].earthquake.hypocenter.name)
+      magnitude=$(echo $data | jq .[].earthquake.hypocenter.magnitude)
+      scale=$(echo $data | jq .[].earthquake.maxScale)
+      tsunami=$(echo $data | jq -r .[].earthquake.domesticTsunami)
+      timestamp=$(echo $data | jq -r .[].earthquake.time)
 
-			location=$(echo $earthquake_data | awk '{print $2}')
-			magnitude=$(echo $earthquake_data | awk '{print $4}')
-			timestamp=${earthquake_data#*\(}
+      if shell_is_bsd; then
+        date_arg='-j -f "%H:%M %p "'
+      else
+        date_arg='-d'
+      fi
+      timestamp_24=$(date ${date_arg} "${timestamp}" +%H:%M)
 
-			__convert_jp_magnitude
-			__convert_jp_timestamp
+    elif [ -f "$tmp_file" ]; then
+      __read_tmp_file
+    fi
+  fi
 
-			echo $location  >  $tmp_file
-			echo $magnitude >> $tmp_file
-			echo $timestamp >> $tmp_file
-		elif [ -f "$tmp_file" ]; then
-			__read_tmp_file
-		fi
-	fi
-	__convert_timestamp_to_fmt
-
-	# extract the numerical portion of magnitude
-	magnitude_number=$(echo $magnitude | sed -e 's/+//' -e 's/-//')
-
-	if [ -n "$magnitude" ]; then
-		if __check_alert_time_window && __check_min_magnitude ; then
-			echo "${location}${timestamp_fmt}${magnitude}"
-		fi
-	fi
+  if [ -n "$magnitude" ]; then
+    if __check_alert_time_window ; then
+      scale_jp=$(__get_earthquake_scale "$scale")
+      tsunami_jp=$(__get_tsunami_info "$tsunami")
+      echo "  ${location} ${timestamp_24}  ${scale_jp}  ${tsunami_jp} "  | tee "${tmp_file}"
+    fi
+  fi
 }
-
-__convert_jp_magnitude() {
-	magnitude=${magnitude#震度}
-	# simplify high-lower designation (only used in extreme cases: above 4)
-	if [[ "$magnitude" == *弱 ]] ; then
-		magnitude="-${magnitude%弱}"
-	elif [[ "$magnitude" == *強 ]] ; then
-		magnitude="+${magnitude%強}"
-	fi
-}
-
 __check_alert_time_window() {
-	[[ $(( ( $(date +%s) - $timestamp ) / 60 )) -lt $EARTHQUAKE_ALERT_TIME_WINDOW ]]
+  unixtime=$(date -d "${timestamp}" +%s)
+
+  # (now - occurred_time)/60 < ALERT_TIME_WINDOW ?
+  [[ $(( ( $(date +%s) - unixtime ) / 60 )) -lt $ALERT_TIME_WINDOW ]]
 }
 
-__check_min_magnitude() {
-	[[ $magnitude_number -ge $EARTHQUAKE_MIN_MAGNITUDE ]]
+__get_earthquake_scale() {
+  local scale="$1"
+
+  # https://www.p2pquake.net/develop/api-v2/
+  case "$scale" in
+    "10")
+      echo "1"
+      ;;
+    "20")
+      echo "2"
+      ;;
+    "30")
+      echo "3"
+      ;;
+    "40")
+      echo "4"
+      ;;
+    "45")
+      echo "5弱"
+      ;;
+    "50")
+      echo "5強"
+      ;;
+    "55")
+      echo "6弱"
+      ;;
+    "60")
+      echo "6強"
+      ;;
+    "70")
+      echo "7"
+      ;;
+    *)
+      echo "" # unknown
+      ;;
+  esac
 }
 
-__convert_jp_timestamp() {
-	if shell_is_bsd ; then
-		timestamp=$(date -j -f "%Y年%m月%d日 %H時%M分" "$timestamp" +"%s")
-	else
-		timestamp=$(echo $timestamp | sed -e 's/年/-/' -e 's/月/-/' -e 's/日//' -e 's/時/:/' -e 's/分//')
-		timestamp=$(date -d "$timestamp" +"%s")
-	fi
-}
+__get_tsunami_info() {
+  local tsunami="$1"
 
-__convert_timestamp_to_fmt() {
-	if shell_is_osx ; then
-		timestamp_fmt=$(date -r "$timestamp" +"$EARTHQUAKE_TIME_FORMAT")
-	else
-		timestamp_fmt=$(date -d "$timestamp" +"$EARTHQUAKE_TIME_FORMAT")
-	fi
+  case "$tsunami" in
+    "Warning")
+      echo "津波予報"
+      ;;
+    "Watch")
+      echo "津波注意報"
+      ;;
+    "NonEffective")
+      echo "影響なし"
+      ;;
+    "Checking")
+      echo "調査中"
+      ;;
+    "Unknown")
+      echo "不明"
+      ;;
+    "None")
+      echo "なし"
+      ;;
+  esac
 }
 
 __read_tmp_file() {
-	if [ ! -f "$tmp_file" ]; then
-		return
-	fi
-	IFS_bak="$IFS"
-	IFS=$'\n'
-	lines=($(cat ${tmp_file}))
-	IFS="$IFS_bak"
-	location="${lines[0]}"
-	magnitude="${lines[1]}"
-	timestamp="${lines[2]}"
+  if [ ! -f "$tmp_file" ]; then
+    return
+  fi
+  cat "${tmp_file}"
+  exit
 }
 
 # exec

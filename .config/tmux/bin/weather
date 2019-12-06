@@ -6,7 +6,7 @@
 #
 # NEED API KEY in .bashrc_local: WEATHER_API
 
-ostype() { echo $OSTYPE | tr '[A-Z]' '[a-z]'; }
+ostype() { echo $OSTYPE | tr '[:upper:]' '[:lower:]'; }
 
 export SHELL_PLATFORM='unknown'
 
@@ -84,12 +84,12 @@ __default_settings() {
 # Run status line in tmux
 __run_weather() {
   __default_settings
-  local tmp_file="${DIR_TEMPORARY}/weather_openweathermap.json"
+  local tmp_file="${DIR_TEMPORARY}/weather_openweathermap.txt"
   local weather
   case "$WEATHER_DATA_PROVIDER" in
     "openweathermap") weather=$(__openweathermap_weather) ;;
     *)
-      echo "Unknown weather provider [${$WEATHER_DATA_PROVIDER}]";
+      echo "Unknown weather provider [$WEATHER_DATA_PROVIDER]";
       return 1
   esac
   if [ -n "$weather" ]; then
@@ -147,7 +147,7 @@ __openweathermap_weather() {
 # Get symbol for condition. 
 # Available conditions: https://openweathermap.org/weather-conditions
 __get_weather_image() {
-  local condition=$(echo "$1")
+  local condition="$1"
   local sunrise="$2"
   local sunset="$3"
   local degree="$4"
