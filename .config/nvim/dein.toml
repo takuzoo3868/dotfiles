@@ -157,12 +157,6 @@ let g:airline_theme='luna'
 [[plugins]]
 repo = 'mattn/webapi-vim'
 
-# [[plugins]]
-# repo = 'Wildog/airline-weather.vim'
-# hook_add = '''
-# source ~/.config/nvim/plugins/airline-weather.rc.vim
-# '''
-
 [[plugins]]
 repo = 'gcmt/taboo.vim'
 depends = 'vim-airline'
@@ -202,24 +196,6 @@ if = "!has('nvim')"
 # ==========================================================
 # other
 # ==========================================================
-
-#[[plugins]]
-## twitter for neovim
-#repo = 'lycoris0731/tweet.nvim'
-
-[[plugins]]
-# twitter for vim8
-repo = 'twitvim/twitvim'
-if = "!has('nvim')"
-hook_add = '''
-let twitvim_enable_python3 = 1
-let twitvim_browser_cmd = 'open'
-let twitvim_force_ssl = 1
-let twitvim_count = 100
-nnoremap <Space>tt :FriendsTwitter<CR>
-nnoremap <Space>tp :PosttoTwitter<CR>
-nnoremap <Space>tr :UserTwitter<CR>
-'''
 
 [[plugins]]
 # にゃーん

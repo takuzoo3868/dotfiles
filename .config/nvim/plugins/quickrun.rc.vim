@@ -6,9 +6,10 @@ let g:quickrun_config = {
       \"hook/close_buffer/enable_failure": 1,
       \"hook/close_buffer/enable_empty_data": 1,
       \"outputter/buffer/split": ":botright 10",
+      \"outputter/buffer/into" : 1,
       \"hook/time/enable": '1',
       \"runner": "vimproc",
       \"runner/vimproc/updatetime": 40,
       \}
       \}
-nmap <Leader>r <Plug>(quickrun)
+nmap qr <Plug>(quickrun)
