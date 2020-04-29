@@ -34,7 +34,6 @@ fi
 WEATHER_DATA_PROVIDER_DEFAULT="openweathermap"
 WEATHER_UNIT_DEFAULT="metric" # metric:Celsius, imperial:Fahrenheit
 WEATHER_UPDATE_PERIOD_DEFAULT="600"
-WEATHER_LOCATION_DEFAULT="1864518" #chofu
 
 export WEATHER_DATA_PROVIDER="${WEATHER_DATA_PROVIDER_DEFAULT}"
 export WEATHER_UNIT="${WEATHER_UNIT_DEFAULT}"
@@ -52,8 +51,19 @@ esac
 export WEATHER_UPDATE_PERIOD="${WEATHER_UPDATE_PERIOD_DEFAULT}"
 # Name of GNU grep binary if in PATH, or path to it.
 export WEATHER_GREP="${WEATHER_GREP_DEFAULT}"
-# Your location. Find a code that works for you:
-export WEATHER_LOCATION="${WEATHER_LOCATION_DEFAULT}"
+# Your location name by ip-api.com
+function __get_location() {
+  location_data=$(curl -sf "http://ip-api.com/json/?fields=query,country,region,city,zip,lat,lon,isp")
+  
+  if [ "$?" -eq "0" ]; then
+    city_name=$(echo "$location_data" | jq -r .city)
+  else
+    # WEATHER LOCATION DEFAULT: Japan
+    city_name="Japan"
+  fi
+  echo "$city_name"
+}
+export WEATHER_LOCATION="$(__get_location)"
 
 # Setting grep command
 if shell_is_bsd  && [ -f /user/local/bin/grep  ]; then
@@ -115,7 +125,7 @@ __openweathermap_weather() {
 
   degree=""
   if [ -z "$degree" ]; then
-    weather_data=$(curl --max-time 4 -s "http://api.openweathermap.org/data/2.5/weather?id=${WEATHER_LOCATION}&units=${WEATHER_UNIT}&appid=${WEATHER_API}")
+    weather_data=$(curl --max-time 4 -s "http://api.openweathermap.org/data/2.5/weather?q=${WEATHER_LOCATION}&units=${WEATHER_UNIT}&appid=${WEATHER_API}")
     # echo "$weather_data"
     if [ "$?" -eq "0" ]; then
       degree=$(echo "$weather_data" | jq .main.temp)

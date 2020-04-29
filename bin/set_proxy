@@ -81,7 +81,7 @@ fi
 
 if [[ $(uname) = "Linux" ]]; then
 
-  if [[ $(iwgetid -r) == "UECWireless" ]] || [[ $(iwgetid -r) == "netarch2_5G" ]] || [[ $(uname -n) == "Sco-Alniyat" ]]; then
+  if [[ $(iwgetid -r) == "UECWireless" ]] || [[ $(iwgetid -r) == "netarch2_5G" ]] || [[ $(iwgetid -r) == "netarch2" ]]  || [[ $(uname -n) == "Sco-Alniyat" ]]; then
     proxy_on
     environment_on
   else
@@ -92,7 +92,7 @@ if [[ $(uname) = "Linux" ]]; then
 elif [[ $(uname) = "Darwin" ]]; then
   AIRPORT="/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport"
 
-  if test "` ${AIRPORT} -I |grep [^B]SSID|awk '{print $2}'`" = "UECWireless" || test "` ${AIRPORT} -I |grep [^B]SSID|awk '{print $2}'`" = "netarch2_5G"; then
+  if test "` ${AIRPORT} -I |grep [^B]SSID|awk '{print $2}'`" = "UECWireless" || test "` ${AIRPORT} -I |grep [^B]SSID|awk '{print $2}'`" = "netarch2_5G" || test "` ${AIRPORT} -I |grep [^B]SSID|awk '{print $2}'`" = "netarch2"; then
     proxy_on
     export ALL_PROXY=http://proxy.uec.ac.jp:8080/
     export http_proxy=http://proxy.uec.ac.jp:8080/
