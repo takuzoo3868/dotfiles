@@ -167,13 +167,13 @@ __get_weather_image() {
     "clear sky")
       time_forecast=$(date +%H%M)
       if [ "$time_forecast" -ge "$sunset" -o "$time_forecast" -le "$sunrise" ]; then
-        if [ "$degree" -le 5 ]; then
+        if [ "$(echo "${degree} <= 5" | bc)" -eq 1 ]; then
           echo ""
         else
           echo ""
         fi
       else
-        if [ "$degree" -ge 25 ]; then
+        if [ "$(echo "${degree} >= 25" | bc)" -eq 1 ]; then
           echo "" # weather_hot
         else
           echo ""
