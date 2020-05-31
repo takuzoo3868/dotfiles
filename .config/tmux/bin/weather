@@ -32,8 +32,8 @@ fi
 
 # DEFAULT
 WEATHER_DATA_PROVIDER_DEFAULT="openweathermap"
-WEATHER_UNIT_DEFAULT="metric" # metric:Celsius, imperial:Fahrenheit
-WEATHER_UPDATE_PERIOD_DEFAULT="600"
+WEATHER_UNIT_DEFAULT="metric"        # metric:Celsius, imperial:Fahrenheit
+WEATHER_UPDATE_PERIOD_DEFAULT="600"  # sec
 
 export WEATHER_DATA_PROVIDER="${WEATHER_DATA_PROVIDER_DEFAULT}"
 export WEATHER_UNIT="${WEATHER_UNIT_DEFAULT}"
