@@ -21,6 +21,4 @@ function! s:my_cr_function() abort
   return deoplete#cancel_popup() . "\<CR>"
 endfunction
 
-let g:deoplete#enable_refresh_always = 0
 let g:deoplete#enable_camel_case = 1
-let g:deoplete#skip_chars = ['(', ')']
