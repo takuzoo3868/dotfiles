@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+
+# Author: takuzoo3868
+# Last Modified: 16 Feb 2021.
+
+trap 'echo Error: $0:$LINENO stopped; exit 1' ERR INT
+set -euo pipefail
+dotfiles=$HOME/.dotfiles
+config=$dotfiles/config
+
+# load lib script (functions)
+. $dotfiles/etc/lib/header.sh
+
+
+## create symbolic link
+echo ""
+info "Creating symbolic links..."
+if [ ! -d "$HOME/.local/bin" ]; then
+  mkdir -p $HOME/.local/bin
+fi
+symlink "$dotfiles/etc/scripts/deploy" "$HOME/.local/bin/deploy"
+
+# bash
+info "bash..."
+symlink "$config/bash/.bashrc" "$HOME/.bashrc"
+if [ ! -d "$HOME/.bash" ]; then
+  mkdir -p $HOME/.bash
+fi
+symlink "$config/bash/aliases.bash" "$HOME/.bash/aliases.bash"
+symlink "$config/bash/prompt.bash" "$HOME/.bash/prompt.bash"
+
+# fish
+info "fish..."
+if [ ! -d "$HOME/.config/fish/functions" ]; then
+  mkdir -p $HOME/.config/fish/functions
+fi
+symlink "$config/fish/config.fish" "$HOME/.config/fish/config.fish"
+symlink "$config/fish/fishfile" "$HOME/.config/fish/fishfile"
+for i in $config/fish/functions/*.fish; do
+  ln -sf $i $HOME/.config/fish/functions/
+done
+
+# git
+info "git..."
+symlink "$config/git/.gitconfig" "$HOME/.gitconfig"
+symlink "$config/git/.gitignore.global" "$HOME/.gitignore.global"
+symlink "$config/git/.gitmessage" "$HOME/.gitmessage"
+mkdir -p $HOME/.git_template/hooks
+
+# vim
+info "vim..."
+symlink "$config/vim/.vimrc" "$HOME/.vimrc"
+
+# neovim
+info "neovim..."
+symlink "$config/nvim" "$HOME/.config/nvim"
+
+# nyaovim
+info "nyaovim..."
+symlink "$config/nyaovim" "$HOME/.config/nyaovim"
+
+# tmux
+info "tmux..."
+if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
+  git clone https://github.com/tmux-plugins/tpm $HOME/.tmux/plugins/tpm
+fi
+symlink "$config/tmux/.tmux.conf" "$HOME/.tmux.conf"
+symlink "$config/tmux/.tmux_local.conf" "$HOME/.tmux_local.conf"
+symlink "$config/tmux/bin" "$HOME/.tmux/bin"
+symlink "$config/tmux/work.yaml" "$HOME/.tmux/work.yaml"
+symlink "$config/tmux/uec.yaml" "$HOME/.tmux/uec.yaml"
+echo "  please check --> doc/tmux.md"
+echo '  export PATH="$HOME/.tmux/bin:$PATH"'
+
+# sqlite3
+info "sqlite..."
+symlink "$config/sqlite/.sqliterc" "$HOME/.sqliterc"
+
+# radare2
+info "radare2..."
+symlink "$config/radare2/.radare2rc" "$HOME/.radare2rc"
+
+# ranger
+info "ranger..."
+if [ ! -d "$HOME/.config/ranger" ]; then
+  mkdir -p $HOME/.config/ranger
+fi
+symlink "$config/ranger/rc.conf" "$HOME/.config/ranger/rc.conf"
+
+# weechat
+info "weechat..."
+echo "  please check --> doc/weechat.md"
+
+# local binary
+info "binary..."
+echo '  export PATH="$HOME/.local/bin:$PATH'
+echo '  export PATH="/opt/local/bin:/opt/local/sbin:$PATH"'
+for i in $dotfiles/bin/*; do
+  ln -sf $i $HOME/.local/bin/
+done
+echo ""

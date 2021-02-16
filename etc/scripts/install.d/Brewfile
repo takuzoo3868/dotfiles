@@ -1,0 +1,141 @@
+# Brewfile
+cask_args appdir: "/Applications"
+
+tap "homebrew/core"
+tap "homebrew/bundle"
+tap "homebrew/services"
+tap "caskroom/cask"
+tap "homebrew/cask-fonts"
+tap "homebrew/cask-versions"
+tap "caskroom/versions"
+tap "buo/cask-upgrade"
+
+# third party repo
+tap "b-ramsey/kali"
+tap "browsh-org/browsh"
+tap "cjbassi/gotop"
+tap "fumiyas/echo-sd"
+tap "nativeos/i386-elf-toolchain"
+tap "neovim/neovim"
+tap "sidaf/pentest"
+
+# dev tools
+brew "bat"
+brew "binutils"
+brew "coreutils"
+brew "curl"
+brew "fish"
+brew "gcc"
+brew "git"
+brew "gnu-sed"
+brew "grep"
+brew "jq"
+brew "neovim"
+brew "nkf"
+brew "openssl"
+brew "reattach-to-user-namespace" # For tmux clipboard
+brew "shellcheck"
+brew "telnet"
+brew "tmux"
+brew "tree"
+brew "unrar"
+brew "unzip"
+brew "vim", args: ["with-lua", "with-python3"]
+brew "wget"
+
+# language
+brew "go"
+brew "mysql"
+brew "redis"
+brew "ruby"
+brew "rust"
+brew "rustup-init"
+
+# useful tools
+brew "astyle"
+brew "browsh-org/browsh/browsh"
+brew "cjbassi/gotop/gotop"
+brew "evince"
+brew "ffmpeg"
+brew "fontforge"
+brew "fumiyas/echo-sd/echo-sd"
+brew "graphviz"
+brew "httpie"
+brew "jpeg"
+brew "libcaca", args: ["with-imlib2"]
+brew "libelf"
+brew "libyaml"
+brew "mas" # Mac App Store CLI
+brew "mps-youtube"
+brew "nativeos/i386-elf-toolchain/i386-elf-binutils"
+brew "nativeos/i386-elf-toolchain/i386-elf-gcc"
+brew "ntfs-3g"
+brew "nyancat"
+brew "ranger"
+brew "readline"
+brew "screenfetch"
+brew "source-highlight"
+brew "trash" # Moves files or folders to the trash
+brew "weechat", args: ["with-aspell", "with-curl", "with-lua", "with-perl", "with-python@2", "with-ruby"]
+brew "wine"
+brew "winetricks"
+brew "zenity"
+
+# golang based tools
+brew "ghq"
+brew "hub"
+brew "peco"
+brew "dep"
+
+# cask "appcleaner"
+# cask "ccleaner"
+# cask "cd-to"
+# cask "db-browser-for-sqlite"
+# cask "discord"
+# cask "dwarf-fortress"
+# cask "firefox"
+# cask "firefox-developer-edition"
+# cask "geektool"
+# cask "graphql-playground"
+# cask "iterm2"
+# cask "java"
+# cask "osxfuse"
+# cask "slack"
+# cask "spectacle"
+# cask "the-unarchiver"
+# cask "vagrant"
+# cask "vagrant-manager"
+# cask "visual-studio-code"
+# cask "vlc"
+# cask "xquartz"
+
+# ethical hacking tools
+# brew "exiftool"
+# brew "hydra"
+# brew "john-jumbo"
+# brew "libpcap"
+# brew "nikto"
+# brew "nmap"
+# brew "pwntools"
+# brew "radare2"
+# brew "sqlmap"
+# brew "tor"
+# cask "burp-suite"
+# cask "cutter"
+# cask "ghidra"
+# cask "owasp-zap"
+# cask "torbrowser"
+# cask "wireshark"
+
+
+# brew "ghostscript"
+# cask "mactex"
+# cask "font-noto-color-emoji"
+# cask "font-noto-emoji"
+# cask "font-noto-sans-cham"
+# cask "font-noto-sans-cjk-jp"
+# cask "font-twitter-color-emoji"
+
+# mas "LINE", id: 539883307
+# mas "PhotoSync", id: 418818452
+# mas "RunCat", id: 1429033973

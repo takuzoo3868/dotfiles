@@ -80,42 +80,33 @@ symlink() {
   [ -e "$2" ] || ln -sf "$1" "$2"
 }
 
-# install lang
-install_langenv(){
-  if is_exists "anyenv"; then
-    if ! is_exists "goenv"; then
-      anyenv install goenv
-    fi
-    if ! is_exists "pyenv"; then
-      anyenv install pyenv
-    fi
-    if ! is_exists "jenv"; then
-      anyenv install jenv
-    fi
-    if ! is_exists "rbenv"; then
-      anyenv install rbenv
-    fi
-    sleep 2
-  else
-    error "anyenv not found."
-    exit
-  fi
+# estimate os  
+detect_os() {
+  case "$(uname -s)" in
+    Linux|GNU*)
+      linux_distribution ;;
+    Darwin)
+      echo darwin ;;
+    Windows|CYGWIN*|MSYS*|MINGW*)
+      echo windows ;;
+    *)
+      echo unknown ;;
+  esac
 }
 
-install_python(){
-  if is_exists "pyenv"; then
-    if [ ! -d "$HOME/.anyenv/envs/pyenv/versions/2.7.15" ]; then
-      pyenv install 2.7.15
+# estimate distribution name
+linux_distribution() {
+  if [ -f /etc/debian_version ]; then
+    if [ "$(awk -F= '/DISTRIB_ID/ {print $2}' /etc/lsb-release)" = "Ubuntu" ]; then
+      echo ubuntu
+    else
+      echo debian
     fi
-    if [ ! -d "$HOME/.anyenv/envs/pyenv/versions/3.7.0" ]; then
-      pyenv install 3.7.0
-      pyenv global 3.7.0
-    fi
-    info "Installed python 2.7 & 3.7"
-    source $HOME/.bashrc
+  elif [ -f /etc/arch-release ]; then
+    echo archlinux
+  elif [[ -d /system/app/ && -d /system/priv-app ]]; then
+    echo android
   else
-    warn "pyenv not found. installing..."
-    install_langenv
-    install_python
+    echo unkown_linux
   fi
 }

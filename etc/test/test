@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-
-# Author: takuzoo3868
-# Last Modified: 25 Nov 2018.
-
-trap 'echo Error: $0: stopped; exit 1' ERR INT

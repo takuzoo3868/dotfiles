@@ -1,0 +1,137 @@
+#!/usr/bin/env bash
+
+# Author: takuzoo3868
+# Last Modified: 15 Feb 2021.
+
+trap 'echo Error: $0:$LINENO stopped; exit 1' ERR INT
+set -euo pipefail
+
+# set dotfiles path
+dotfiles=$HOME/.dotfiles
+
+# load lib script (functions)
+. $dotfiles/etc/lib/header.sh
+
+### Start install script
+DOTFILES_GITHUB="https://github.com/takuzoo3868/dotfiles.git"; export DOTFILES_GITHUB
+
+dotfiles_logo='
+██████╗  ██████╗ ████████╗███████╗██╗██╗     ███████╗███████╗
+██╔══██╗██╔═══██╗╚══██╔══╝██╔════╝██║██║     ██╔════╝██╔════╝
+██║  ██║██║   ██║   ██║   █████╗  ██║██║     █████╗  ███████╗
+██║  ██║██║   ██║   ██║   ██╔══╝  ██║██║     ██╔══╝  ╚════██║
+██████╔╝╚██████╔╝   ██║   ██║     ██║███████╗███████╗███████║
+╚═════╝  ╚═════╝    ╚═╝   ╚═╝     ╚═╝╚══════╝╚══════╝╚══════╝
+
+*** WHAT IS INSIDE? ***
+1. Download dotfiles from https://github.com/takuzoo3868/dotfiles.git
+2. Install dev packages
+   [coreutils bash vim git python tmux curl fish...]
+3. Symbolik linking config files to your home directory
+
+*** HOW TO INSTALL? ***
+See the README for documentation.
+Licensed under the MIT license.  
+'
+
+printf "${BOLD}"
+echo   "$dotfiles_logo"
+printf "${NORMAL}"
+
+log "*** ATTENTION ***"
+log "This script can change your entire setup."
+log "I recommend to read first. You can even copy commands one by one."
+log "If you use termux on Android, try this."
+log "$ /data/data/com.termux/files/usr/bin/bash"
+echo ""
+read -p "$(warn '(U^w^) < Are you sure you want to install it? [y/N] ')" -n 1 -r
+echo ""
+
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+  echo ""
+  error 'OK. Goodbye.'
+  exit 1
+fi
+
+_download() {
+  info "Downloading dotfiles..."
+
+  if [ ! -d "$dotfiles" ]; then
+    if is_exists "git"; then
+      git clone "$DOTFILES_GITHUB" "$dotfiles"
+      info "Downloaded"
+
+    elif is_exists "curl" || is_exists "wget"; then
+      local zip_url="https://github.com/takuzoo3868/dotfiles/archive/master.zip"
+
+      if is_exists "curl"; then
+        curl -L "$zip_url"
+
+      elif is_exists "wget"; then
+        wget -O - "$zip_url"
+      fi | tar xvz
+      
+      if [ ! -d dotfiles-master ]; then
+        error "dotfiles-master: not found"
+        exit 1
+      fi
+      mv -f dotfiles-master "$dotfiles"
+      info "Downloaded!"
+
+    else
+      error "curl or wget required"
+      exit 1
+    fi
+  else
+    warn "Dotfiles are already installed"
+  fi
+}
+
+_deploy() {
+  info "Deploying dotfiles..."
+  if [ ! -d $dotfiles ]; then
+    error "$dotfiles: not found"
+    exit 1
+  fi
+  
+  cd "$dotfiles"
+  make deploy
+  info "Deployed!"
+}
+
+_initialize() {
+  case "$@" in
+    "-i" | "--init" | "init")
+      info "Initializing dotfiles..."
+      cd "$dotfiles"
+      if [ -f Makefile ]; then
+        make init
+        info "Initialized!"
+      else
+        error "Makefile: not found"
+        exit 1
+      fi
+      ;;
+    *)
+      info "Skipped initialize"
+      ;;
+  esac
+}
+
+# A script for the file named "setup"
+dotfiles_setup() {
+    # 1. Download the repository
+    # ==> downloading
+    # Priority: git > curl > wget
+    _download &&
+
+    # 2. Deploy dotfiles to your home directory
+    # ==> deploying
+    _deploy &&
+
+    # 3. Execute all sh files within etc/init/
+    # ==> initializing
+    _initialize "$@"
+}
+
+dotfiles_setup "$@"

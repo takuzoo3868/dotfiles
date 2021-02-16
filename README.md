@@ -1,4 +1,4 @@
-# dotfiles
+# Dotfiles
 ![](https://img.shields.io/badge/works%20on-Ubuntu-DD4814.svg)
 ![](https://img.shields.io/badge/works%20on-ArchLinux-00AAD4.svg)
 ![](https://img.shields.io/badge/works%20on-MacOS-lightgrey.svg)
@@ -7,58 +7,72 @@
 ![img01](./doc/misc/Screenshot_2018-11-26_00-49-36.png)
 
 Author: takuzoo3868  
-Date: 26/Nov/2018 
+Date: 20/Feb/2021 
 
 This is a repository with my configuration files, those are verified on Linux / MacOS.
 
 ```
 dotfiles/
- ├── .bashrc 
- ├── .bashrc_prompt
- ├── bin/            --> Useful scripts
- ├── .config/
- │   ├── cpp
+ ├── bin/            --> Useful command scripts
+ ├── config/         --> Dotfiles
+ │   ├── bash
  │   ├── fish
  │   ├── git
  │   ├── nvim
  │   ├── nyaovim
+ │   ├── radare2
  │   ├── ranger
+ │   ├── sqlite
  │   ├── tmux
- │   └── fonts/      --> Store local font [unstage]
- ├── doc/            --> Other files (img/md) 
+ │   ├── vim
+ │   └── weechat
+ ├── doc/            --> Document files (img/md) 
  ├── etc/
  │   ├── init        --> Setup & Install scripts
- │   └── test        --> OS,env,shell tests [not yet upload]
- ├── Makefile
- ├── .radare2rc
- ├── .vimrc          --> Check nvim/init.vim
- └── .weechat/
+ │   └── lib         --> Library scripts
+ └── Makefile
 ```
 
-## requirements
-I recommend the introduction of [Cica](https://github.com/miiton/Cica) or [Nerd fonts](https://github.com/ryanoasis/nerd-fonts) to display graphical icons on terminal. 
+## Setup
 
-
-I'll add a script about fonts and other environment variables, as well as language environment maintenance in `etc/init`.
-
-## setup
 Just copy and execute this !!!
 ```bash
-$ bash -c "`curl -fsSL https://raw.githubusercontent.com/takuzoo3868/dotfiles/master/etc/init/init `"
+$ bash -c "$(curl -fsSL https://raw.githubusercontent.com/takuzoo3868/dotfiles/master/etc/setup)"
 ```
 
-It is almost the same as the command below except for executing through a Web site directly.
+If you want to install a [dev-packages](), add `init` as an optional argument.
 ```bash
+$ bash -c "$(curl -fsSL https://raw.githubusercontent.com/takuzoo3868/dotfiles/master/etc/setup)" -s init
+```
+
+### Setup using Makefile
+
+```bash
+$ git clone https://github.com/takuzoo3868/dotfiles.git $HOME/.dotfiles
+$ cd $HOME/.dotfiles
 $ make install
 ```
+
 Incidentally, `make install` will perform the following tasks.
+- `make update` Updating dotfiles from this repository
+- `make deploy` Deploying dotfiles to host
+- `make init` Initializing some settings
 
-- `make update` Updating dotfiles repository
-- `make deploy` Deploying dot files
-- `make init` Initializing some settings 
+Other options can be checked with `make help`.
 
-## screenshot
+## Recommend
+I recommend installing [Cica](https://github.com/miiton/Cica) or [Nerd fonts](https://github.com/ryanoasis/nerd-fonts) to display graphical icons on terminal. 
+
+A script to automate the installation is placed in `etc/init/install.d/98_font.sh`.
+
+## Screenshot
 
 ![img02](doc/misc/Screenshot_2018-11-26_00-52-06.png)
 
 ![img03](doc/misc/Screenshot_2018-11-26_00-53-13.png)
+
+## References
+
+- [b4b4r07/dotfiles](https://github.com/b4b4r07/dotfiles)
+
+- [dylanaraps/neofetch](https://github.com/dylanaraps/neofetch)

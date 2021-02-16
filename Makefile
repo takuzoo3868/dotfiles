@@ -1,10 +1,7 @@
-export dotfiles=${HOME}/.dotfiles
-
 DOTPATH    := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 CANDIDATES := $(wildcard .??*) bin
 EXCLUSIONS := .DS_Store .git .gitignore .vscode
 DOTFILES   := $(filter-out $(EXCLUSIONS), $(CANDIDATES))
-UNAME_S    := $(shell uname -s)
 
 .DEFAULT_GOAL := help
 
@@ -13,32 +10,26 @@ all:
 list: ## Show dot files in this repo
 	@$(foreach val, $(DOTFILES), ls -dl $(val);)
 
+update: ## Fetch changes for this repo
+	git pull origin master
+
 deploy: ## Create symlink to home directory
 	@echo '==> Start to deploy dotfiles to home directory.'
 	@echo ''
-	bash ${dotfiles}/etc/init/deploy
+	bash $(DOTPATH)/etc/scripts/deploy
 
 init: ## Setup environment settings
 	@echo '==> Start to install app using pkg manager.'
 	@echo ''
-	bash ${dotfiles}/etc/init/init
-
-update: ## Fetch changes for this repo
-	git pull origin master
+	bash $(DOTPATH)/etc/scripts/init
 
 install: update deploy init ## Run make update, deploy, init
 	@exec $$SHELL
 
-clean: ## Remove the dot files and this repo
+clean: ## Remove dotfiles and this repo
 	@echo 'Remove dot files in your home directory...'
 	@-$(foreach val, $(DOTFILES), rm -vrf $(HOME)/$(val);)
 	-rm -rf $(DOTPATH)
-
-goinstall: ## Install go packages
-	mkdir -p ${HOME}/{bin,src}
-
-test:
-	@echo ${dotfiles}
 
 help: ## Self-documented Makefile
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
