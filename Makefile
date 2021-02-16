@@ -23,7 +23,12 @@ init: ## Setup environment settings
 	@echo ''
 	bash $(DOTPATH)/etc/scripts/init
 
-install: update deploy init ## Run make update, deploy, init
+deep: ## Setup more finicky settings
+	@echo '==> Start to install a variety of tools.'
+	@echo ''
+	@find $(DOTPATH)/etc/scripts/deep.d -name "[0-9][0-9]*.sh"
+
+install: deploy init ## Run make deploy, init
 	@exec $$SHELL
 
 clean: ## Remove dotfiles and this repo

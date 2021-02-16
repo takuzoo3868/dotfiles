@@ -40,7 +40,7 @@ Just copy and execute this !!!
 $ bash -c "$(curl -fsSL https://raw.githubusercontent.com/takuzoo3868/dotfiles/master/etc/setup)"
 ```
 
-If you want to install a [dev-packages](), add `init` as an optional argument.
+If you want to install a [dev-packages](https://github.com/takuzoo3868/dotfiles/tree/master/etc/scripts/install.d), add `init` as an optional argument.
 ```bash
 $ bash -c "$(curl -fsSL https://raw.githubusercontent.com/takuzoo3868/dotfiles/master/etc/setup)" -s init
 ```
@@ -63,7 +63,11 @@ Other options can be checked with `make help`.
 ## Recommend
 I recommend installing [Cica](https://github.com/miiton/Cica) or [Nerd fonts](https://github.com/ryanoasis/nerd-fonts) to display graphical icons on terminal. 
 
-A script to automate the installation is placed in `etc/init/install.d/98_font.sh`.
+A script to automate the installation is placed in `etc/init/deep.d/98_font.sh`.
+
+```bash
+$ make deep
+```
 
 ## Screenshot
 
