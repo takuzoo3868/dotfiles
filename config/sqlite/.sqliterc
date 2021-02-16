@@ -1,0 +1,6 @@
+.timer on
+.headers on
+.mode column
+.width 0
+.separator ROW "\n"
+.nullvalue NULL

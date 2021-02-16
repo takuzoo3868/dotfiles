@@ -6,8 +6,9 @@
 **/*.ttf
 **/*.sfd
 
-# IntelliJ project files
+# Project files
 .idea
 .vscode
+tmp
 out
 gen

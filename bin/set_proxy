@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
 # Author: takuzoo3868
-# Last Modified: 10 May 2019.
+# Last Modified: 15 Feb 2021.
 
 HTTP_PROXY_HOST=proxy.uec.ac.jp
 HTTP_PROXY_PORT=8080
 HTTPS_PROXY_HOST=proxy.uec.ac.jp
 HTTPS_PROXY_PORT=8080
 
-SHELL_RC=$HOME/.bashrc_local
+SHELL_RC=$HOME/.bash/local.bash
 GIT_CONFIG_FILE=$HOME/.gitconfig.local
 CURL_RC=$HOME/.curlrc
 
@@ -31,6 +31,9 @@ HTTPS_PROXY="http://$HTTPS_PROXY_HOST:$HTTPS_PROXY_PORT"
 ftp_proxy="ftp://$HTTP_PROXY_HOST:$HTTPS_PROXY_PORT"
 FTP_PROXY="ftp://$HTTP_PROXY_HOST:$HTTPS_PROXY_PORT"
 EOF
+  sudo tee -a $CURL_RC <<EOF
+proxy="http://$HTTP_PROXY_HOST:$HTTP_PROXY_PORT"
+EOF
   echo "set UEC proxy environment for Linux!!!"
 }
 
@@ -43,6 +46,7 @@ environment_off(){
   sudo sed -i.bak "/HTTPS_PROXY/Id" /etc/environment
   sudo sed -i.bak "/ftp_proxy/Id" /etc/environment
   sudo sed -i.bak "/FTP_PROXY/Id" /etc/environment
+  sudo sed -i.bak "/proxy/Id" $CURL_RC
   echo "See you UEC, welcome my home!!!"
 }
 
@@ -53,6 +57,9 @@ proxy_on(){
   git config --file $GIT_CONFIG_FILE http.proxy $http_proxy
   git config --file $GIT_CONFIG_FILE https.proxy $https_proxy
   git config --file $GIT_CONFIG_FILE url."https://".insteadOf git://
+  tee -a $CURL_RC <<EOF
+proxy="http://$HTTP_PROXY_HOST:$HTTP_PROXY_PORT"
+EOF
   echo "set UEC proxy!!!"
 }
 
@@ -63,6 +70,7 @@ proxy_off(){
   git config --file $GIT_CONFIG_FILE --unset http.proxy
   git config --file $GIT_CONFIG_FILE --unset https.proxy
   git config --file $GIT_CONFIG_FILE --unset url."https://".insteadOf
+  sed -i '.bak' "/proxy/d" $CURL_RC
   echo "unset UEC proxy!!!"
 }
 

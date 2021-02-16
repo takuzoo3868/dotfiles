@@ -3,9 +3,15 @@
 
 [core]
   editor = vim
-  excludesfile = ~/.gitignore_global
+  excludesfile = ~/.gitignore.global
   preloadindex = true
   fscache = true
+
+[pager]
+	branch = cat
+	status = cat
+	diff = less
+	log = less
 
 [include]
   path = ~/.gitconfig.local

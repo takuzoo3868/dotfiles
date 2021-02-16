@@ -1,0 +1,48 @@
+name: Setup Test
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  ubuntu:
+    runs-on: ubuntu-latest
+    container: ubuntu:latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install required packages
+        run: apt-get update && apt-get install -y git sudo build-essential
+
+      - name: Install dotfiles
+        run: make install
+  
+  arch:
+    runs-on: ubuntu-latest
+    container: archlinux/base:latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Update packages
+        run: pacman -Syu --noconfirm
+
+      - name: Install required packages
+        run: pacman -S --noconfirm git sudo
+
+      - name: Install dotfiles
+        run: make install
+  
+  # darwin:
+  #   runs-on: macos-latest
+
+  # centos:
+  #   runs-on: ubuntu-latest
+  #   container: centos:latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+
+  #     - name: Install required packages
+  #       run: yum install -y git sudo
+  
+  #     - name: Install dotfiles
+  #       run: .bin/install.sh install
