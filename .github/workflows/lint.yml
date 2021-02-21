@@ -29,10 +29,11 @@ jobs:
         pip install vim-vint
     
     # Lint check
-    - name: Check init deploy
+    - name: Check setup init deploy
       run: |
-        shellcheck -f gcc ${GITHUB_WORKSPACE}/etc/init/init
-        shellcheck -f gcc ${GITHUB_WORKSPACE}/etc/init/deploy
+        shellcheck -f gcc ${GITHUB_WORKSPACE}/etc/setup --exclude=SC1090
+        shellcheck -f gcc ${GITHUB_WORKSPACE}/etc/scripts/init --exclude=SC1090
+        shellcheck -f gcc ${GITHUB_WORKSPACE}/etc/scripts/deploy --exclude=SC1090
 
     - name: Check .bashrc
       run: shellcheck -f gcc ${GITHUB_WORKSPACE}/config/bash/.bashrc --exclude=SC2148,SC1090

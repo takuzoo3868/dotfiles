@@ -5,10 +5,14 @@
 
 trap 'echo Error: $0:$LINENO stopped; exit 1' ERR INT
 set -euo pipefail
-dotfiles=$HOME/.dotfiles
+
+# set dotfiles path as default variable
+if [ -z "${DOTPATH:-}" ]; then
+    DOTPATH=$HOME/.dotfiles; export DOTPATH
+fi
 
 # load lib script (functions)
-. $dotfiles/etc/lib/header.sh
+. "$DOTPATH"/etc/lib/header.sh
 
 
 ## install packages
@@ -27,7 +31,7 @@ do
     kill -0 "$$" || exit
 done 2>/dev/null &
 
-find $dotfiles/etc/scripts/install.d -name "[0-9][0-9]*.sh"
+find "$DOTPATH"/etc/scripts/install.d -name "[0-9][0-9]*.sh"
 # find install.d -name "[0-9][0-9]*.sh" | bash
 
 echo ""

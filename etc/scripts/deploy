@@ -5,87 +5,91 @@
 
 trap 'echo Error: $0:$LINENO stopped; exit 1' ERR INT
 set -euo pipefail
-dotfiles=$HOME/.dotfiles
-config=$dotfiles/config
+
+# set dotfiles path as default variable
+if [ -z "${DOTPATH:-}" ]; then
+    DOTPATH=$HOME/.dotfiles; export DOTPATH
+fi
+CONFPATH=$DOTPATH/config
 
 # load lib script (functions)
-. $dotfiles/etc/lib/header.sh
-
+. "$DOTPATH"/etc/lib/header.sh
 
 ## create symbolic link
 echo ""
 info "Creating symbolic links..."
 if [ ! -d "$HOME/.local/bin" ]; then
-  mkdir -p $HOME/.local/bin
+  mkdir -p "$HOME"/.local/bin
 fi
-symlink "$dotfiles/etc/scripts/deploy" "$HOME/.local/bin/deploy"
+symlink "$DOTPATH/etc/scripts/deploy" "$HOME/.local/bin/deploy"
 
 # bash
 info "bash..."
-symlink "$config/bash/.bashrc" "$HOME/.bashrc"
+symlink "$CONFPATH/bash/.bashrc" "$HOME/.bashrc"
 if [ ! -d "$HOME/.bash" ]; then
-  mkdir -p $HOME/.bash
+  mkdir -p "$HOME".bash
 fi
-symlink "$config/bash/aliases.bash" "$HOME/.bash/aliases.bash"
-symlink "$config/bash/prompt.bash" "$HOME/.bash/prompt.bash"
+symlink "$CONFPATH/bash/aliases.bash" "$HOME/.bash/aliases.bash"
+symlink "$CONFPATH/bash/prompt.bash" "$HOME/.bash/prompt.bash"
 
 # fish
 info "fish..."
 if [ ! -d "$HOME/.config/fish/functions" ]; then
-  mkdir -p $HOME/.config/fish/functions
+  mkdir -p "$HOME"/.config/fish/functions
 fi
-symlink "$config/fish/config.fish" "$HOME/.config/fish/config.fish"
-symlink "$config/fish/fishfile" "$HOME/.config/fish/fishfile"
-for i in $config/fish/functions/*.fish; do
-  ln -sf $i $HOME/.config/fish/functions/
+symlink "$CONFPATH/fish/config.fish" "$HOME/.config/fish/config.fish"
+symlink "$CONFPATH/fish/fishfile" "$HOME/.config/fish/fishfile"
+for i in "$CONFPATH"/fish/functions/*.fish; do
+  ln -sf "$i" "$HOME"/.config/fish/functions/
 done
 
 # git
 info "git..."
-symlink "$config/git/.gitconfig" "$HOME/.gitconfig"
-symlink "$config/git/.gitignore.global" "$HOME/.gitignore.global"
-symlink "$config/git/.gitmessage" "$HOME/.gitmessage"
-mkdir -p $HOME/.git_template/hooks
+symlink "$CONFPATH/git/.gitconfig" "$HOME/.gitconfig"
+symlink "$CONFPATH/git/.gitignore.global" "$HOME/.gitignore.global"
+symlink "$CONFPATH/git/.gitmessage" "$HOME/.gitmessage"
+mkdir -p "$HOME"/.git_template/hooks
 
 # vim
 info "vim..."
-symlink "$config/vim/.vimrc" "$HOME/.vimrc"
+symlink "$CONFPATH/vim/.vimrc" "$HOME/.vimrc"
 
 # neovim
 info "neovim..."
-symlink "$config/nvim" "$HOME/.config/nvim"
+symlink "$CONFPATH/nvim" "$HOME/.config/nvim"
 
 # nyaovim
 info "nyaovim..."
-symlink "$config/nyaovim" "$HOME/.config/nyaovim"
+symlink "$CONFPATH/nyaovim" "$HOME/.config/nyaovim"
 
 # tmux
 info "tmux..."
 if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
-  git clone https://github.com/tmux-plugins/tpm $HOME/.tmux/plugins/tpm
+  git clone https://github.com/tmux-plugins/tpm "$HOME"/.tmux/plugins/tpm
 fi
-symlink "$config/tmux/.tmux.conf" "$HOME/.tmux.conf"
-symlink "$config/tmux/.tmux_local.conf" "$HOME/.tmux_local.conf"
-symlink "$config/tmux/bin" "$HOME/.tmux/bin"
-symlink "$config/tmux/work.yaml" "$HOME/.tmux/work.yaml"
-symlink "$config/tmux/uec.yaml" "$HOME/.tmux/uec.yaml"
+symlink "$CONFPATH/tmux/.tmux.conf" "$HOME/.tmux.conf"
+symlink "$CONFPATH/tmux/.tmux_local.conf" "$HOME/.tmux_local.conf"
+symlink "$CONFPATH/tmux/bin" "$HOME/.tmux/bin"
+symlink "$CONFPATH/tmux/work.yaml" "$HOME/.tmux/work.yaml"
+symlink "$CONFPATH/tmux/uec.yaml" "$HOME/.tmux/uec.yaml"
 echo "  please check --> doc/tmux.md"
+# shellcheck disable=SC2016
 echo '  export PATH="$HOME/.tmux/bin:$PATH"'
 
 # sqlite3
 info "sqlite..."
-symlink "$config/sqlite/.sqliterc" "$HOME/.sqliterc"
+symlink "$CONFPATH/sqlite/.sqliterc" "$HOME/.sqliterc"
 
 # radare2
 info "radare2..."
-symlink "$config/radare2/.radare2rc" "$HOME/.radare2rc"
+symlink "$CONFPATH/radare2/.radare2rc" "$HOME/.radare2rc"
 
 # ranger
 info "ranger..."
 if [ ! -d "$HOME/.config/ranger" ]; then
-  mkdir -p $HOME/.config/ranger
+  mkdir -p "$HOME"/.config/ranger
 fi
-symlink "$config/ranger/rc.conf" "$HOME/.config/ranger/rc.conf"
+symlink "$CONFPATH/ranger/rc.conf" "$HOME/.config/ranger/rc.conf"
 
 # weechat
 info "weechat..."
@@ -93,9 +97,11 @@ echo "  please check --> doc/weechat.md"
 
 # local binary
 info "binary..."
+# shellcheck disable=SC2016
 echo '  export PATH="$HOME/.local/bin:$PATH'
+# shellcheck disable=SC2016
 echo '  export PATH="/opt/local/bin:/opt/local/sbin:$PATH"'
-for i in $dotfiles/bin/*; do
-  ln -sf $i $HOME/.local/bin/
+for i in "$DOTPATH"/bin/*; do
+  ln -sf "$i" "$HOME"/.local/bin/
 done
 echo ""

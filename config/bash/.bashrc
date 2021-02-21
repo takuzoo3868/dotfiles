@@ -15,14 +15,15 @@
 # Last Modified: 16 Feb 2021.
 
 load_conf() {
-    if [ -e $1 ]; then
-        . $1
+    if [ -e "$1" ]; then
+        # shellcheck disable=SC1090
+        . "$1"
     fi
 }
 
 if_exist_load_conf() {
-    if [ $1 == 1 ]; then
-        load_conf $2
+    if [ "$1" == 1 ]; then
+        load_conf "$2"
     fi
 }
 
@@ -72,6 +73,7 @@ esac
 ### should be on the output of commands, not on the prompt
 #force_color_prompt=yes
 
+# shellcheck disable=SC2154
 if [ -n "$force_color_prompt" ]; then
     if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
 	### We have color support; assume it's compliant with Ecma-48
@@ -111,9 +113,9 @@ if ! shopt -oq posix; then
 fi
 
 ### Load bash settings
-load_conf $HOME/.bash/local.bash
-load_conf $HOME/.bash/aliases.bash
-load_conf $HOME/.bash/prompt.bash
+load_conf "$HOME"/.bash/local.bash
+load_conf "$HOME"/.bash/aliases.bash
+load_conf "$HOME"/.bash/prompt.bash
 
 ### USE neovim as default editor
 export EDITOR=nvim

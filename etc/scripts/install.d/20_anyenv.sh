@@ -6,14 +6,15 @@
 trap 'echo Error: $0:$LINENO stopped; exit 1' ERR INT
 set -euo pipefail
 
-# set dotfiles path
-dotfiles=$HOME/.dotfiles
-localrc=$HOME/.bash/local.bash
+# set dotfiles path as default variable
+if [ -z "${DOTPATH:-}" ]; then
+    DOTPATH=$HOME/.dotfiles; export DOTPATH
+fi
+LOCALRC=$HOME/.bash/local.bash
 
 # load lib script (functions)
-# shellcheck source="$dotfiles"/etc/lib/header.sh
-# shellcheck disable=SC1091
-. "$dotfiles"/etc/lib/header.sh
+. "$DOTPATH"/etc/lib/header.sh
+
 
 install_anyenv() {
   echo ""
@@ -24,50 +25,50 @@ install_anyenv() {
     info "anyenv is already installed"
   else
     warn "anyenv has not installed yet"
-    git clone https://github.com/anyenv/anyenv.git $HOME/.anyenv
-    source $HOME/.bashrc
+    git clone https://github.com/anyenv/anyenv.git "$HOME"/.anyenv
+    source "$HOME"/.bashrc
 
     # plugins
-    mkdir -p $HOME/.anyenv/plugins
-    git clone https://github.com/znz/anyenv-update.git $HOME/.anyenv/plugins/anyenv-update
-    git clone https://github.com/znz/anyenv-git.git $HOME/.anyenv/plugins/anyenv-git
+    mkdir -p "$HOME"/.anyenv/plugins
+    git clone https://github.com/znz/anyenv-update.git "$HOME"/.anyenv/plugins/anyenv-update
+    git clone https://github.com/znz/anyenv-git.git "$HOME"/.anyenv/plugins/anyenv-git
   fi
 
   # check exist local bashrc
-  if [ ! -f $localrc ]; then
-    touch $localrc
+  if [ ! -f "$LOCALRC" ]; then
+    touch "$LOCALRC"
   fi
 
-  if grep -q "### anyenv" "$localrc"; then
+  if grep -q "### anyenv" "$LOCALRC"; then
     info "anyenv: export PATH is ok"
   else
     warn "anyenv: not export PATH..."
-    tee -a $localrc <<EOF
+    tee -a "$LOCALRC" <<EOF
 
 ### anyenv
-if [ -d $HOME/.anyenv ] ; then
+if [ -d "$HOME"/.anyenv ] ; then
     export PATH="$HOME/.anyenv/bin:$PATH"
     eval "$(anyenv init -)"
     # tmux
-    for D in `\ls $HOME/.anyenv/envs`
-    do
-        export PATH="$HOME/.anyenv/envs/$D/shims:$PATH"
+    for D in $(ls "$HOME"/.anyenv/envs); do
+      export PATH="$HOME/.anyenv/envs/$D/shims:$PATH"
     done
 fi
 
 EOF
-    source $HOME/.bashrc
+    # shellcheck disable=SC1091
+    source "$HOME"/.bashrc
   fi
   
-  $HOME/.anyenv/bin/anyenv init
+  "$HOME"/.anyenv/bin/anyenv init
   # exec $SHELL -l
-  source $HOME/.bashrc
+  source "$HOME"/.bashrc
   anyenv install --init
 
-  for lang_env in goenv pyenv jenv rbenv; do
-    anyenv install $lang_env
+  for l in goenv pyenv jenv rbenv; do
+    anyenv install $l
   done
-  info "Installed {go,py,j,rb}env"
+  info "Installed go, python, java and ruby environment"
 }
 
 install_anyenv

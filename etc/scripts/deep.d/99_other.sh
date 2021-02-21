@@ -6,13 +6,18 @@
 trap 'echo Error: $0:$LINENO stopped; exit 1' ERR INT
 set -euo pipefail
 
-# set dotfiles path
-dotfiles=$HOME/.dotfiles
+# set dotfiles path as default variable
+if [ -z "${DOTPATH:-}" ]; then
+    DOTPATH=$HOME/.dotfiles; export DOTPATH
+fi
 
 # load lib script (functions)
-. $dotfiles/etc/lib/header.sh
+# shellcheck source="$dotfiles"/etc/lib/header.sh
+# shellcheck disable=SC1091
+. "$DOTPATH"/etc/lib/header.sh
 
 
+# lolcat
 if is_exists "lolcat"; then
   info "Installed lolcat"
 else
@@ -20,6 +25,7 @@ else
   brew install lolcat
 fi
 
+# octocatsay
 if is_exists "octocatsay"; then
   info "Installed octocatsay"
 else
@@ -35,8 +41,8 @@ else
   cd $HOME
 fi
 
-info "Dwarf Fortress is a single-player fantasy game."
-#brew cask install dwarf-fortress
+# info "Dwarf Fortress is a single-player fantasy game."
+# brew cask install dwarf-fortress
 
-info "Installation was successful. Terminal restart..."
-exec $SHELL -l
+# info "Installation was successful. Terminal restart..."
+# exec $SHELL -l

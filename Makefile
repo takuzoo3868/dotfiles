@@ -1,14 +1,11 @@
 DOTPATH    := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
-CANDIDATES := $(wildcard .??*) bin
-EXCLUSIONS := .DS_Store .git .gitignore .vscode
+CANDIDATES := $(wildcard .??*) bin config
+EXCLUSIONS := .DS_Store .git .github .gitignore .vscode
 DOTFILES   := $(filter-out $(EXCLUSIONS), $(CANDIDATES))
 
 .DEFAULT_GOAL := help
 
 all:
-
-list: ## Show dot files in this repo
-	@$(foreach val, $(DOTFILES), ls -dl $(val);)
 
 update: ## Fetch changes for this repo
 	git pull origin master
@@ -16,12 +13,12 @@ update: ## Fetch changes for this repo
 deploy: ## Create symlink to home directory
 	@echo '==> Start to deploy dotfiles to home directory.'
 	@echo ''
-	bash $(DOTPATH)/etc/scripts/deploy
+	@DOTPATH=$(DOTPATH) bash $(DOTPATH)/etc/scripts/deploy
 
 init: ## Setup environment settings
 	@echo '==> Start to install app using pkg manager.'
 	@echo ''
-	bash $(DOTPATH)/etc/scripts/init
+	@DOTPATH=$(DOTPATH) bash $(DOTPATH)/etc/scripts/init
 
 deep: ## Setup more finicky settings
 	@echo '==> Start to install a variety of tools.'
@@ -30,6 +27,10 @@ deep: ## Setup more finicky settings
 
 install: deploy init ## Run make deploy, init
 	@exec $$SHELL
+
+check: ## Check if it is ready to install
+	@echo 'PATH:' $(DOTPATH)
+	@echo 'TARGET:' $(DOTFILES)
 
 clean: ## Remove dotfiles and this repo
 	@echo 'Remove dot files in your home directory...'

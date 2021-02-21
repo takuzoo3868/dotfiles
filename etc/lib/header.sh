@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Author: takuzoo3868
-# Last Modified: 08 Jun 2018.
+# Last Modified: 08 Jun 2021.
 
 # use colors on terminal
 tput=$(which tput)
@@ -27,23 +27,23 @@ fi
 ### functions
 # info: output terminal green
 info() { 
-  printf "${GREEN}"
+  printf "%s" "$GREEN"
   echo -n "[+] "
-  printf "${NORMAL}"
+  printf "%s" "$NORMAL"
   echo "$1"
 }
 # error: output terminal red
 error() {
-  printf "${RED}"
+  printf "%s" "$RED"
   echo -n "[-] "
-  printf "${NORMAL}"
+  printf "%s" "$NORMAL"
   echo "$1"
 }
 # warn: output terminal yellow
 warn() {
-  printf "${YELLOW}"
+  printf "%s" "$YELLOW"
   echo -n "[*] "
-  printf "${NORMAL}"
+  printf "%s" "$NORMAL"
   echo "$1"
 }
 # log: out put termial normal

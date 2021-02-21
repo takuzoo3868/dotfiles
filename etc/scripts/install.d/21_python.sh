@@ -6,13 +6,18 @@
 trap 'echo Error: $0:$LINENO stopped; exit 1' ERR INT
 set -euo pipefail
 
-# set dotfiles path
-dotfiles=$HOME/.dotfiles
+# set dotfiles path as default variable
+if [ -z "${DOTPATH:-}" ]; then
+    DOTPATH=$HOME/.dotfiles; export DOTPATH
+fi
 
 # load lib script (functions)
-# shellcheck source="$dotfiles"/etc/lib/header.sh
-# shellcheck disable=SC1091
-. "$dotfiles"/etc/lib/header.sh
+. "$DOTPATH"/etc/lib/header.sh
+
+
+echo ""
+info "21 Install Python"
+echo ""
 
 # install python
 install_python(){
@@ -25,7 +30,7 @@ install_python(){
       pyenv global 3.7.0
     fi
     info "Installed python 2.7 & 3.7"
-    source $HOME/.bashrc
+    source "$HOME"/.bashrc
   else
     warn "pyenv not found. installing..."
     install_langenv
@@ -46,11 +51,10 @@ else
   brew install pipenv
 fi
 
-echo ""
-info "Check PIPENV_VENV_IN_PROJECT..."
-if $(cat $HOME/.bashrc_local | grep PIPENV_VENV_IN_PROJECT > /dev/null) ; then
-  info "export is OK"
-else
-  warn "export is NG --> bashrc_local"
-fi
-
+# echo ""
+# info "Check PIPENV_VENV_IN_PROJECT..."
+# if $(cat "$HOME"/.bashrc_local | grep PIPENV_VENV_IN_PROJECT > /dev/null) ; then
+#   info "export is OK"
+# else
+#   warn "export is NG --> bashrc_local"
+# fi

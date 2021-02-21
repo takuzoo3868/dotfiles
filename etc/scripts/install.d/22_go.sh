@@ -16,12 +16,5 @@ fi
 
 
 echo ""
-info "05 Install Docker"
+info "22 Install Golang"
 echo ""
-
-case $(detect_os) in
-  android)
-    echo "Skip 05-docker" ;;
-  *)
-    /bin/bash -c "$(curl -fsSL https://get.docker.com)" ;;
-esac

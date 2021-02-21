@@ -6,11 +6,65 @@
 trap 'echo Error: $0:$LINENO stopped; exit 1' ERR INT
 set -euo pipefail
 
-# set dotfiles path
-dotfiles=$HOME/.dotfiles
+# set dotfiles path as default variable
+if [ -z "${DOTPATH:-}" ]; then
+    DOTPATH=$HOME/.dotfiles; export DOTPATH
+fi
 
-# load lib script (functions)
-. $dotfiles/etc/lib/header.sh
+# load lib functions
+# use colors on terminal
+tput=$(which tput)
+if [ -n "$tput" ]; then
+  ncolors=$($tput colors)
+fi
+if [ -t 1 ] && [ -n "$ncolors" ] && [ "$ncolors" -ge 8 ]; then
+  RED="$(tput setaf 1)"
+  GREEN="$(tput setaf 2)"
+  YELLOW="$(tput setaf 3)"
+  BOLD="$(tput bold)"
+  NORMAL="$(tput sgr0)"
+else
+  RED=""
+  GREEN=""
+  YELLOW=""
+  BOLD=""
+  NORMAL=""
+fi
+
+### functions
+# info: output terminal green
+info() { 
+  printf "%s" "$GREEN"
+  echo -n "[+] "
+  printf "%s" "$NORMAL"
+  echo "$1"
+}
+# error: output terminal red
+error() {
+  printf "%s" "$RED"
+  echo -n "[-] "
+  printf "%s" "$NORMAL"
+  echo "$1"
+}
+# warn: output terminal yellow
+warn() {
+  printf "%s" "$YELLOW"
+  echo -n "[*] "
+  printf "%s" "$NORMAL"
+  echo "$1"
+}
+# log: out put termial normal
+log() { 
+  echo "  $1" 
+}
+
+# check package & return flag
+is_exists() {
+  which "$1" >/dev/null 2>&1
+  return $?
+}
+
+
 
 ### Start install script
 DOTFILES_GITHUB="https://github.com/takuzoo3868/dotfiles.git"; export DOTFILES_GITHUB
@@ -34,9 +88,9 @@ See the README for documentation.
 Licensed under the MIT license.  
 '
 
-printf "${BOLD}"
+printf "%s" "$BOLD"
 echo   "$dotfiles_logo"
-printf "${NORMAL}"
+printf "%s" "$NORMAL"
 
 log "*** ATTENTION ***"
 log "This script can change your entire setup."
@@ -56,9 +110,9 @@ fi
 _download() {
   info "Downloading dotfiles..."
 
-  if [ ! -d "$dotfiles" ]; then
+  if [ ! -d "$DOTPATH" ]; then
     if is_exists "git"; then
-      git clone "$DOTFILES_GITHUB" "$dotfiles"
+      git clone "$DOTFILES_GITHUB" "$DOTPATH"
       info "Downloaded"
 
     elif is_exists "curl" || is_exists "wget"; then
@@ -75,7 +129,7 @@ _download() {
         error "dotfiles-master: not found"
         exit 1
       fi
-      mv -f dotfiles-master "$dotfiles"
+      mv -f dotfiles-master "$DOTPATH"
       info "Downloaded!"
 
     else
@@ -89,12 +143,12 @@ _download() {
 
 _deploy() {
   info "Deploying dotfiles..."
-  if [ ! -d $dotfiles ]; then
-    error "$dotfiles: not found"
+  if [ ! -d "$DOTPATH" ]; then
+    error "$DOTPATH: not found"
     exit 1
   fi
   
-  cd "$dotfiles"
+  cd "$DOTPATH"
   make deploy
   info "Deployed!"
 }
@@ -103,7 +157,7 @@ _initialize() {
   case "$@" in
     "-i" | "--init" | "init")
       info "Initializing dotfiles..."
-      cd "$dotfiles"
+      cd "$DOTPATH"
       if [ -f Makefile ]; then
         make init
         info "Initialized!"

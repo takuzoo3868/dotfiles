@@ -6,13 +6,14 @@
 trap 'echo Error: $0:$LINENO stopped; exit 1' ERR INT
 set -euo pipefail
 
-# set dotfiles path
-dotfiles=$HOME/.dotfiles
+# set dotfiles path as default variable
+if [ -z "${DOTPATH:-}" ]; then
+    DOTPATH=$HOME/.dotfiles; export DOTPATH
+fi
 
 # load lib script (functions)
-# shellcheck source="$dotfiles"/etc/lib/header.sh
-# shellcheck disable=SC1091
-. "$dotfiles"/etc/lib/header.sh
+. "$DOTPATH"/etc/lib/header.sh
+
 
 brewery() {
   echo ""
@@ -28,14 +29,14 @@ brewery() {
     info "brew: installed successfully."
   fi
 
-  builtin cd $dotfiles/etc/scripts/install.d
+  builtin cd "$DOTPATH"/etc/scripts/install.d
   if [ ! -f Brewfile ]; then
     error "Brewfile: not found"
   else
     brew bundle
     info "brew: tapped successfully."
   fi
-  builtin cd $dotfiles
+  builtin cd "$DOTPATH"
 }
 
 case $(detect_os) in

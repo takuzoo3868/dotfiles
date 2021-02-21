@@ -6,13 +6,16 @@
 trap 'echo Error: $0:$LINENO stopped; exit 1' ERR INT
 set -euo pipefail
 
-# set dotfiles path
-dotfiles=$HOME/.dotfiles
+# set dotfiles path as default variable
+if [ -z "${DOTPATH:-}" ]; then
+    DOTPATH=$HOME/.dotfiles; export DOTPATH
+fi
 
 # load lib script (functions)
 # shellcheck source="$dotfiles"/etc/lib/header.sh
 # shellcheck disable=SC1091
-. "$dotfiles"/etc/lib/header.sh
+. "$DOTPATH"/etc/lib/header.sh
+
 
 if is_exists "fontforge"; then
   info "98 Install fonts..."
@@ -21,11 +24,12 @@ else
   exit 1
 fi
 
-mkdir -p $dotfiles/tmp && cd $dotfiles/tmp
+mkdir -p $DOTPATH/tmp && cd $DOTPATH/tmp
 
 # Download Nerd fonts
 nerd_url="https://github.com/ryanoasis/nerd-fonts.git"
 git clone --depth 1 "$nerd_url" && cd nerd-fonts && mkdir -p orig dist
+
 # Download Cica fonts
 cica_url=$(curl -s https://api.github.com/repos/miiton/Cica/releases/latest | grep "browser_download_url.*zip" | grep "with_emoji" | cut -d '"' -f 4)
 curl -L "$cica_url" | tar -xvz -C orig
@@ -44,5 +48,5 @@ done
 # Copy to font directory
 cp -u dist/* $fonts_dir
 
-cd $dotfiles
+cd $DOTPATH
 rm -rf tmp
