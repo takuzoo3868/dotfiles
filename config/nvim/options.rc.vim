@@ -1,3 +1,6 @@
+set encoding=utf-8
+scriptencoding utf-8
+
 " 起動メッセージ
 augroup InitialMessage
   autocmd!
