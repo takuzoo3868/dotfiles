@@ -1,7 +1,9 @@
-name: Setup Test
+name: Setup
 
 on:
   push:
+    branches: [ master ]
+  pull_request:
     branches: [ master ]
 
 jobs:
@@ -18,6 +20,7 @@ jobs:
       - name: Install dotfiles
         run: make deploy
         env:
+          TERM: xterm
           DOTPATH: ${GITHUB_WORKSPACE}
   
   arch:

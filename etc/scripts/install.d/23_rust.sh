@@ -16,19 +16,9 @@ fi
 
 
 echo ""
-info "22 Install Golang"
+info "23 Install Rust"
 echo ""
 
-# curl -LO "https://get.golang.org/$(uname)/go_installer"
-# chmod +x go_installer
-# ./go_installer
-# rm go_installer
-
-# export PATH=$PATH:$HOME/.go/bin
-# export GOPATH=$HOME/go
-# export PATH=$PATH:$GOPATH/bin
-
-# mkdir -p $HOME/src $HOME/bin
-
-# go get github.com/x-motemen/ghq
-# go get github.com/peco/peco/cmd/peco
+if [ ! -e $HOME/.cargo ] ; then
+	curl https://sh.rustup.rs -sSf | sh -s -- -y
+fi
