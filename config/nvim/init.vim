@@ -1,4 +1,6 @@
-" vint: -ProhibitMissingScriptEncoding
+set encoding=utf-8
+scriptencoding utf-8
+
 "        ___                                     ___           ___           ___     
 "       /\  \          ___                      /\  \         /\  \         /\__\    
 "       \:\  \        /\  \        ___         |::\  \       /::\  \       /:/  /    
@@ -15,8 +17,8 @@
 " Date: 03/May/2017
 
 " Vi互換モードをオフ（Vimの拡張機能を有効化）
-" vint: next-line -ProhibitSetNoCompatible
 if &compatible
+  " vint: next-line -ProhibitSetNoCompatible
   set nocompatible
 endif
 
