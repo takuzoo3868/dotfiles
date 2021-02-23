@@ -27,7 +27,7 @@ symlink "$DOTPATH/etc/scripts/deploy" "$HOME/.local/bin/deploy"
 info "bash..."
 symlink "$CONFPATH/bash/.bashrc" "$HOME/.bashrc"
 if [ ! -d "$HOME/.bash" ]; then
-  mkdir -p "$HOME".bash
+  mkdir -p "$HOME"/.bash
 fi
 symlink "$CONFPATH/bash/aliases.bash" "$HOME/.bash/aliases.bash"
 symlink "$CONFPATH/bash/prompt.bash" "$HOME/.bash/prompt.bash"

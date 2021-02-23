@@ -7,39 +7,37 @@ on:
     branches: [ master ]
 
 jobs:
-  ubuntu:
+  linux:
+    strategy:
+      matrix:
+        container: [ubuntu, archlinux/base]
+      fail-fast: false
+    
     runs-on: ubuntu-latest
-    container: ubuntu:latest
+    name: Test on ${{ matrix.container }}
+    container: ${{ matrix.container }}
+
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Install required packages
-        run: apt-get update && apt-get install -y git sudo build-essential
-
-      # Error Check
-      - name: Install dotfiles
-        run: make deploy
-        env:
-          TERM: xterm
-          DOTPATH: ${GITHUB_WORKSPACE}
-  
-  arch:
-    runs-on: ubuntu-latest
-    container: archlinux/base:latest
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Update packages
-        run: pacman -Syu --noconfirm
-
-      - name: Install required packages
-        run: pacman -S --noconfirm git sudo
+      - name: Install required packages (apt)
+        if: matrix.container == 'ubuntu'
+        run: |
+          apt-get update
+          apt-get install -y git sudo build-essential
       
-      # Error Check
+      - name: Install required packages (pacman)
+        if: matrix.container == 'archlinux/base'
+        run: |
+          pacman -Syu --noconfirm base-devel
+          pacman -S --noconfirm git sudo
+      
+      - uses: actions/checkout@v2
+
+      # Error check
       - name: Install dotfiles
         run: make deploy
-        env:
-          DOTPATH: ${GITHUB_WORKSPACE}
+          env:
+            TERM: xterm
+            DOTPATH: ${GITHUB_WORKSPACE}
   
   # darwin:
   #   runs-on: macos-latest
