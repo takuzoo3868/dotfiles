@@ -35,9 +35,9 @@ jobs:
       # Error check
       - name: Install dotfiles
         run: make deploy
-          env:
-            TERM: xterm
-            DOTPATH: ${GITHUB_WORKSPACE}
+        env:
+          TERM: xterm
+          DOTPATH: ${GITHUB_WORKSPACE}
   
   # darwin:
   #   runs-on: macos-latest
