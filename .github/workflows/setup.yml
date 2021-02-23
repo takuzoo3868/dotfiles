@@ -27,8 +27,7 @@ jobs:
       - name: Install required packages (pacman)
         if: matrix.container == 'archlinux/base'
         run: |
-          pacman -Sy --noconfirm --needed base-devel
-          pacman -Sy --noconfirm --needed git sudo pkgconf
+          pacman -Syu --noconfirm --needed git sudo pkgconf
       
       - uses: actions/checkout@v2
 
