@@ -122,3 +122,4 @@ export EDITOR=nvim
 
 ### USE fish as default shell
 #exec fish
+. "$HOME/.cargo/env"

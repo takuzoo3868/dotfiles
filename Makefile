@@ -12,17 +12,14 @@ update: ## Fetch changes for this repo
 
 deploy: ## Create symlink to home directory
 	@echo '==> Start to deploy dotfiles to home directory.'
-	@echo ''
 	@DOTPATH=$(DOTPATH) bash $(DOTPATH)/etc/scripts/deploy
 
 init: ## Setup environment settings
 	@echo '==> Start to install app using pkg manager.'
-	@echo ''
 	@DOTPATH=$(DOTPATH) bash $(DOTPATH)/etc/scripts/init
 
 deep: ## Setup more finicky settings
 	@echo '==> Start to install a variety of tools.'
-	@echo ''
 	@find $(DOTPATH)/etc/scripts/deep.d -name "[0-9][0-9]*.sh"
 
 install: deploy init ## Run make deploy, init

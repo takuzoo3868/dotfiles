@@ -32,11 +32,9 @@ if = "has('nvim')"
 on_ft = 'python'
 hook_source = '''
 if has('unix')
-  let g:python_host_prog = '/usr/bin/python2'
   let g:python3_host_prog = '/usr/bin/python3'
 endif
 if has('mac')
-  let g:python_host_prog = '/usr/local/bin/python2'
   let g:python3_host_prog = '/usr/local/bin/python3'
 endif
 '''
@@ -52,11 +50,6 @@ let g:deoplete#sources#go#sort_class = ['package', 'func', 'type', 'var', 'const
 let g:deoplete#sources#go#use_cache = 1
 let g:deoplete#sources#go#json_directory = '~/.cache/deoplete/go/$GOOS_$GOARCH'
 '''
-
-[[plugins]]
-repo = 'mhartington/nvim-typescript'
-depends = 'deoplete.nvim'
-on_ft = 'typescript'
 
 [[plugins]]
 repo = 'tweekmonster/deoplete-clang2'
@@ -115,13 +108,6 @@ repo = 'vim-jp/cpp-vim'
 on_ft = ['c', 'cpp']
 
 [[plugins]]
-repo = 'majutsushi/tagbar'
-on_ft = ['c', 'cpp']
-hook_add = '''
-nmap <F4> :TagbarToggle<CR>
-'''
-
-[[plugins]]
 repo = 'rust-lang/rust.vim'
 on_ft = 'rust'
 hook_source = '''
@@ -176,25 +162,10 @@ on_ft = 'coffee'
 repo = 'dag/vim-fish'
 on_ft = 'fish'
 
-[[plugins]]
-repo = 'tikhomirov/vim-glsl'
-on_ft = 'glsl'
-
-[[plugins]]
-repo = 'neovimhaskell/haskell-vim'
-on_ft = ['haskell', 'cabal']
 
 [[plugins]]
 repo = 'rhysd/vim-gfm-syntax'
 on_ft = ['markdown', 'mkd']
-
-[[plugins]]
-repo = 'udalov/kotlin-vim'
-on_ft = 'kotlin'
-
-[[plugins]]
-repo = 'keith/swift.vim'
-on_ft = 'swift'
 
 [[plugins]]
 repo = 'posva/vim-vue'

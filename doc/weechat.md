@@ -31,13 +31,7 @@
 /set alias.cmd.b = "/buffer"
 ```
 
-### UEC proxy
-
-```
-/proxy add <name> <protocol> hoge.uec.ac.jp 8080
-```
-
-### 設定の確認
+### Check settings
 
 ```
 /fset

@@ -1,3 +1,27 @@
+# -- bindings ------------------------------------------------------------------
+
+# preserve tmux stock bindings,
+# while adding bindings that don't conflict with these stock bindings
+#   - true
+#   - false (default)
+tmux_conf_preserve_stock_bindings=false
+
+
+# -- session creation ----------------------------------------------------------
+
+# prompt for session name when creating a new session, possible values are:
+#   - true
+#   - false (default)
+#   - disabled (do not modify new-session bindings)
+tmux_conf_new_session_prompt=false
+
+# new session retains current path, possible values are:
+#   - true
+#   - false (default)
+#   - disabled (do not modify new-session bindings)
+tmux_conf_new_session_retain_current_path=false
+
+
 # -- windows & pane creation ---------------------------------------------------
 
 # new window retains current path, possible values are:
@@ -28,11 +52,38 @@ tmux_conf_new_session_prompt=false
 #  - false (default)
 tmux_conf_theme_24b_colour=true
 
+
+# -- display -------------------------------------------------------------------
+
+# RGB 24-bit colour support, possible values are:
+#   - true
+#   - false
+#   - auto (default)
+#
+# automatic detection relies on the COLORTERM environment variable being defined
+# to 'truecolor' or '24bit' or '$ tput colors' answering '16777216'
+# see https://github.com/termstandard/colors
+tmux_conf_24b_colour=auto
+
+
+# -- theming -------------------------------------------------------------------
+
+# enable or disable theming:
+#   - enabled (default)
+#   - disabled
+# when disabled, all tmux_conf_theme_xxx variables are ignored except:
+#   - tmux_conf_theme_pairing
+#   - tmux_conf_theme_prefix
+#   - tmux_conf_theme_mouse
+#   - tmux_conf_theme_root
+#   - tmux_conf_theme_synchronized
+tmux_conf_theme=enabled
+
 # window style
 tmux_conf_theme_window_fg='default'
 tmux_conf_theme_window_bg='#1C1C1C'
 
-# highlight focused pane (tmux >= 2.1), possible values are:
+# highlight focused pane, possible values are:
 #   - true
 #   - false (default)
 tmux_conf_theme_highlight_focused_pane=false
@@ -50,7 +101,7 @@ tmux_conf_theme_pane_border_style=thin
 tmux_conf_theme_pane_border='#444444'                   # gray
 tmux_conf_theme_pane_active_border='#1C1C1C'            # light blue
 
-# pane indicator colours
+# pane indicator colours (when you hit <prefix> + q)
 tmux_conf_theme_pane_indicator='#00afff'                
 tmux_conf_theme_pane_active_indicator='#00afff'         
 
@@ -74,9 +125,28 @@ tmux_conf_theme_status_fg='#E0E0E0'
 tmux_conf_theme_status_bg='#005F5F'                     
 tmux_conf_theme_status_attr='none'
 
+# terminal title
+#   - built-in variables are:
+#     - #{circled_window_index}
+#     - #{circled_session_name}
+#     - #{hostname}
+#     - #{hostname_ssh}
+#     - #{hostname_full}
+#     - #{hostname_full_ssh}
+#     - #{username}
+#     - #{username_ssh}
+tmux_conf_theme_terminal_title="#h ❐ #S ● #I #W"
+
 # window status style
 #   - built-in variables are:
 #     - #{circled_window_index}
+#     - #{circled_session_name}
+#     - #{hostname}
+#     - #{hostname_ssh}
+#     - #{hostname_full}
+#     - #{hostname_full_ssh}
+#     - #{username}
+#     - #{username_ssh}
 tmux_conf_theme_window_status_fg='#E0E0E0'              
 tmux_conf_theme_window_status_bg='#005F5F'              
 tmux_conf_theme_window_status_attr='bold'
@@ -85,9 +155,17 @@ tmux_conf_theme_window_status_format=' #W'
 #tmux_conf_theme_window_status_format='#{circled_window_index} #W'
 #tmux_conf_theme_window_status_format='#I #W#{?window_bell_flag,🔔,}#{?window_zoomed_flag,🔍,}'
 
+
 # window current status style
 #   - built-in variables are:
 #     - #{circled_window_index}
+#     - #{circled_session_name}
+#     - #{hostname}
+#     - #{hostname_ssh}
+#     - #{hostname_full}
+#     - #{hostname_full_ssh}
+#     - #{username}
+#     - #{username_ssh}
 tmux_conf_theme_window_status_current_fg='#E0E0E0'    
 tmux_conf_theme_window_status_current_bg='#00AF87'      
 tmux_conf_theme_window_status_current_attr='bold'
@@ -115,7 +193,11 @@ tmux_conf_theme_window_status_last_attr='none'
 tmux_conf_theme_left_separator_main='' 
 tmux_conf_theme_left_separator_sub=''   
 tmux_conf_theme_right_separator_main='' 
-tmux_conf_theme_right_separator_sub=''  
+tmux_conf_theme_right_separator_sub=''
+# tmux_conf_theme_left_separator_main=""
+# tmux_conf_theme_left_separator_sub="|"
+# tmux_conf_theme_right_separator_main=""
+# tmux_conf_theme_right_separator_sub="|"
 
 # auto restore tmux
 #set -g @continuum-restore 'on'
@@ -129,8 +211,8 @@ set -g @sysstat_cpu_view_tmpl '#{cpu.pused}'
 set -g @sysstat_mem_view_tmpl '#{mem.pused}'
 
 # status left/right content:
-#   - separate main sections with '|'
-#   - separate subsections with ','
+#   - separate main sections with "|"
+#   - separate subsections with ","
 #   - built-in variables are:
 #     - #{battery_bar}
 #     - #{battery_hbar}
@@ -140,12 +222,16 @@ set -g @sysstat_mem_view_tmpl '#{mem.pused}'
 #     - #{circled_session_name}
 #     - #{hostname_ssh}
 #     - #{hostname}
+#     - #{hostname_full}
+#     - #{hostname_full_ssh}
 #     - #{loadavg}
+#     - #{mouse}
 #     - #{pairing}
 #     - #{prefix}
 #     - #{root}
 #     - #{synchronized}
-#     - #{uptime_d}
+#     - #{uptime_y}
+#     - #{uptime_d} (modulo 365 when #{uptime_y} is used)
 #     - #{uptime_h}
 #     - #{uptime_m}
 #     - #{uptime_s}
@@ -185,7 +271,7 @@ set -g @sysstat_mem_view_tmpl '#{mem.pused}'
 
 tmux_conf_theme_status_left='  #S | #{online_status} , #[bold]#(~/.tmux/bin/ip_lan)#[nobold] , #[bold]#(~/.tmux/bin/ip_wan)#[nobold] '
 #tmux_conf_theme_status_right='#{pairing}#{prefix} #{battery_status} #{battery_bar} #{battery_percentage} , %R , %d %b | #{username} | #{hostname} '
-tmux_conf_theme_status_right='#(~/.tmux/bin/earthquake)| #{prefix}#{pairing}#{synchronized}  #{sysstat_cpu}  #{sysstat_mem} #{?battery_status, #{battery_status},}#{?battery_bar, #{battery_bar},}#{?battery_percentage, #{battery_percentage},} ,  %F  %R | #(~/.tmux/bin/weather) |  #{username}#{root} '
+tmux_conf_theme_status_right='#(~/.tmux/bin/earthquake)| #{prefix}#{pairing}#{synchronized}  #{sysstat_cpu}  #{sysstat_mem} #{?battery_status,#{battery_status},}#{?battery_bar, #{battery_bar},}#{?battery_percentage, #{battery_percentage},} ,  %F  %R | #(~/.tmux/bin/weather) |  #{username}#{root} '
 
 # test color
 #008700 #d75f00
@@ -213,6 +299,12 @@ tmux_conf_theme_prefix_fg='default'
 tmux_conf_theme_prefix_bg='none'
 tmux_conf_theme_prefix_attr='bold'
 
+# mouse indicator
+tmux_conf_theme_mouse=""
+tmux_conf_theme_mouse_fg="none"
+tmux_conf_theme_mouse_bg="none"
+tmux_conf_theme_mouse_attr="none"
+
 # root indicator
 tmux_conf_theme_root=' '
 tmux_conf_theme_root_fg='#ffff00'
@@ -232,7 +324,7 @@ tmux_conf_battery_bar_symbol_empty='◻'
 # battery bar length (in number of symbols), possible values are:
 #   - auto
 #   - a number, e.g. 5
-tmux_conf_battery_bar_length='6'
+tmux_conf_battery_bar_length="auto"
 
 # battery bar palette, possible values are:
 #   - gradient (default)
@@ -261,6 +353,11 @@ tmux_conf_battery_vbar_palette='gradient'
 tmux_conf_battery_status_charging=''
 tmux_conf_battery_status_discharging='ﮤ'
 
+# clock style (when you hit <prefix> + t)
+# you may want to use %I:%M %p in place of %R in tmux_conf_theme_status_right
+tmux_conf_theme_clock_colour="#008700"
+tmux_conf_theme_clock_style="24"
+
 
 # -- clipboard -----------------------------------------------------------------
 
@@ -272,20 +369,14 @@ tmux_conf_battery_status_discharging='ﮤ'
 tmux_conf_copy_to_os_clipboard=true
 
 
+# -- urlscan -------------------------------------------------------------------
+
+# options passed to urlscan
+tmux_conf_urlscan_options="--compact --dedupe"
+
+
 # -- user customizations -------------------------------------------------------
 # this is the place to override or undo settings
-
-set -g set-titles-string "❐ #S ● #I #W"
-#set -g set-titles-string "#H:#S.#I.#P #W #T"
-
-# prefix = Ctrl-j
-set-option -g prefix C-j
-
-# send prefix to program C-j*2
-bind C-j send-prefix
-
-# reload .tmux.conf prefix + r
-bind r source-file ~/.tmux.conf \; display '~/.tmux.conf RELOADED!!'
 
 # redraw status line every 1 seconds
 set -g status-interval 1   
@@ -315,10 +406,44 @@ bind C-w list-windows
 # set -g prefix C-a
 # bind C-a send-prefix
 
+# display a message after toggling mouse support
+bind m run "cut -c3- '#{TMUX_CONF}' | sh -s _toggle_mouse" \; display 'mouse #{?#{mouse},on,off}'
+
 # move status line to top
 #set -g status-position top
 
-set -g @plugin "tmux-plugins/tpm"
+# -- tpm -----------------------------------------------------------------------
+
+# while I don't use tpm myself, many people requested official support so here
+# is a seamless integration that automatically installs plugins in parallel
+
+# whenever a plugin introduces a variable to be used in 'status-left' or
+# 'status-right', you can use it in 'tmux_conf_theme_status_left' and
+# 'tmux_conf_theme_status_right' variables.
+
+# by default, launching tmux will update tpm and all plugins
+#   - true (default)
+#   - false
+tmux_conf_update_plugins_on_launch=true
+
+# by default, reloading the configuration will update tpm and all plugins
+#   - true (default)
+#   - false
+tmux_conf_update_plugins_on_reload=true
+
+# by default, reloading the configuration will uninstall tpm and plugins when no
+# plugins are enabled
+#   - true (default)
+#   - false
+tmux_conf_uninstall_plugins_on_reload=true
+
+# /!\ the tpm bindings differ slightly from upstream:
+#   - installing plugins: <prefix> + I
+#   - uninstalling plugins: <prefix> + Alt + u
+#   - updating plugins: <prefix> + u
+
+# /!\ do not add set -g @plugin 'tmux-plugins/tpm'
+# /!\ do not add run '~/.tmux/plugins/tpm/tpm'
 
 set -g @plugin "tmux-plugins/tmux-yank"
 set -g @plugin "tmux-plugins/tmux-copycat"
@@ -327,10 +452,60 @@ set -g @plugin "tmux-plugins/tmux-pain-control"
 set -g @plugin "tmux-plugins/tmux-online-status"
 set -g @plugin "tmux-plugins/tmux-net-speed"
 set -g @plugin 'samoshkin/tmux-plugin-sysstat'
+set -g @plugin 'tmux-plugins/tmux-continuum'
+set -g @continuum-restore 'on'
 
-# Check if tmux plugin manager is installed, otherwise clone it.
-if "test ! -d ~/.tmux/plugins/tpm" \
-   "run 'git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm && ~/.tmux/plugins/tpm/bin/install_plugins'"
 
-# Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
-run -b '~/.tmux/plugins/tpm/tpm'
+# -- custom variables ----------------------------------------------------------
+
+# to define a custom #{foo} variable, define a POSIX shell function between the
+# '# EOF' and the '# "$@"' lines. Please note that the opening brace { character
+# must be on the same line as the function name otherwise the parse won't detect
+# it.
+#
+# then, use #{foo} in e.g. the 'tmux_conf_theme_status_left' or the
+# 'tmux_conf_theme_status_right' variables.
+
+# ------------------------------------------------------------------------------
+
+# # /!\ do not remove the following line
+# EOF
+#
+# # /!\ do not "uncomment" the functions: the leading "# " characters are needed
+#
+# # usage: #{weather}
+# weather() {                                         # see https://github.com/chubin/wttr.in#one-line-output
+#   curl -f -s -m 2 'wttr.in?format=3' || printf '\n' # /!\ make sure curl is installed
+#   sleep 900                                         # sleep for 15 minutes, throttle network requests whatever the value of status-interval
+# }
+#
+# # usage: #{online}
+# online() {
+#   ping -c 1 1.1.1.1 >/dev/null 2>&1 && printf '✔' || printf '✘'
+# }
+#
+# # usage: #{wan_ip_v4}
+# wan_ip_v4() {
+#   curl -f -s -m 2 -4 ifconfig.me
+#   sleep 300                                         # sleep for 5 minutes, throttle network requests whatever the value of status-interval
+# }
+#
+# # usage: #{wan_ip_v6}
+# wan_ip_v6() {
+#   curl -f -s -m 2 -6 ifconfig.me
+#   sleep 300                                         # sleep for 5 minutes, throttle network requests whatever the value of status-interval
+# }
+#
+# # usage: #{github_stars}, #{github_stars tmux/tmux}, ...
+# github_stars() {
+#   repository=${1##*https://github.com/}
+#   repository=${repository%% *}
+#   repository=${repository%%.git}
+#   url="https://api.github.com/repos/${repository:-gpakosz/.tmux}"
+#   curl -s "$url" | perl -MJSON::PP=decode_json -CO -0777 -E '$response = decode_json(readline *STDIN); say ($response->{stargazers_count})'
+#   sleep 300                                         # sleep for 5 minutes, throttle network requests whatever the value of status-interval
+# }
+#
+# "$@"
+# # /!\ do not remove the previous line
+# #     do not write below this line

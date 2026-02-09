@@ -1,247 +1,191 @@
 #!/usr/bin/env bash
 #
-# Author: takuzoo3868
-# Last Modified: 27 Nov 2019.
+# tmux weather status script
 # API: https://openweathermap.org/current
-#
 # NEED API KEY in .bashrc_local: WEATHER_API
+#
 
-ostype() { echo $OSTYPE | tr '[:upper:]' '[:lower:]'; }
+set -Eeuo pipefail
+trap 'echo "[ERROR] ${BASH_SOURCE[0]}:${LINENO} aborted." >&2' ERR INT
+
+#######################################
+# OS detection
+#######################################
+
+ostype() {
+  printf '%s\n' "${OSTYPE,,}"
+}
 
 export SHELL_PLATFORM='unknown'
 
 case "$(ostype)" in
-  *'linux'*	) SHELL_PLATFORM='linux'	;;
-  *'darwin'*	) SHELL_PLATFORM='osx'		;;
-  *'bsd'*		) SHELL_PLATFORM='bsd'		;;
+  *linux*)  SHELL_PLATFORM='linux' ;;
+  *darwin*) SHELL_PLATFORM='osx'   ;;
+  *bsd*)    SHELL_PLATFORM='bsd'   ;;
 esac
 
-shell_is_linux() { [[ $SHELL_PLATFORM == 'linux' || $SHELL_PLATFORM == 'bsd' ]]; }
-shell_is_osx()   { [[ $SHELL_PLATFORM == 'osx' ]]; }
-shell_is_bsd()   { [[ $SHELL_PLATFORM == 'bsd' ]]; }
+shell_is_linux() { [[ $SHELL_PLATFORM == linux ]]; }
+shell_is_osx()   { [[ $SHELL_PLATFORM == osx   ]]; }
+shell_is_bsd()   { [[ $SHELL_PLATFORM == bsd   ]]; }
+shell_is_unix()  { [[ $SHELL_PLATFORM == linux || $SHELL_PLATFORM == bsd ]]; }
 
-export -f shell_is_linux
-export -f shell_is_osx
-export -f shell_is_bsd
+export -f shell_is_linux shell_is_osx shell_is_bsd shell_is_unix
 
-# Path tmp file
-export DIR_TEMPORARY="/tmp/tmux-weather_${USER}"
-if [ ! -d "$DIR_TEMPORARY" ]; then
-  mkdir -p "$DIR_TEMPORARY"
+#######################################
+# Temporary directory
+#######################################
+
+export WEATHER_DIR_TEMPORARY="/tmp/tmux-weather_${USER}"
+if [ ! -d "$WEATHER_DIR_TEMPORARY" ]; then
+  mkdir -p "$WEATHER_DIR_TEMPORARY"
 fi
 
-# DEFAULT
-WEATHER_DATA_PROVIDER_DEFAULT="openweathermap"
-WEATHER_UNIT_DEFAULT="metric"        # metric:Celsius, imperial:Fahrenheit
-WEATHER_UPDATE_PERIOD_DEFAULT="600"  # sec
+readonly WEATHER_TMP_FILE="${WEATHER_DIR_TEMPORARY}/weather_openweathermap.txt"
 
-export WEATHER_DATA_PROVIDER="${WEATHER_DATA_PROVIDER_DEFAULT}"
-export WEATHER_UNIT="${WEATHER_UNIT_DEFAULT}"
+#######################################
+# Defaults
+#######################################
+
+readonly WEATHER_DATA_PROVIDER_DEFAULT="openweathermap"
+readonly WEATHER_UNIT_DEFAULT="metric"        # metric / imperial / kelvin
+readonly WEATHER_UPDATE_PERIOD_DEFAULT="300"  # sec
+
+export WEATHER_DATA_PROVIDER="${WEATHER_DATA_PROVIDER:-$WEATHER_DATA_PROVIDER_DEFAULT}"
+export WEATHER_UNIT="${WEATHER_UNIT:-$WEATHER_UNIT_DEFAULT}"
+export WEATHER_UPDATE_PERIOD="${WEATHER_UPDATE_PERIOD:-$WEATHER_UPDATE_PERIOD_DEFAULT}"
+
 case "$WEATHER_UNIT" in
-    "metric")
-      export WEATHER_UNIT_CASE="c"
-      ;;
-    "imperial")
-      export WEATHER_UNIT_CASE="f"
-      ;;
-    *)
-      export WEATHER_UNIT_CASE="k"
+  metric)   WEATHER_UNIT_CASE="C" ;;
+  imperial) WEATHER_UNIT_CASE="F" ;;
+  *)        WEATHER_UNIT_CASE="K" ;;
 esac
-# How often to update the weather in seconds.
-export WEATHER_UPDATE_PERIOD="${WEATHER_UPDATE_PERIOD_DEFAULT}"
-# Name of GNU grep binary if in PATH, or path to it.
-export WEATHER_GREP="${WEATHER_GREP_DEFAULT}"
-# Your location name by ip-api.com
-function __get_location() {
-  location_data=$(curl -sf "http://ip-api.com/json/?fields=query,country,region,city,zip,lat,lon,isp")
-  
-  if [ "$?" -eq "0" ]; then
-    city_name=$(echo "$location_data" | jq -r .city)
-  else
-    # WEATHER LOCATION DEFAULT: Japan
-    city_name="Japan"
-  fi
-  echo "$city_name"
+export WEATHER_UNIT_CASE
+
+#######################################
+# Location detection
+#######################################
+
+__get_location() {
+  local city
+  city=$(curl -sf "http://ip-api.com/json/?fields=city" | jq -r '.city // empty') || true
+  echo "${city:-Japan}"
 }
 export WEATHER_LOCATION="$(__get_location)"
 
-# Setting grep command
-if shell_is_bsd  && [ -f /user/local/bin/grep  ]; then
-  WEATHER_GREP_DEFAULT="/usr/local/bin/grep"
-else
-  WEATHER_GREP_DEFAULT="grep"
-fi
+#######################################
+# Helpers
+#######################################
 
-__default_settings() {
-  if [ -z "$WEATHER_DATA_PROVIDER" ]; then
-    export WEATHER_DATA_PROVIDER="${WEATHER_DATA_PROVIDER_DEFAULT}"
+__file_is_fresh() {
+  local file="$1"
+  [[ ! -f "$file" ]] && return 1
+
+  local last now
+  if shell_is_bsd || shell_is_osx; then
+    last=$(stat -f "%m" "$file")
+  else
+    last=$(stat -c "%Y" "$file")
   fi
-  if [ -z "$WEATHER_UNIT" ]; then
-    export WEATHER_UNIT="${WEATHER_UNIT_DEFAULT}"
-  fi
-  if [ -z "$WEATHER_UPDATE_PERIOD" ]; then
-    export WEATHER_UPDATE_PERIOD="${WEATHER_UPDATE_PERIOD_DEFAULT}"
-  fi
-  if [ -z "$WEATHER_GREP" ]; then
-    export WEATHER_GREP="${WEATHER_GREP_DEFAULT}"
-  fi
-  if [ -z "$WEATHER_LOCATION" ]; then
-    echo "No weather location specified.";
-    exit 8
-  fi
+  now=$(date +%s)
+  (( now - last < WEATHER_UPDATE_PERIOD ))
 }
 
-# Run status line in tmux
+__read_tmp_file() {
+  [[ -f "$WEATHER_TMP_FILE" ]] || return
+  cat "$WEATHER_TMP_FILE"
+  exit 0
+}
+
+#######################################
+# Main
+#######################################
+
 __run_weather() {
-  __default_settings
-  local tmp_file="${DIR_TEMPORARY}/weather_openweathermap.txt"
-  local weather
-  case "$WEATHER_DATA_PROVIDER" in
-    "openweathermap") weather=$(__openweathermap_weather) ;;
-    *)
-      echo "Unknown weather provider [$WEATHER_DATA_PROVIDER]";
-      return 1
-  esac
-  if [ -n "$weather" ]; then
-    echo "$weather"
+  __file_is_fresh "$WEATHER_TMP_FILE" && __read_tmp_file
+
+  local data
+  data=$(curl --max-time 4 -s \
+    "https://api.openweathermap.org/data/2.5/weather?q=${WEATHER_LOCATION}&units=${WEATHER_UNIT}&appid=${WEATHER_API}") || true
+
+  [[ -z "$data" ]] && __read_tmp_file  && return
+
+  local degree condition sunrise sunset
+  degree=$(jq -r '.main.temp // empty' <<<"$data")
+  condition=$(jq -r '.weather[0].description // empty' <<<"$data")
+  sunrise=$(jq -r '.sys.sunrise // 0' <<<"$data")
+  sunset=$(jq -r '.sys.sunset // 0' <<<"$data")
+
+  if [[ "$WEATHER_UNIT_CASE" == "K" ]]; then
+    degree=$(awk "BEGIN{printf \"%.1f\", $degree + 273.15}")
   fi
+
+  local sunrise_h sunset_h
+  sunrise_h=$(date -d "@$sunrise" +%H%M 2>/dev/null || date -r "$sunrise" +%H%M)
+  sunset_h=$(date -d "@$sunset" +%H%M 2>/dev/null || date -r "$sunset" +%H%M)
+
+  local icon
+  icon=$(__get_weather_image "$condition" "$sunrise_h" "$sunset_h" "$degree")
+
+  echo "${icon} ${degree}°$(echo "$WEATHER_UNIT_CASE" | tr '[:lower:]' '[:upper:]')" | tee "$WEATHER_TMP_FILE"
 }
 
-# Get the weather from OpenWeatherMap
-__openweathermap_weather() {
-  if [ -f "$tmp_file" ]; then
-    if shell_is_bsd; then
-      last_update=$(stat -f "%m" ${tmp_file})
-    elif shell_is_linux || shell_is_osx; then
-      last_update=$(stat -c "%Y" ${tmp_file})
-    fi
-    time_now=$(date +%s)
-
-    up_to_date=$(echo "(${time_now}-${last_update}) < ${WEATHER_UPDATE_PERIOD}" | bc)
-    if [ "$up_to_date" -eq 1 ]; then
-      __read_tmp_file
-    fi
-  fi
-
-  degree=""
-  if [ -z "$degree" ]; then
-    weather_data=$(curl --max-time 4 -s "http://api.openweathermap.org/data/2.5/weather?q=${WEATHER_LOCATION}&units=${WEATHER_UNIT}&appid=${WEATHER_API}")
-    # echo "$weather_data"
-    if [ "$?" -eq "0" ]; then
-      degree=$(echo "$weather_data" | jq .main.temp)
-      condition=$(echo "$weather_data" | jq -r '.weather[] | .description')
-      sunrise_unixtime=$(echo "$weather_data" | jq .sys.sunrise)
-      sunset_unixtime=$(echo "$weather_data" | jq .sys.sunset)
- 
-      if shell_is_bsd; then
-        date_arg='-j -f "%H:%M %p "'
-      else
-        date_arg='-d'
-      fi
-      sunrise=$(date ${date_arg} @${sunrise_unixtime} +%H%M)
-      sunset=$(date ${date_arg} @${sunset_unixtime} +%H%M)
-    elif [ -f "${tmp_file}" ]; then
-      __read_tmp_file
-    fi
-  fi
-
-  if [ -n "$degree" ]; then
-    if [ "$WEATHER_UNIT_CASE" == "k" ]; then
-      degree=$(echo "${degree} + 273.15" | bc)
-    fi
-    condition_symbol=$(__get_weather_image "$condition" "$sunrise" "$sunset" "$degree") 
-    echo "${condition_symbol} ${degree}°$(echo "$WEATHER_UNIT_CASE" | tr '[:lower:]' '[:upper:]')" | tee "${tmp_file}"
-  fi
-}
-
-# Get symbol for condition. 
+#######################################
+# Weather icons
 # Available conditions: https://openweathermap.org/weather-conditions
+#######################################
 __get_weather_image() {
-  local condition="$1"
-  local sunrise="$2"
-  local sunset="$3"
-  local degree="$4"
+  local condition="$1" sunrise="$2" sunset="$3" degree="$4"
+  local now
+  now=$(date +%H%M)
 
   case "$condition" in
     ## Group 800: Clear
     "clear sky")
-      time_forecast=$(date +%H%M)
-      if [ "$time_forecast" -ge "$sunset" -o "$time_forecast" -le "$sunrise" ]; then
-        if [ "$(echo "${degree} <= 5" | bc)" -eq 1 ]; then
-          echo ""
-        else
-          echo ""
-        fi
+      if (( now >= sunset || now <= sunrise )); then
+        (( $(awk "BEGIN{print ($degree <= 5)}") )) && echo "" || echo ""
       else
-        if [ "$(echo "${degree} >= 25" | bc)" -eq 1 ]; then
-          echo "" # weather_hot
-        else
-          echo ""
-        fi
+        (( $(awk "BEGIN{print ($degree >= 25)}") )) && echo "" || echo ""
       fi
       ;;
-
     ## Group 80x: Clouds
     "few clouds")
-      echo ""
-      ;;
+      echo "" ;;
     "scattered clouds")
-      echo ""
-      ;;
+      echo "" ;;
     "broken clouds" | "overcast clouds")
-      echo "" # fa_cloud
-      ;;
+      echo "" ;;
 
     ## Group 7xx: Atmosphere
     "dust" | "Haze" | "Smoke" | "sand" | "dust whirls")
-      echo "" # weather_dust
-      ;;
+      echo "" ;;
     "fog" | "mist")
-      echo "" # weather_fog
-      ;;
+      echo "" ;;
     "volcanic ash")
-      echo ""
-      ;;
+      echo "" ;;
     "tornado" | "tropical storm" | "hurricane")
-      echo "" # weather_hurricane
-      ;;
+      echo "" ;;
 
     ## Group 5xx: Rain & Group 3xx: Drizzle
     "rain" | "light rain"  | "moderate rain" | "heavy intensity rain" | "drizzle" | "light intensity drizzle" | "heavy intensity drizzle" | "light intensity drizzle rain" | "drizzle rain")
-      echo ""
-      ;;
+      echo "" ;;
     "shower rain" | "scattered showers" | "very heavy rain" | "extreme rain" | "light intensity shower rain" | "heavy intensity shower rain" | "ragged shower rain" | "heavy intensity drizzle rain" | "shower rain and drizzle" | "heavy shower rain and drizzle" | "shower drizzle" | "squalls")
-      echo "" # weather_showers
-      ;;
-    "mixed rain and snow" | "mixed rain and sleet" | "freezing drizzle" | "freezing rain" | "mixed rain and hail" | "Light rain and snow" | "Rain and snow")
-      echo "" # weather_rain_mix
-      ;;
+      echo "" ;;
+    "mixed rain and snow" | "mixed rain and sleet" | "freezing drizzle" | "freezing rain" | "mixed rain and hail" | "Light rain and snow" | "rain and snow")
+      echo "" ;;
     
     ## Group 6xx: Snow
-    "Snow" | "light snow" | "Heavy snow" | "Sleet" | "Light shower sleet" | "Shower sleet" | "Light shower snow" | "Shower snow" | "Heavy shower snow")
-      echo ""
-      ;;
+    "snow" | "light snow" | "heavy snow" | "sleet" | "light shower sleet" | "shower sleet" | "light shower snow" | "shower snow" | "heavy shower snow")
+      echo "" ;;
     
     ## Group 2xx: Thunderstorm
     "thunderstorm with light rain" | "thunderstorm with rain" | "thunderstorm with heavy rain" | "light thunderstorm" | "thunderstorm" | "heavy thunderstorm" | "ragged thunderstorm" | "thunderstorm with light drizzle" | "thunderstorm with drizzle" | "thunderstorm with heavy drizzle")
-      echo "" # weather_lightning
-      ;;
+      echo "" ;;
     
     "not available")
-      echo "" 
-      ;;
+      echo "" ;;
     *)
-      echo "" # unknown
-      ;;
+      echo "" ;;
   esac
-}
-
-__read_tmp_file() {
-  if [ ! -f "$tmp_file" ]; then
-    return
-  fi
-  cat "${tmp_file}"
-  exit
 }
 
 # exec

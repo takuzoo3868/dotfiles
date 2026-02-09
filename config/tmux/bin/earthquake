@@ -1,204 +1,175 @@
 #!/usr/bin/env bash
 #
-# Author: takuzoo3868
-# Last Modified: 06 Dec 2019.
+# tmux earthquake status script
+#
 
-ostype() { echo $OSTYPE | tr '[:upper:]' '[:lower:]'; }
+set -Eeuo pipefail
+trap 'echo "[ERROR] ${BASH_SOURCE[0]}:${LINENO} aborted." >&2' ERR INT
+
+#######################################
+# OS detection
+#######################################
+
+ostype() {
+  printf '%s\n' "${OSTYPE,,}"
+}
 
 export SHELL_PLATFORM='unknown'
 
 case "$(ostype)" in
-  *'linux'*  ) SHELL_PLATFORM='linux'  ;;
-  *'darwin'*  ) SHELL_PLATFORM='osx'    ;;
-  *'bsd'*    ) SHELL_PLATFORM='bsd'    ;;
+  *linux*)  SHELL_PLATFORM='linux' ;;
+  *darwin*) SHELL_PLATFORM='osx'   ;;
+  *bsd*)    SHELL_PLATFORM='bsd'   ;;
 esac
 
-shell_is_linux() { [[ $SHELL_PLATFORM == 'linux' || $SHELL_PLATFORM == 'bsd' ]]; }
-shell_is_osx()   { [[ $SHELL_PLATFORM == 'osx' ]]; }
-shell_is_bsd()   { [[ $SHELL_PLATFORM == 'bsd' ]]; }
+shell_is_linux() { [[ $SHELL_PLATFORM == linux ]]; }
+shell_is_osx()   { [[ $SHELL_PLATFORM == osx   ]]; }
+shell_is_bsd()   { [[ $SHELL_PLATFORM == bsd   ]]; }
+shell_is_unix()  { [[ $SHELL_PLATFORM == linux || $SHELL_PLATFORM == bsd ]]; }
 
-export -f shell_is_linux
-export -f shell_is_osx
-export -f shell_is_bsd
+export -f shell_is_linux shell_is_osx shell_is_bsd shell_is_unix
 
-# Path tmp file
+#######################################
+# Temporary directory
+#######################################
+
 export EARTHQUAKE_DIR_TEMPORARY="/tmp/tmux-earthquake_${USER}"
 if [ ! -d "$EARTHQUAKE_DIR_TEMPORARY" ]; then
   mkdir -p "$EARTHQUAKE_DIR_TEMPORARY"
 fi
 
-# DEFAULT
-EARTHQUAKE_DATA_PROVIDER_DEFAULT="p2pquake"
-UPDATE_PERIOD_DEFAULT="180" # sec
-ALERT_TIME_WINDOW_DEFAULT="60" # min
-EARTHQUAKE_GET_DATA_LIMIT_DEFAULT='1'
-EARTHQUAKE_MIN_SCALE_DEFAULT='20'
+readonly EARTHQUAKE_TMP_FILE="${EARTHQUAKE_DIR_TEMPORARY}/earthquake.txt"
 
-export EARTHQUAKE_DATA_PROVIDER="${EARTHQUAKE_DATA_PROVIDER_DEFAULT}"
-export UPDATE_PERIOD="${UPDATE_PERIOD_DEFAULT}"
-export ALERT_TIME_WINDOW="${ALERT_TIME_WINDOW_DEFAULT}"
-export EARTHQUAKE_GET_DATA_LIMIT="${EARTHQUAKE_GET_DATA_LIMIT_DEFAULT}"
-export EARTHQUAKE_MIN_SCALE="${EARTHQUAKE_MIN_SCALE_DEFAULT}"
+#######################################
+# Defaults
+#######################################
 
-__default_settings() {
-  if [ -z "$EARTHQUAKE_DATA_PROVIDER" ]; then
-    export EARTHQUAKE_DATA_PROVIDER="${EARTHQUAKE_DATA_PROVIDER_DEFAULT}"
-  fi
-  if [ -z "$UPDATE_PERIOD" ]; then
-    export UPDATE_PERIOD="${UPDATE_PERIOD_DEFAULT}"
-  fi
-  if [ -z "$ALERT_TIME_WINDOW" ]; then
-    export ALERT_TIME_WINDOW="${ALERT_TIME_WINDOW_DEFAULT}"
-  fi
-  if [ -z "$EARTHQUAKE_GET_DATA_LIMIT" ]; then
-    export EARTHQUAKE_GET_DATA_LIMIT="${EARTHQUAKE_GET_DATA_LIMIT_DEFAULT}"
-  fi
-  if [ -z "$EARTHQUAKE_MIN_SCALE" ]; then
-    export EARTHQUAKE_MIN_SCALE="${EARTHQUAKE_MIN_SCALE_DEFAULT}"
-  fi
+readonly EARTHQUAKE_DATA_PROVIDER_DEFAULT="p2pquake"
+readonly UPDATE_PERIOD_DEFAULT=20            # sec
+readonly ALERT_TIME_WINDOW_DEFAULT=30        # min
+readonly EARTHQUAKE_GET_DATA_LIMIT_DEFAULT=1
+readonly EARTHQUAKE_MIN_SCALE_DEFAULT=10     # 10(震度1)、20(震度2)、30(震度3)、40(震度4)、45(震度5弱)、50(震度5強)、55(震度6弱)、60(震度6強)、70(震度7)
+
+export EARTHQUAKE_DATA_PROVIDER="${EARTHQUAKE_DATA_PROVIDER:-$EARTHQUAKE_DATA_PROVIDER_DEFAULT}"
+export UPDATE_PERIOD="${UPDATE_PERIOD:-$UPDATE_PERIOD_DEFAULT}"
+export ALERT_TIME_WINDOW="${ALERT_TIME_WINDOW:-$ALERT_TIME_WINDOW_DEFAULT}"
+export EARTHQUAKE_GET_DATA_LIMIT="${EARTHQUAKE_GET_DATA_LIMIT:-$EARTHQUAKE_GET_DATA_LIMIT_DEFAULT}"
+export EARTHQUAKE_MIN_SCALE="${EARTHQUAKE_MIN_SCALE:-$EARTHQUAKE_MIN_SCALE_DEFAULT}"
+
+#######################################
+# Helpers
+#######################################
+
+__read_tmp_file() {
+  [[ -f "$EARTHQUAKE_TMP_FILE" ]] || return
+  cat "$EARTHQUAKE_TMP_FILE"
+  exit 0
 }
 
-# Run status line in tmux
-__run_earthquake() {
-  __default_settings
-  local tmp_file="${EARTHQUAKE_DIR_TEMPORARY}/earthquake.txt"
-  local earthquake
-  case "$EARTHQUAKE_DATA_PROVIDER" in
-    "p2pquake") earthquake=$(__p2pquake_earthquake) ;;
-    *)
-      echo "Unknown earthquake-information provider [${EARTHQUAKE_DATA_PROVIDER}]";
-      return 1
-  esac
-  if [ -n "$earthquake" ]; then
-    echo "${earthquake}"
-  fi
-}
-
-# Get earthquake information from p2pquake
-__p2pquake_earthquake() {
-  if [[ -f "$tmp_file" ]]; then
-    if shell_is_bsd; then
-      last_update=$(stat -f "%m" ${tmp_file})
-    elif shell_is_linux || shell_is_osx; then
-      last_update=$(stat -c "%Y" ${tmp_file})
-    fi
-    time_now=$(date +%s)
-
-    up_to_date=$(echo "(${time_now} - ${last_update}) < ${UPDATE_PERIOD}" | bc)
-    if [ "$up_to_date" -eq 1 ]; then
-      __read_tmp_file
-    fi
-  fi
-
-  magnitude=""
-  if [ -z "$magnitude" ]; then
-    # get the rss file
-    data=$(curl --max-time 4 -s "https://api.p2pquake.net/v2/jma/quake?limit=${EARTHQUAKE_GET_DATA_LIMIT}&min_scale=${EARTHQUAKE_MIN_SCALE}")
-    
-    if [ "$?" -eq "0" ]; then
-      location=$(echo $data | jq -r .[].earthquake.hypocenter.name)
-      magnitude=$(echo $data | jq .[].earthquake.hypocenter.magnitude)
-      scale=$(echo $data | jq .[].earthquake.maxScale)
-      tsunami=$(echo $data | jq -r .[].earthquake.domesticTsunami)
-      timestamp=$(echo $data | jq -r .[].earthquake.time)
-
-      if shell_is_bsd; then
-        date_arg='-j -f "%H:%M %p "'
-      else
-        date_arg='-d'
-      fi
-      timestamp_24=$(date ${date_arg} "${timestamp}" +%H:%M)
-
-    elif [ -f "$tmp_file" ]; then
-      __read_tmp_file
-    fi
-  fi
-
-  if [ -n "$magnitude" ]; then
-    if __check_alert_time_window ; then
-      scale_jp=$(__get_earthquake_scale "$scale")
-      tsunami_jp=$(__get_tsunami_info "$tsunami")
-      echo "  ${location} ${timestamp_24}  ${scale_jp}  ${tsunami_jp} "  | tee "${tmp_file}"
-    fi
-  fi
-}
 __check_alert_time_window() {
-  unixtime=$(date -d "${timestamp}" +%s)
+  local timestamp="$1"
+  local unixtime now
 
-  # (now - occurred_time)/60 < ALERT_TIME_WINDOW ?
-  [[ $(( ( $(date +%s) - unixtime ) / 60 )) -lt $ALERT_TIME_WINDOW ]]
+  if shell_is_osx || shell_is_bsd; then
+    unixtime=$(date -j -f "%Y-%m-%dT%H:%M:%S%z" "$timestamp" +%s 2>/dev/null || echo 0)
+  else
+    unixtime=$(date -d "$timestamp" +%s 2>/dev/null || echo 0)
+  fi
+
+  now=$(date +%s)
+  (( (now - unixtime) / 60 < ALERT_TIME_WINDOW ))
 }
 
 __get_earthquake_scale() {
-  local scale="$1"
-
-  # https://www.p2pquake.net/develop/api-v2/
-  case "$scale" in
-    "10")
-      echo "1"
-      ;;
-    "20")
-      echo "2"
-      ;;
-    "30")
-      echo "3"
-      ;;
-    "40")
-      echo "4"
-      ;;
-    "45")
-      echo "5弱"
-      ;;
-    "50")
-      echo "5強"
-      ;;
-    "55")
-      echo "6弱"
-      ;;
-    "60")
-      echo "6強"
-      ;;
-    "70")
-      echo "7"
-      ;;
-    *)
-      echo "" # unknown
-      ;;
+  case "$1" in
+    10) echo "1" ;;
+    20) echo "2" ;;
+    30) echo "3" ;;
+    40) echo "4" ;;
+    45) echo "5弱" ;;
+    50) echo "5強" ;;
+    55) echo "6弱" ;;
+    60) echo "6強" ;;
+    70) echo "7" ;;
+    *)  echo "" ;;
   esac
 }
 
 __get_tsunami_info() {
-  local tsunami="$1"
-
-  case "$tsunami" in
-    "Warning")
-      echo "津波予報"
-      ;;
-    "Watch")
-      echo "津波注意報"
-      ;;
-    "NonEffective")
-      echo "影響なし"
-      ;;
-    "Checking")
-      echo "調査中"
-      ;;
-    "Unknown")
-      echo "不明"
-      ;;
-    "None")
-      echo "なし"
-      ;;
+  case "$1" in
+    Warning)      echo "津波予報" ;;
+    Watch)        echo "津波注意報" ;;
+    NonEffective) echo "影響なし" ;;
+    Checking)     echo "調査中" ;;
+    Unknown)      echo "不明" ;;
+    None)         echo "なし" ;;
+    *)            echo "不明" ;;
   esac
 }
 
-__read_tmp_file() {
-  if [ ! -f "$tmp_file" ]; then
-    return
+#######################################
+# Provider: p2pquake
+#######################################
+
+__p2pquake_earthquake() {
+  command -v curl >/dev/null || return
+  command -v jq   >/dev/null || return
+
+  local last_update time_now
+
+  if [[ -f "$EARTHQUAKE_TMP_FILE" ]]; then
+    if shell_is_osx || shell_is_bsd; then
+      last_update=$(stat -f "%m" "$EARTHQUAKE_TMP_FILE")
+    else
+      last_update=$(stat -c "%Y" "$EARTHQUAKE_TMP_FILE")
+    fi
+
+    time_now=$(date +%s)
+    if (( time_now - last_update < UPDATE_PERIOD )); then
+      __read_tmp_file
+    fi
   fi
-  cat "${tmp_file}"
-  exit
+
+  local data location magnitude scale tsunami timestamp timestamp_24
+
+  data=$(curl --max-time 4 -s \
+    "https://api.p2pquake.net/v2/jma/quake?limit=${EARTHQUAKE_GET_DATA_LIMIT}&min_scale=${EARTHQUAKE_MIN_SCALE}" \
+    || true)
+
+  [[ -z "$data" ]] && __read_tmp_file && return
+
+  location=$(jq -r '.[].earthquake.hypocenter.name' <<<"$data")
+  magnitude=$(jq -r '.[].earthquake.hypocenter.magnitude' <<<"$data")
+  scale=$(jq -r '.[].earthquake.maxScale' <<<"$data")
+  tsunami=$(jq -r '.[].earthquake.domesticTsunami' <<<"$data")
+  timestamp=$(jq -r '.[].earthquake.time' <<<"$data")
+
+  if shell_is_osx || shell_is_bsd; then
+    timestamp_24=$(date -j -f "%Y-%m-%dT%H:%M:%S%z" "$timestamp" +%H:%M 2>/dev/null || echo "--:--")
+  else
+    timestamp_24=$(date -d "$timestamp" +%H:%M 2>/dev/null || echo "--:--")
+  fi
+
+  if __check_alert_time_window "$timestamp"; then
+    local scale_jp tsunami_jp
+    scale_jp=$(__get_earthquake_scale "$scale")
+    tsunami_jp=$(__get_tsunami_info "$tsunami")
+
+    echo "  ${location} ${timestamp_24}  ${scale_jp}  ${tsunami_jp} " | tee "$EARTHQUAKE_TMP_FILE"
+  else
+    echo "  地震情報なし " | tee "$EARTHQUAKE_TMP_FILE"
+  fi
 }
 
-# exec
+#######################################
+# Main
+#######################################
+
+__run_earthquake() {
+  case "$EARTHQUAKE_DATA_PROVIDER" in
+    p2pquake) __p2pquake_earthquake ;;
+    *) echo "Unknown provider: $EARTHQUAKE_DATA_PROVIDER" ;;
+  esac
+}
+
 __run_earthquake

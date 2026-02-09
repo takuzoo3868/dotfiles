@@ -2,29 +2,15 @@ tmux_options: -2
 session_name: work
 
 windows:
-- window_name: main
-  layout: 333b,238x68,0,0{163x68,0,0[163x47,0,0,1,163x20,0,48,2],74x68,164,0[74x20,164,0,3,74x47,164,21,4]}
-  panes:
-    - gotop -c solarized
-    - lnav
-    - screenfetch
-    - curl v2.wttr.in
-    # - mpsyt pl PLBFICLTzW2LckbdM1Ri6BBfpeSPwRYzXe
-- window_name: file
-  layout: 2a1b,238x68,0,0[238x41,0,0,5,238x26,0,42,9]
-  panes:
-    - ranger
-    - pane
-- window_name: chat
-  panes:
-    - weechat
-- window_name: web
-  panes:
-    - echo "If you start CUI browser... browsh" | octocatsay | lolcat
 - window_name: work
   focus: true
-  layout: f026,238x68,0,0{136x68,0,0,7,101x68,137,0[101x43,137,0,8,101x24,137,44,10]}
+  layout: c50c,353x84,0,0[353x56,0,0,1,353x27,0,57{176x27,0,57,2,176x27,177,57,5}]
   panes:
+    - yazi
     - pane
     - pane
-    - echo "Do your BEST. No output, No life." | octocatsay | lolcat
+
+- window_name: music
+  focus: false
+  panes:
+    - yt pl PLBFICLTzW2LckbdM1Ri6BBfpeSPwRYzXe

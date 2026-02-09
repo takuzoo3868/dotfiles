@@ -1,14 +1,34 @@
-# Folder view configuration files
+# ======================================
+# OS generated files
+# ======================================
+
+## macOS
 .DS_Store
-Desktop.ini
-
-# Thumbnail cache files
+.AppleDouble
+.LSOverride
 ._*
-Thumbs.db
-*~
-*.swp
 
-# Files that might appear on external disks
+## Windows
+Desktop.ini
+Thumbs.db
+ehthumbs.db
+ehthumbs_vista.db
+
+## Linux / Unix
+.nfs*
+
+# ======================================
+# Cache / temporary files
+# ======================================
+
 .Spotlight-V100
 .Trashes
 
+# ======================================
+# Editor / backup files
+# ======================================
+
+*~
+*.swp
+*.swo
+*.swx

@@ -5,6 +5,9 @@
 
 # Backs up a user's home directory
 
+set -Eeuo pipefail
+trap 'echo "[ERROR] ${BASH_SOURCE[0]}:${LINENO} aborted." >&2' ERR INT
+
 PROGNAME=$(basename $0)
 VERSION="1.0.0"
 

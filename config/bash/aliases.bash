@@ -37,21 +37,15 @@ alias sed="gsed"
 alias rebash='exec $SHELL -l'
 
 # ghq peco hub
-alias gcd='cd $(ghq root)/$(ghq list | peco)'
-alias ophub='hub browse $(ghq list | peco | cut -d "/" -f 2,3)'
-alias vcode='code-insiders $(ghq root)/$(ghq list | peco)'
+# alias gcd='cd $(ghq root)/$(ghq list | peco)'
+# alias ophub='hub browse $(ghq list | peco | cut -d "/" -f 2,3)'
 
 # virtualenv
-alias workoff='deactivate'
+# alias workoff='deactivate'
 
 # move go project
-alias gogo="cd $HOME/go/src/github.com/takuzoo3868"
-
-alias govuls="cd $HOME/go/src/github.com/future-architect"
-alias goio="cd $HOME/go/src/github.com/vulsio"
-alias gokanbe="cd $HOME/go/src/github.com/kotakanbe"
+# alias gogo="cd $HOME/go/src/github.com/takuzoo3868"
 
 # tmuxp
 alias mux='tmuxp'
 alias gomux='tmuxp load ~/.tmux/work.yaml'
-alias gouec='set_proxy && tmuxp load ~/.tmux/uec.yaml'

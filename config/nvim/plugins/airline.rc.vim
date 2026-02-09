@@ -6,9 +6,6 @@ let g:airline_right_alt_sep = ' '
 let g:airline#extensions#tabline#left_sep = ' '
 let g:airline#extensions#tabline#left_alt_sep = '│'
 
-set laststatus=2
-set showtabline=2
-
 if exists('g:nyaovim_version')
   let g:airline_powerline_fonts = 0
   let g:airline_left_sep = ''
@@ -33,3 +30,18 @@ let g:airline#extensions#tabline#fnamemod = ':t'
 
 " ブランチ情報を表示する
 let g:airline#extensions#branch#enabled = 1
+
+" ==========================================================
+" Fix vim-airline reverse StatusLine (Issue #2693)
+" ==========================================================
+
+augroup AirlineStatuslineFix
+  autocmd!
+  autocmd ColorScheme * call s:fix_airline_statusline()
+augroup END
+
+function! s:fix_airline_statusline() abort
+  highlight StatusLine   cterm=NONE gui=NONE
+  highlight StatusLineNC cterm=NONE gui=NONE
+  highlight TabLineFill  cterm=NONE gui=NONE
+endfunction

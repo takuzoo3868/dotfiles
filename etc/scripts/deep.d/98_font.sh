@@ -3,18 +3,29 @@
 # Author: takuzoo3868
 # Last Modified: 15 Feb 2021.
 
-trap 'echo Error: $0:$LINENO stopped; exit 1' ERR INT
-set -euo pipefail
+set -Eeuo pipefail
+trap 'echo "[ERROR] ${BASH_SOURCE[0]}:${LINENO} aborted." >&2' ERR INT
 
-# set dotfiles path as default variable
-if [ -z "${DOTPATH:-}" ]; then
-    DOTPATH=$HOME/.dotfiles; export DOTPATH
+###############################################################################
+# Globals
+###############################################################################
+
+: "${DOTPATH:=$HOME/.dotfiles}"
+export DOTPATH
+
+###############################################################################
+# Load shared helpers
+###############################################################################
+
+if [[ -f "$DOTPATH/etc/lib/header.sh" ]]; then
+  # shellcheck source=/dev/null
+  . "$DOTPATH/etc/lib/header.sh"
+else
+  error() { echo "[-] $*" >&2; }
+  error "Failed to load shared helpers"
+  exit 1
 fi
 
-# load lib script (functions)
-# shellcheck source="$dotfiles"/etc/lib/header.sh
-# shellcheck disable=SC1091
-. "$DOTPATH"/etc/lib/header.sh
 
 
 if is_exists "fontforge"; then

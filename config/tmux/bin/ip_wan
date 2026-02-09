@@ -1,73 +1,85 @@
 #!/usr/bin/env bash
 #
-# Author: takuzoo3868
-# Last Modified: 25 Nov 2018.
+# tmux WAN IPv4 script
+#
 
-# Check OS
-ostype() { echo $OSTYPE | tr '[A-Z]' '[a-z]'; }
+set -Eeuo pipefail
+trap 'echo "[ERROR] ${BASH_SOURCE[0]}:${LINENO} aborted." >&2' ERR INT
+
+#######################################
+# OS detection
+#######################################
+
+ostype() {
+  printf '%s\n' "${OSTYPE,,}"
+}
 
 export SHELL_PLATFORM='unknown'
 
 case "$(ostype)" in
-	*'linux'*	) SHELL_PLATFORM='linux'	;;
-	*'darwin'*	) SHELL_PLATFORM='osx'		;;
-	*'bsd'*		) SHELL_PLATFORM='bsd'		;;
+  *linux*)  SHELL_PLATFORM='linux' ;;
+  *darwin*) SHELL_PLATFORM='osx'   ;;
+  *bsd*)    SHELL_PLATFORM='bsd'   ;;
 esac
 
-shell_is_linux() { [[ $SHELL_PLATFORM == 'linux' || $SHELL_PLATFORM == 'bsd' ]]; }
-shell_is_osx()   { [[ $SHELL_PLATFORM == 'osx' ]]; }
-shell_is_bsd()   { [[ $SHELL_PLATFORM == 'bsd' || $SHELL_PLATFORM == 'osx' ]]; }
+shell_is_linux() { [[ $SHELL_PLATFORM == linux ]]; }
+shell_is_osx()   { [[ $SHELL_PLATFORM == osx   ]]; }
+shell_is_bsd()   { [[ $SHELL_PLATFORM == bsd   ]]; }
+shell_is_unix()  { [[ $SHELL_PLATFORM == linux || $SHELL_PLATFORM == bsd ]]; }
 
-export -f shell_is_linux
-export -f shell_is_osx
-export -f shell_is_bsd
+export -f shell_is_linux shell_is_osx shell_is_bsd shell_is_unix
 
-# Path tmp file
+#######################################
+# Temporary directory
+#######################################
+
 export DIR_TEMPORARY="/tmp/tmux-wan_${USER}"
 if [ ! -d "$DIR_TEMPORARY" ]; then
 	mkdir -p "$DIR_TEMPORARY"
 fi
 
+#######################################
+# WAN IP
+#######################################
+
 __run_wan() {
-	local tmp_file="${DIR_TEMPORARY}/wan_ip.txt"
-	local wan_ip
+  local tmp_file="${DIR_TEMPORARY}/wan_ip.txt"
+  local wan_ip=""
+  local last_update=0
+  local time_now
+  local update_period=900  # seconds
 
-	if [ -f "$tmp_file" ]; then
-		if shell_is_osx || shell_is_bsd; then
-			stat >/dev/null 2>&1 && is_gnu_stat=false || is_gnu_stat=true
-			if [ "$is_gnu_stat" == "true" ];then
-				last_update=$(stat -c "%Y" ${tmp_file})
-			else
-				last_update=$(stat -f "%m" ${tmp_file})
-			fi
-		elif shell_is_linux || [ -z $is_gnu_stat]; then
-			last_update=$(stat -c "%Y" ${tmp_file})
-		fi
+  # stat compatibility
+  if command -v stat >/dev/null 2>&1; then
+    if stat -c "%Y" "$tmp_file" >/dev/null 2>&1; then
+      stat_cmd='stat -c %Y'
+    else
+      stat_cmd='stat -f %m'
+    fi
+  fi
 
-		time_now=$(date +%s)
-		update_period=900
-		up_to_date=$(echo "(${time_now}-${last_update}) < ${update_period}" | bc)
+  # Read cache if valid
+  if [[ -f "$tmp_file" ]]; then
+    last_update=$($stat_cmd "$tmp_file")
+    time_now=$(date +%s)
 
-		if [ "$up_to_date" -eq 1 ]; then
-			wan_ip=$(cat ${tmp_file})
-		fi
-	fi
+    if (( time_now - last_update < update_period )); then
+      wan_ip=$(<"$tmp_file")
+    fi
+  fi
 
-	if [ -z "$wan_ip" ]; then
-		wan_ip=$(curl --max-time 2 -s http://whatismyip.akamai.com/)
+  # Fetch WAN IP
+  if [[ -z "$wan_ip" ]]; then
+    if wan_ip=$(curl --max-time 2 -fs http://whatismyip.akamai.com/); then
+      printf '%s\n' "$wan_ip" >"$tmp_file"
+    elif [[ -f "$tmp_file" ]]; then
+      wan_ip=$(<"$tmp_file")
+    fi
+  fi
 
-		if [ "$?" -eq "0" ]; then
-			echo "${wan_ip}" > $tmp_file
-		elif [ -f "${tmp_file}" ]; then
-			wan_ip=$(cat "$tmp_file")
-		fi
-	fi
-
-	if [ -n "$wan_ip" ]; then
-		echo "ⓦ ${wan_ip}"
-	fi
-
-	return 0
+  if [[ -n "$wan_ip" ]]; then
+    printf ' %s\n' "$wan_ip"
+  fi
 }
 
 __run_wan

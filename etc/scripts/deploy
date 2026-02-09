@@ -1,107 +1,163 @@
 #!/usr/bin/env bash
-
+#
+# deploy - Deploy dotfiles safely and idempotently
+#
 # Author: takuzoo3868
-# Last Modified: 16 Feb 2021.
+# Last Modified: 9 Feb 2026.
+#
 
-trap 'echo Error: $0:$LINENO stopped; exit 1' ERR INT
-set -euo pipefail
+set -Eeuo pipefail
+trap 'echo "[ERROR] ${BASH_SOURCE[0]}:${LINENO} aborted." >&2' ERR INT
 
-# set dotfiles path as default variable
-if [ -z "${DOTPATH:-}" ]; then
-    DOTPATH=$HOME/.dotfiles; export DOTPATH
+###############################################################################
+# Globals
+###############################################################################
+
+: "${DOTPATH:=$HOME/.dotfiles}"
+export DOTPATH
+
+readonly CONFPATH="$DOTPATH/config"
+readonly LOCAL_BIN="$HOME/.local/bin"
+
+###############################################################################
+# Load shared helpers
+###############################################################################
+
+if [[ -f "$DOTPATH/etc/lib/header.sh" ]]; then
+  # shellcheck source=/dev/null
+  . "$DOTPATH/etc/lib/header.sh"
+else
+  error() { echo "[-] $*" >&2; }
+  error "Failed to load shared helpers"
+  exit 1
 fi
-CONFPATH=$DOTPATH/config
 
-# load lib script (functions)
-. "$DOTPATH"/etc/lib/header.sh
+###############################################################################
+# Utilities
+###############################################################################
 
-## create symbolic link
-echo ""
-info "Creating symbolic links..."
-if [ ! -d "$HOME/.local/bin" ]; then
-  mkdir -p "$HOME"/.local/bin
-fi
-symlink "$DOTPATH/etc/scripts/deploy" "$HOME/.local/bin/deploy"
+ensure_git_repo() {
+  local repo="$1"
+  local dir="$2"
 
-# bash
-info "bash..."
+  if [[ -d "$dir/.git" ]]; then
+    return 0
+  fi
+
+  command -v git >/dev/null 2>&1 || {
+    warn "git not found, skip: $repo"
+    return 0
+  }
+
+  git clone --depth=1 "$repo" "$dir"
+}
+
+###############################################################################
+# Local bin
+###############################################################################
+
+info "local bin"
+ensure_dir "$LOCAL_BIN"
+symlink "$DOTPATH/etc/scripts/deploy" "$LOCAL_BIN/deploy"
+
+###############################################################################
+# Bash
+###############################################################################
+
+info "bash"
+ensure_dir "$HOME/.bash"
 symlink "$CONFPATH/bash/.bashrc" "$HOME/.bashrc"
-if [ ! -d "$HOME/.bash" ]; then
-  mkdir -p "$HOME"/.bash
-fi
 symlink "$CONFPATH/bash/aliases.bash" "$HOME/.bash/aliases.bash"
 symlink "$CONFPATH/bash/prompt.bash" "$HOME/.bash/prompt.bash"
 
-# fish
-info "fish..."
-if [ ! -d "$HOME/.config/fish/functions" ]; then
-  mkdir -p "$HOME"/.config/fish/functions
-fi
-symlink "$CONFPATH/fish/config.fish" "$HOME/.config/fish/config.fish"
-symlink "$CONFPATH/fish/fishfile" "$HOME/.config/fish/fishfile"
-for i in "$CONFPATH"/fish/functions/*.fish; do
-  ln -sf "$i" "$HOME"/.config/fish/functions/
-done
+###############################################################################
+# Git
+###############################################################################
 
-# git
-info "git..."
+info "git"
+ensure_dir "$HOME/.git_template/hooks"
 symlink "$CONFPATH/git/.gitconfig" "$HOME/.gitconfig"
 symlink "$CONFPATH/git/.gitignore.global" "$HOME/.gitignore.global"
 symlink "$CONFPATH/git/.gitmessage" "$HOME/.gitmessage"
-mkdir -p "$HOME"/.git_template/hooks
 
-# vim
-info "vim..."
+###############################################################################
+# Vim / Neovim / Nyaovim
+###############################################################################
+
+info "vim"
 symlink "$CONFPATH/vim/.vimrc" "$HOME/.vimrc"
 
-# neovim
-info "neovim..."
+info "neovim"
+ensure_dir "$HOME/.config"
 symlink "$CONFPATH/nvim" "$HOME/.config/nvim"
 
-# nyaovim
-info "nyaovim..."
+info "nyaovim"
 symlink "$CONFPATH/nyaovim" "$HOME/.config/nyaovim"
 
+###############################################################################
 # tmux
-info "tmux..."
-if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
-  git clone https://github.com/tmux-plugins/tpm "$HOME"/.tmux/plugins/tpm
-fi
+###############################################################################
+
+info "tmux"
+ensure_git_repo \
+  "https://github.com/tmux-plugins/tpm" \
+  "$HOME/.tmux/plugins/tpm"
+
 symlink "$CONFPATH/tmux/.tmux.conf" "$HOME/.tmux.conf"
-symlink "$CONFPATH/tmux/.tmux_local.conf" "$HOME/.tmux_local.conf"
+symlink "$CONFPATH/tmux/.tmux.conf.local" "$HOME/.tmux.conf.local"
 symlink "$CONFPATH/tmux/bin" "$HOME/.tmux/bin"
 symlink "$CONFPATH/tmux/work.yaml" "$HOME/.tmux/work.yaml"
-symlink "$CONFPATH/tmux/uec.yaml" "$HOME/.tmux/uec.yaml"
-echo "  please check --> doc/tmux.md"
-# shellcheck disable=SC2016
-echo '  export PATH="$HOME/.tmux/bin:$PATH"'
 
-# sqlite3
-info "sqlite..."
+echo "==> Docs: doc/tmux.md"
+# shellcheck disable=SC2016
+echo '==> Add PATH: export PATH="$HOME/.tmux/bin:$PATH"'
+
+###############################################################################
+# yazi
+###############################################################################
+
+info "yazi"
+ensure_dir "$HOME/.config/yazi"
+symlink "$CONFPATH/yazi/init.lua" "$HOME/.config/yazi/init.lua"
+symlink "$CONFPATH/yazi/yazi.toml" "$HOME/.config/yazi/yazi.toml"
+symlink "$CONFPATH/yazi/keymap.toml" "$HOME/.config/yazi/keymap.toml"
+symlink "$CONFPATH/yazi/theme.toml" "$HOME/.config/yazi/theme.toml"
+
+###############################################################################
+# SQLite3
+###############################################################################
+
+info "sqlite3"
 symlink "$CONFPATH/sqlite/.sqliterc" "$HOME/.sqliterc"
+echo "==> Install sqlite3 if necessary"
 
-# radare2
-info "radare2..."
+###############################################################################
+# Radare2
+###############################################################################
+
+info "radare2"
 symlink "$CONFPATH/radare2/.radare2rc" "$HOME/.radare2rc"
+echo "==> Install radare2 if necessary"
 
-# ranger
-info "ranger..."
-if [ ! -d "$HOME/.config/ranger" ]; then
-  mkdir -p "$HOME"/.config/ranger
-fi
-symlink "$CONFPATH/ranger/rc.conf" "$HOME/.config/ranger/rc.conf"
+###############################################################################
+# WeeChat
+###############################################################################
 
-# weechat
-info "weechat..."
-echo "  please check --> doc/weechat.md"
+info "weechat"
+echo "==> Docs: doc/weechat.md"
+echo "==> Install weechat if necessary"
 
-# local binary
-info "binary..."
-# shellcheck disable=SC2016
-echo '  export PATH="$HOME/.local/bin:$PATH'
-# shellcheck disable=SC2016
-echo '  export PATH="/opt/local/bin:/opt/local/sbin:$PATH"'
-for i in "$DOTPATH"/bin/*; do
-  ln -sf "$i" "$HOME"/.local/bin/
+###############################################################################
+# User binaries
+###############################################################################
+
+info "user binaries"
+ensure_dir "$LOCAL_BIN"
+
+for bin in "$DOTPATH"/bin/*; do
+  [[ -e "$bin" ]] || continue
+  ln -sfn "$bin" "$LOCAL_BIN/$(basename "$bin")"
 done
-echo ""
+
+echo '==> Add PATH: export PATH="$HOME/.local/bin:$PATH"'
+echo '==> Add PATH (macOS/MacPorts): export PATH="/opt/local/bin:/opt/local/sbin:$PATH"'

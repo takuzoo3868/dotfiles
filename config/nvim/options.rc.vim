@@ -38,6 +38,8 @@ endif
 set laststatus=2
 " タブページを常に表示
 set showtabline=2
+" ターミナルカラーを利用
+set termguicolors
 
 " 自動インデント
 set autoindent
@@ -65,8 +67,6 @@ set noswapfile
 set nobackup
 set nowritebackup
 
-" 貼り付けモードとの切り替え
-set pastetoggle=<C-E>
 " カーソルが端まで来たら次の行に飛ばす
 set whichwrap=b,s,h,l,<,>,[,],~
 " マッピング受付時間

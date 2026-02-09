@@ -1,75 +1,67 @@
 #!/usr/bin/env bash
-
+#
+# setup - dotfiles bootstrap script
+#
 # Author: takuzoo3868
-# Last Modified: 15 Feb 2021.
+# Last Modified: 9 Feb 2026.
+#
 
-trap 'echo Error: $0:$LINENO stopped; exit 1' ERR INT
-set -euo pipefail
+set -Eeuo pipefail
+trap 'echo "[ERROR] ${BASH_SOURCE[0]}:${LINENO} aborted." >&2' ERR INT
 
-# set dotfiles path as default variable
-if [ -z "${DOTPATH:-}" ]; then
-    DOTPATH=$HOME/.dotfiles; export DOTPATH
-fi
+##############################################################################
+# Globals / Defaults
+###############################################################################
 
-# load lib functions
-# use colors on terminal
-tput=$(which tput)
-if [ -n "$tput" ]; then
-  ncolors=$($tput colors)
-fi
-if [ -t 1 ] && [ -n "$ncolors" ] && [ "$ncolors" -ge 8 ]; then
+readonly DOTFILES_REPO="https://github.com/takuzoo3868/dotfiles.git"
+readonly DOTFILES_ZIP="https://github.com/takuzoo3868/dotfiles/archive/master.zip"
+
+: "${DOTPATH:=$HOME/.dotfiles}"
+export DOTPATH
+
+###############################################################################
+# Terminal colors (safe)
+###############################################################################
+
+if command -v tput >/dev/null 2>&1 && [[ -t 1 ]] && [[ "$(tput colors 2>/dev/null || echo 0)" -ge 8 ]]; then
   RED="$(tput setaf 1)"
   GREEN="$(tput setaf 2)"
   YELLOW="$(tput setaf 3)"
   BOLD="$(tput bold)"
-  NORMAL="$(tput sgr0)"
+  RESET="$(tput sgr0)"
 else
-  RED=""
-  GREEN=""
-  YELLOW=""
-  BOLD=""
-  NORMAL=""
+  RED=""; GREEN=""; YELLOW=""; BOLD=""; RESET=""
 fi
 
-### functions
-# info: output terminal green
-info() { 
-  printf "%s" "$GREEN"
-  echo -n "[+] "
-  printf "%s" "$NORMAL"
-  echo "$1"
-}
-# error: output terminal red
-error() {
-  printf "%s" "$RED"
-  echo -n "[-] "
-  printf "%s" "$NORMAL"
-  echo "$1"
-}
-# warn: output terminal yellow
-warn() {
-  printf "%s" "$YELLOW"
-  echo -n "[*] "
-  printf "%s" "$NORMAL"
-  echo "$1"
-}
-# log: out put termial normal
-log() { 
-  echo "  $1" 
+###############################################################################
+# Logging helpers
+###############################################################################
+
+info()  { printf "%s[+] %s%s\n" "$GREEN" "$*" "$RESET"; }
+warn()  { printf "%s[*] %s%s\n" "$YELLOW" "$*" "$RESET"; }
+error() { printf "%s[-] %s%s\n" "$RED" "$*" "$RESET" >&2; }
+die()   { error "$*"; exit 1; }
+
+###############################################################################
+# Utilities
+###############################################################################
+
+has() { command -v "$1" >/dev/null 2>&1; }
+
+require_any() {
+  for cmd in "$@"; do
+    has "$cmd" && return 0
+  done
+  return 1
 }
 
-# check package & return flag
-is_exists() {
-  which "$1" >/dev/null 2>&1
-  return $?
-}
+###############################################################################
+# Banner
+###############################################################################
 
-
-
-### Start install script
-DOTFILES_GITHUB="https://github.com/takuzoo3868/dotfiles.git"; export DOTFILES_GITHUB
-
-dotfiles_logo='
+show_banner() {
+  printf "%s" "$BOLD"
+  cat <<'EOF'
 ██████╗  ██████╗ ████████╗███████╗██╗██╗     ███████╗███████╗
 ██╔══██╗██╔═══██╗╚══██╔══╝██╔════╝██║██║     ██╔════╝██╔════╝
 ██║  ██║██║   ██║   ██║   █████╗  ██║██║     █████╗  ███████╗
@@ -77,115 +69,115 @@ dotfiles_logo='
 ██████╔╝╚██████╔╝   ██║   ██║     ██║███████╗███████╗███████║
 ╚═════╝  ╚═════╝    ╚═╝   ╚═╝     ╚═╝╚══════╝╚══════╝╚══════╝
 
-*** WHAT IS INSIDE? ***
-1. Download dotfiles from https://github.com/takuzoo3868/dotfiles.git
-2. Install dev packages
-   [coreutils bash vim git python tmux curl fish...]
-3. Symbolik linking config files to your home directory
+*** WHAT THIS SCRIPT DOES ***
+1. Download dotfiles repository
+2. Deploy dotfiles into your HOME directory
+3. Optionally initialize environment
 
-*** HOW TO INSTALL? ***
-See the README for documentation.
-Licensed under the MIT license.  
-'
+MIT License
 
-printf "%s" "$BOLD"
-echo   "$dotfiles_logo"
-printf "%s" "$NORMAL"
+EOF
+  printf "%s" "$RESET"
+}
 
-log "*** ATTENTION ***"
-log "This script can change your entire setup."
-log "I recommend to read first. You can even copy commands one by one."
-log "If you use termux on Android, try this."
-log "$ /data/data/com.termux/files/usr/bin/bash"
-echo ""
-read -p "$(warn '(U^w^) < Are you sure you want to install it? [y/N] ')" -n 1 -r
-echo ""
+###############################################################################
+# Confirmation
+###############################################################################
 
-if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+confirm() {
+  echo "*** ATTENTION ***"
+  echo "This script may modify your shell environment."
+  echo "I recommend to read first. You can even copy commands one by one."
+  echo "If you use termux on Android, try this."
+  echo "$ /data/data/com.termux/files/usr/bin/bash"
   echo ""
-  error 'OK. Goodbye.'
-  exit 1
-fi
+  read -r -p "$(printf "%s(U^w^) < Proceed with installation? [y/N] %s" "$YELLOW" "$RESET")" ans
+  [[ "${ans:-}" =~ ^[Yy]$ ]]
+}
 
-_download() {
-  info "Downloading dotfiles..."
+###############################################################################
+# Download dotfiles (idempotent)
+###############################################################################
 
-  if [ ! -d "$DOTPATH" ]; then
-    if is_exists "git"; then
-      git clone "$DOTFILES_GITHUB" "$DOTPATH"
-      info "Downloaded"
+download_dotfiles() {
+  if [[ -d "$DOTPATH/.git" ]]; then
+    info "Dotfiles already installed: $DOTPATH"
+    return 0
+  fi
 
-    elif is_exists "curl" || is_exists "wget"; then
-      local zip_url="https://github.com/takuzoo3868/dotfiles/archive/master.zip"
+  info "Downloading dotfiles to $DOTPATH"
 
-      if is_exists "curl"; then
-        curl -L "$zip_url"
+  if has git; then
+    git clone --depth=1 "$DOTFILES_REPO" "$DOTPATH"
+    info "Cloned via git"
+    return 0
+  fi
 
-      elif is_exists "wget"; then
-        wget -O - "$zip_url"
-      fi | tar xvz
-      
-      if [ ! -d dotfiles-master ]; then
-        error "dotfiles-master: not found"
-        exit 1
-      fi
-      mv -f dotfiles-master "$DOTPATH"
-      info "Downloaded!"
+  require_any curl wget || die "git, curl, or wget is required"
 
-    else
-      error "curl or wget required"
-      exit 1
-    fi
+  local tmp
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' RETURN
+
+  if has curl; then
+    curl -fsSL "$DOTFILES_ZIP" | tar -xz -C "$tmp"
   else
-    warn "Dotfiles are already installed"
+    wget -qO- "$DOTFILES_ZIP" | tar -xz -C "$tmp"
   fi
+
+  mv "$tmp"/dotfiles-* "$DOTPATH"
+  info "Downloaded via archive"
 }
 
-_deploy() {
-  info "Deploying dotfiles..."
-  if [ ! -d "$DOTPATH" ]; then
-    error "$DOTPATH: not found"
-    exit 1
-  fi
-  
+###############################################################################
+# Deploy dotfiles (safe + idempotent)
+###############################################################################
+
+deploy_dotfiles() {
+  [[ -d "$DOTPATH" ]] || die "$DOTPATH not found"
+
+  info "Deploying dotfiles"
   cd "$DOTPATH"
+
+  [[ -f Makefile ]] || die "Makefile not found"
+
   make deploy
-  info "Deployed!"
+  info "Deploy completed"
 }
 
-_initialize() {
-  case "$@" in
-    "-i" | "--init" | "init")
-      info "Initializing dotfiles..."
+###############################################################################
+# Initialize (optional)
+###############################################################################
+
+initialize_dotfiles() {
+  case "${1:-}" in
+    init|-i|--init)
+      info "Running initialization"
       cd "$DOTPATH"
-      if [ -f Makefile ]; then
-        make init
-        info "Initialized!"
-      else
-        error "Makefile: not found"
-        exit 1
-      fi
+      make init
+      info "Initialization completed"
       ;;
     *)
-      info "Skipped initialize"
+      info "Initialization skipped"
       ;;
   esac
 }
 
-# A script for the file named "setup"
-dotfiles_setup() {
-    # 1. Download the repository
-    # ==> downloading
-    # Priority: git > curl > wget
-    _download &&
+###############################################################################
+# Main
+###############################################################################
 
-    # 2. Deploy dotfiles to your home directory
-    # ==> deploying
-    _deploy &&
+main() {
+  show_banner
 
-    # 3. Execute all sh files within etc/init/
-    # ==> initializing
-    _initialize "$@"
+  confirm || {
+    error "Aborted by user."
+    exit 1
+  }
+
+  download_dotfiles
+  deploy_dotfiles
+  initialize_dotfiles "${1:-}"
 }
 
-dotfiles_setup "$@"
+main "$@"

@@ -1,37 +1,119 @@
 #!/usr/bin/env bash
-
+#
+# init - Initialize development environment
+#
 # Author: takuzoo3868
-# Last Modified: 15 Feb 2021.
+# Last Modified: 9 Feb 2026.
+#
 
-trap 'echo Error: $0:$LINENO stopped; exit 1' ERR INT
-set -euo pipefail
+set -Eeuo pipefail
+trap 'echo "[ERROR] ${BASH_SOURCE[0]}:${LINENO} aborted." >&2' ERR INT
 
-# set dotfiles path as default variable
-if [ -z "${DOTPATH:-}" ]; then
-    DOTPATH=$HOME/.dotfiles; export DOTPATH
+###############################################################################
+# Globals
+###############################################################################
+
+: "${DOTPATH:=$HOME/.dotfiles}"
+export DOTPATH
+
+###############################################################################
+# Load shared helpers
+###############################################################################
+
+if [[ -f "$DOTPATH/etc/lib/header.sh" ]]; then
+  # shellcheck source=/dev/null
+  . "$DOTPATH/etc/lib/header.sh"
+else
+  error() { echo "[-] $*" >&2; }
+  error "Failed to load shared helpers"
+  exit 1
 fi
 
-# load lib script (functions)
-. "$DOTPATH"/etc/lib/header.sh
+OS="$(detect_os)"
+info "Detected OS: $OS"
 
+###############################################################################
+# Sudo keepalive (Linux / macOS only)
+###############################################################################
 
-## install packages
-echo ""
-info "Development environment building..."
+start_sudo_keepalive() {
+  if [[ "$OS" == "windows" ]]; then
+    info "Skipping sudo keepalive on $OS"
+    return 0
+  fi
 
-# Ask for the administrator password upfront
-sudo -v
+  if ! has sudo; then
+    warn "sudo not available, skipping"
+    return 0
+  fi
 
-# Keep-alive: update existing `sudo` time stamp
-#             until this script has finished
-while true
-do
-    sudo -n true
-    sleep 60;
-    kill -0 "$$" || exit
-done 2>/dev/null &
+  info "Requesting sudo privileges"
+  sudo -v
 
-find "$DOTPATH"/etc/scripts/install.d -name "[0-9][0-9]*.sh"
-# find install.d -name "[0-9][0-9]*.sh" | bash
+  (
+    while sleep 60; do
+      sudo -n true || exit
+    done
+  ) &
+  SUDO_KEEPALIVE_PID=$!
+}
 
-echo ""
+stop_sudo_keepalive() {
+  if [[ -n "${SUDO_KEEPALIVE_PID:-}" ]]; then
+    kill "$SUDO_KEEPALIVE_PID" 2>/dev/null || true
+  fi
+}
+
+trap stop_sudo_keepalive EXIT
+
+###############################################################################
+# Install scripts runner
+###############################################################################
+run_install_scripts() {
+  local base="$DOTPATH/etc/scripts/install.d"
+
+  if [[ ! -d "$base" ]]; then
+    warn "install.d not found: $base"
+    return 0
+  fi
+
+  local dirs=(
+    # "$base/common"
+    "$base/$OS"
+  )
+
+  mapfile -t scripts < <(find "$dir" -type f -name '[0-9][0-9]*.sh' | sort)
+
+  for dir in "${dirs[@]}"; do
+    [[ -d "$dir" ]] || continue
+
+    info "Processing install scripts in: $(basename "$dir")"
+
+    mapfile -t scripts < <(
+      find "$dir" -type f -name '[0-9][0-9]*.sh' | sort
+    )
+
+    for script in "${scripts[@]}"; do
+      info "Running $(basename "$script")"
+      bash "$script"
+    done
+  done
+}
+
+###############################################################################
+# Main
+###############################################################################
+info "Development environment initialization"
+
+start_sudo_keepalive
+run_install_scripts
+
+# TODO: Replace Android termux support
+# android() {
+#   PKG_ANDROID="ncurses-utils binutils coreutils file grep wget taskwarrior neovim"
+
+#   pkg update
+#   pkg install "$PKG_DEFAULT"
+#   pkg install "$PKG_ANDROID"
+#   termux-setup-storage
+# }

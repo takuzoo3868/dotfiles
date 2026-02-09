@@ -8,47 +8,84 @@ on:
 
 jobs:
   linux:
-    strategy:
-      matrix:
-        container: [ubuntu, archlinux/base]
-      fail-fast: false
-    
+    name: Test deploy on ${{ matrix.os }}
     runs-on: ubuntu-latest
-    name: Test on ${{ matrix.container }}
-    container: ${{ matrix.container }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu
+            container: ubuntu:22.04
+            pkg_install: |
+              apt-get update
+              DEBIAN_FRONTEND=noninteractive apt-get install -y \
+                git make ca-certificates
+
+          - os: debian
+            container: debian:12
+            pkg_install: |
+              apt-get update
+              DEBIAN_FRONTEND=noninteractive apt-get install -y \
+                git make ca-certificates
+
+          - os: archlinux
+            container: archlinux:latest
+            pkg_install: |
+              pacman -Syu --noconfirm --needed \
+                git make which ca-certificates
+
+    container: 
+      image: ${{ matrix.container }}
 
     steps:
-      - name: Install required packages (apt)
+      - name: Install required packages
         if: matrix.container == 'ubuntu'
         run: |
-          apt-get update
-          apt-get install -y git sudo build-essential
+          set -eux
+          ${{ matrix.pkg_install }}
       
-      - name: Install required packages (pacman)
-        if: matrix.container == 'archlinux/base'
-        run: |
-          pacman -Syu --noconfirm --needed git sudo make which pkgconf
-      
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      # Error check
-      - name: Install dotfiles
-        run: make deploy
+      - name: Deploy dotfiles
         env:
-          TERM: xterm
-          DOTPATH: ${GITHUB_WORKSPACE}
+          TERM: xterm-256color
+          DOTPATH: ${{ github.workspace }}
+        run: |
+          set -eux
+          make deploy
+      
+      - name: Post deploy sanity check
+        run: |
+          set -eux
+          test -f "$HOME/.bashrc"
+          test -f "$HOME/.gitconfig"
   
-  # darwin:
-  #   runs-on: macos-latest
+  darwin:
+    name: Test deploy on macOS
+    runs-on: macos-latest
 
-  # centos:
-  #   runs-on: ubuntu-latest
-  #   container: centos:latest
-  #   steps:
-  #     - uses: actions/checkout@v2
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  #     - name: Install required packages
-  #       run: yum install -y git sudo
-  
-  #     - name: Install dotfiles
-  #       run: .bin/install.sh install
+      - name: Install Homebrew packages
+        run: |
+          set -eux
+          brew update
+          brew install git make
+
+      - name: Deploy dotfiles
+        env:
+          DOTPATH: ${{ github.workspace }}
+          TERM: xterm-256color
+        run: |
+          set -eux
+          make deploy
+
+      - name: Post deploy sanity check
+        run: |
+          set -eux
+          test -f "$HOME/.bashrc"
+          test -f "$HOME/.gitconfig"

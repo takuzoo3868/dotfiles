@@ -8,35 +8,42 @@ on:
 
 jobs:
   lint-check:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v4
 
-    - name: Set up Python 3.x
-      uses: actions/setup-python@v1
+    - name: Set up Python
+      uses: actions/setup-python@v5
       with:
         python-version: '3.x'
-        architecture: 'x64'
+        cache: 'pip'
 
     - name: Display Python version
       run: python -c "import sys; print(sys.version)"
 
-    - name: Install required packages
+    - name: Install lint tools
       run: |
-        brew install shellcheck
-        pip install --upgrade pip
-        pip install vim-vint==0.4a3
+        python -m pip install --upgrade pip
+        pip install vim-vint
     
     # Lint check
-    - name: Check setup init deploy
+    - name: ShellCheck (setup / scripts)
+      env:
+        SHELLCHECK_OPTS: "-f gcc --exclude=SC1090"
       run: |
-        shellcheck -f gcc ${GITHUB_WORKSPACE}/etc/setup --exclude=SC1090
-        shellcheck -f gcc ${GITHUB_WORKSPACE}/etc/scripts/init --exclude=SC1090
-        shellcheck -f gcc ${GITHUB_WORKSPACE}/etc/scripts/deploy --exclude=SC1090
+        shellcheck $SHELLCHECK_OPTS etc/setup
+        shellcheck $SHELLCHECK_OPTS etc/scripts/init
+        shellcheck $SHELLCHECK_OPTS etc/scripts/deploy
 
-    - name: Check .bashrc
-      run: shellcheck -f gcc ${GITHUB_WORKSPACE}/config/bash/.bashrc --exclude=SC2148,SC1090
+    - name: ShellCheck (.bashrc)
+      run: |
+        shellcheck -f gcc \
+          --exclude=SC2148,SC1090 \
+          config/bash/.bashrc
 
-    - name: Check nvim/*.vim
-      run: vint ${GITHUB_WORKSPACE}/config/nvim/*.vim -cstV --enable-neovim
+    - name: Vint (Neovim config)
+      run: |
+        find config/nvim -type f -name "*.vim" -print0 \
+          | xargs -0 vint -cstV --enable-neovim

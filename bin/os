@@ -1,106 +1,73 @@
 #!/usr/bin/env bash
+#
+# Detect operating system and distribution
+#
 
-# Author: takuzoo3868
-# Last Modified: 07 Dec 2018.
+set -Eeuo pipefail
+trap 'echo "[ERROR] ${BASH_SOURCE[0]}:${LINENO} aborted." >&2' ERR INT
 
-# Estimate an Operating system name
-
-OS=`uname -s`
-REV=`uname -r`
-MACH=`uname -m`
-
-GetVersionFromFile() {
-  VERSION="$(tr "\n" ' ' < cat "$1" | sed s/.*VERSION.*=\ // )"
-}
+OS="$(uname -s)"
+ARCH="$(uname -m)"
 
 
-# Solaris
-if [ "${OS}" = "SunOS" ] ; then
-  OS=Solaris
-  ARCH=$(uname -p)
-  OSSTR="${OS} ${REV}(${ARCH} $(uname -v)"
-  echo ${OSSTR}
+#######################################
+# Windows (Git Bash / MSYS / Cygwin)
+#######################################
+case "$OS" in
+  MINGW*|MSYS*)
+    echo "Windows GitBash (${OS}, ${ARCH})"
+    exit 0
+    ;;
+  CYGWIN*)
+    echo "Windows Cygwin (${OS}, ${ARCH})"
+    exit 0
+    ;;
+esac
 
-# IBM
-elif [ "${OS}" = "AIX" ] ; then
-  OSSTR="${OS} $(oslevel) ($(oslevel -r)"
-  echo ${OSSTR}
 
+#######################################
 # Linux
-elif [ "${OS}" = "Linux" ] ; then
-  KERNEL=$(uname -r)
-
-  # RedHat
-  if [ -f /etc/redhat-release ] ; then
-    DIST='RedHat'
-    PSUEDONAME=$(sed s/.*\(// < /etc/redhat-release | sed s/\)//)
-    REV=$(sed s/.*release\ // < /etc/redhat-release | sed s/\ .*//)
-  
-  # CentOS
-  elif [ -f /etc/centos-release ] ; then
-    DIST='CentOS'
-    PSUEDONAME=$(sed s/.*\(// < /etc/centos-release | sed s/\)//)
-    REV=$(sed s/.*release\ // < /etc/centos-release | sed s/\ .*//)
-  
-  # Oracle
-  elif [ -f /etc/oracle-release ] ; then
-    DIST='OracleLinux'
-    PSUEDONAME=$(sed s/.*\(// < /etc/oracle-release | sed s/\)//)
-    REV=$(sed s/.*release\ // < /etc/oracle-release | sed s/\ .*//)
-  
-  # SuSE
-  elif [ -f /etc/SuSE-release ] ; then
-    DIST=$(tr "\n" ' ' < /etc/SuSE-release | sed s/VERSION.*//)
-    REV=$(tr "\n" ' ' < /etc/SuSE-release| sed s/.*=\ //)
-  
-  # Mandrake
-  elif [ -f /etc/mandrake-release ] ; then
-    DIST='Mandrake'
-    PSUEDONAME=$(sed s/.*\(// < /etc/mandrake-release | sed s/\)//)
-    REV=$(sed s/.*release\ // < /etc/mandrake-release | sed s/\ .*//)
-  
-  # Debian, Ubuntu
-  elif [ -f /etc/debian_version ] ; then	
-    if [ "$(awk -F= '/DISTRIB_ID/ {print $2}' /etc/lsb-release)" = "Ubuntu" ]; then
-      DIST="Ubuntu"
-    else
-      DIST="Debian $(cat /etc/debian_version)"
-      REV=""
-    fi
-  
-  # Arch
-  elif [ -f /etc/arch-release ] ; then
-    DIST="Arch"
-  
-  # Android
-
+#######################################
+if [[ "$OS" == "Linux" ]]; then
+  if [[ -r /etc/os-release ]]; then
+    # shellcheck disable=SC1091
+    . /etc/os-release
+    echo "Linux ${ID:-unknown} ${VERSION_ID:-unknown} (${ARCH})"
+    exit 0
   fi
 
-  # Other
-  if [ -f /etc/UnitedLinux-release ] ; then
-    DIST="${DIST}[$(tr "\n" ' ' < /etc/UnitedLinux-release | sed s/VERSION.*//)]"
-  fi
-  OSSTR="${OS} ${DIST} ${REV}(${PSUEDONAME} ${KERNEL} ${MACH})"
-  echo ${OSSTR}
-
-# OSX
-elif [ "${OS}" == "Darwin" ]; then
-  type -p sw_vers &>/dev/null
-  [ $? -eq 0 ] && {
-    OS=`sw_vers | grep 'ProductName' | cut -f 2`
-    VER=`sw_vers | grep 'ProductVersion' | cut -f 2`
-    BUILD=`sw_vers | grep 'BuildVersion' | cut -f 2`
-    OSSTR="Darwin ${OS} ${VER} ${BUILD}"
-  } || {
-    OSSTR="MacOSX"
-  }
-  echo ${OSSTR}
-
-else
-  # F0ck wind0ws. G0 t0 he11!
-  echo "Your platform ($(uname -a)) is not supported."
-  exit 1
+  echo "Linux unknown (${ARCH})"
+  exit 0
 fi
+
+
+#######################################
+# macOS
+#######################################
+if [[ "$OS" == "Darwin" ]]; then
+  PRODUCT_NAME="$(sw_vers -productName)"
+  PRODUCT_VERSION="$(sw_vers -productVersion)"
+  BUILD_VERSION="$(sw_vers -buildVersion)"
+  echo "Darwin ${PRODUCT_NAME} ${PRODUCT_VERSION} (${BUILD_VERSION}, ${ARCH})"
+  exit 0
+fi
+
+
+#######################################
+# BSD
+#######################################
+if [[ "$OS" =~ BSD$ ]]; then
+  RELEASE="$(uname -r)"
+  echo "${OS} ${RELEASE} (${ARCH})"
+  exit 0
+fi
+
+
+#######################################
+# Unsupported
+#######################################
+echo "Unsupported platform: $(uname -a)" >&2
+exit 1
 
 
 

@@ -8,10 +8,10 @@
   fscache = true
 
 [pager]
-	branch = cat
-	status = cat
-	diff = less
-	log = less
+  branch = less
+  status = cat
+  diff = less
+  log = less
 
 [include]
   path = ~/.gitconfig.local
@@ -31,7 +31,9 @@
 
 [alias]
   # Check git alias 
-  alias = !git config --get-regexp '^alias\\.' | sed 's/alias\\.\\([^ ]*\\) \\(.*\\)/\\1\\\t => \\2/' | sort
+  alias = !git config --get-regexp '^alias\\.' \
+    | sed 's/alias\\.\\([^ ]*\\) \\(.*\\)/\\1\\\t => \\2/' \
+    | sort
 
   # add
   a = add                           # add
@@ -52,11 +54,12 @@
   
   # log
   l = log --graph --date=short
+  lg = log --oneline --graph --decorate
   tree = log --graph --branches --pretty=format:'%C(cyan)[%h]%Creset -%C(cyan bold)%d%Creset %s (%cr) %C(blue)<%an>%Creset'
  
   # pull
   pl = pull
-  drag = pull --rebase              # Pull using rebase mode (Not merge!!!)
+  drag = pull --rebase              # Pull using rebase mode (NEVER MERGE ON PULL)
 
   # push
   ps = push                         # push
@@ -67,7 +70,7 @@
   stat = status                     # status
   
 [filter "lfs"]
-	required = true
-	clean = git-lfs clean -- %f
-	smudge = git-lfs smudge -- %f
+  required = true
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
   process = git-lfs filter-process
