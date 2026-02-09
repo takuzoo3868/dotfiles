@@ -1,4 +1,4 @@
-name: Setup
+name: Setup(deploy)
 
 on:
   push:
@@ -40,7 +40,6 @@ jobs:
 
     steps:
       - name: Install required packages
-        if: matrix.container == 'ubuntu'
         run: |
           set -eux
           ${{ matrix.pkg_install }}

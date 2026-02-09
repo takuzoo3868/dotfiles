@@ -1,4 +1,4 @@
-name: Init Nightly
+name: Setup(init) Nightly
 
 on:
   schedule:
