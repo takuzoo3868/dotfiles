@@ -52,6 +52,7 @@ DEV_PACKAGES=(
   7zip
   poppler-utils  
   ffmpeg
+  fontforge
 )
 
 info "Install development packages via apt"
