@@ -66,8 +66,10 @@ if ! has mise; then
     cat >> "$LOCALRC" <<'EOF'
 
 ### mise
+if [ -f "$HOME/.local/bin/mise" ]; then
+  eval "$("$HOME"/.local/bin/mise activate bash || true)"
+fi
 eval "$(mise activate bash)"
-export PATH="$HOME/.local/share/mise/shims:$PATH"
 
 EOF
   info "Installed mise!!!"

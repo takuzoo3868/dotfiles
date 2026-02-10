@@ -15,6 +15,7 @@ shellcheck = "latest"
 tmux = "latest"
 trivy = "latest"
 uv = "latest"
+vim = "latest"
 yazi = "latest"
 zoxide = "latest"
 
@@ -22,4 +23,7 @@ zoxide = "latest"
 experimental = true
 
 [env]
-MISE_PYTHON_DEFAULT_PACKAGES_FILE = "$HOME/.config/mise/default-python-packages"
+XDG_CONFIG_HOME = "{{env.HOME}}/.config"
+SHELL = "/bin/bash"
+EDITOR = "nvim"
+MISE_PYTHON_DEFAULT_PACKAGES_FILE = "{{env.HOME}}/.config/mise/default-python-packages"
