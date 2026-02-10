@@ -54,6 +54,7 @@ if ! has mise; then
   eval "$("$HOME"/.local/bin/mise activate bash || true)"
 
   if [ ! -f "$LOCALRC" ]; then
+    ensure_dir "$HOME/.bash"
     touch "$LOCALRC"
   fi
 

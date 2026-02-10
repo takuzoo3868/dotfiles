@@ -58,8 +58,12 @@ jobs:
       - name: Post deploy sanity check
         run: |
           set -eux
-          test -f "$HOME/.bashrc"
-          test -f "$HOME/.gitconfig"
+          MANIFEST="$HOME/.dotfiles.manifest"
+          test -f "$MANIFEST"
+          while IFS= read -r line || [[ -n "$line" ]]; do \
+            dst=${line%% ->*} \
+            test -L "$dst" \
+          done <"$MANIFEST"
   
   darwin:
     name: Test deploy on macOS
@@ -84,12 +88,11 @@ jobs:
           make deploy
 
       - name: Post deploy sanity check
-        env:
-          MANIFEST: $HOME/.dotfiles.manifest
         run: |
           set -eux
+          MANIFEST="$HOME/.dotfiles.manifest"
           test -f "$MANIFEST"
           while IFS= read -r line || [[ -n "$line" ]]; do \
             dst=${line%% ->*} \
-            test -f "$dst" \
+            test -L "$dst" \
           done <"$MANIFEST"

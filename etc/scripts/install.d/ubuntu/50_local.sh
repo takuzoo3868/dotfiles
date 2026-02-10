@@ -50,6 +50,7 @@ fi
 setup_bashrc_local() {
   info ".bashrc.local"
   if [ ! -f "$LOCALRC" ]; then
+    ensure_dir "$HOME/.bash"
     touch "$LOCALRC"
   fi
 
