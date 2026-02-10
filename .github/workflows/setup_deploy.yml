@@ -56,13 +56,14 @@ jobs:
           make deploy
       
       - name: Post deploy sanity check
+        shell: bash
         run: |
           set -eux
           MANIFEST="$HOME/.dotfiles.manifest"
           test -f "$MANIFEST"
-          while IFS= read -r line || [[ -n "$line" ]]; do \
-            dst=${line%% ->*} \
-            test -L "$dst" \
+          while IFS= read -r line || [[ -n "$line" ]]; do
+            dst=${line%% ->*}
+            test -L "$dst"
           done <"$MANIFEST"
   
   darwin:
@@ -88,11 +89,12 @@ jobs:
           make deploy
 
       - name: Post deploy sanity check
+        shell: bash
         run: |
           set -eux
           MANIFEST="$HOME/.dotfiles.manifest"
           test -f "$MANIFEST"
-          while IFS= read -r line || [[ -n "$line" ]]; do \
-            dst=${line%% ->*} \
-            test -L "$dst" \
+          while IFS= read -r line || [[ -n "$line" ]]; do
+            dst=${line%% ->*}
+            test -L "$dst"
           done <"$MANIFEST"
