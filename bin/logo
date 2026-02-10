@@ -2,12 +2,12 @@
 #
 # Desplay my logo
 #
+# Author: takuzoo3868
+# Last Modified: 9 Feb 2026.
+#
 
 set -Eeuo pipefail
 trap 'echo "[ERROR] ${BASH_SOURCE[0]}:${LINENO} aborted." >&2' ERR INT
-
-PROGNAME=$(basename $0)
-VERSION="1.0.0"
 
 logo() { 
   clear 2>/dev/null || true
@@ -37,7 +37,7 @@ logo() {
   
   echo ""
   for line in "${!logo_outpt[@]}"; do
-    printf "${logo_outpt[$line]}\n"
+    printf '%s\n' "${logo_outpt[$line]}"
   done
   echo ""
 }

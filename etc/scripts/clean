@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+#
+# clean - Unlink dotfile symlinks
+#
+# Author: takuzoo3868
+# Last Modified: 9 Feb 2026.
+#
+
+set -Eeuo pipefail
+trap 'echo "[ERROR] ${BASH_SOURCE[0]}:${LINENO} aborted." >&2' ERR INT
+
+###############################################################################
+# Globals
+###############################################################################
+
+: "${DOTPATH:=$HOME/.dotfiles}"
+export DOTPATH
+
+MANIFEST="$HOME/.dotfiles.manifest"
+export MANIFEST
+
+###############################################################################
+# Load shared helpers
+###############################################################################
+
+if [[ -f "$DOTPATH/etc/lib/header.sh" ]]; then
+  # shellcheck source=/dev/null
+  . "$DOTPATH/etc/lib/header.sh"
+else
+  error() { echo "[-] $*" >&2; }
+  error "Failed to load shared helpers"
+  exit 1
+fi
+
+###############################################################################
+# Manifest
+###############################################################################
+
+[ -f "$MANIFEST" ] || {
+  die "No manifest found. Nothing to clean."
+}
+
+while IFS= read -r line || [[ -n "$line" ]]; do
+  # skip comments / empty
+  [[ -z "$line" || "$line" == \#* ]] && continue
+  
+  # split: "dst -> src"
+  dst=${line%% ->*}
+  src=${line##*-> }
+
+  # sanity check
+  if [[ -z "$dst" || -z "$src" ]]; then
+    warn "invalid manifest entry: $line"
+    continue
+  fi
+
+  # only touch symlinks
+  if [[ ! -L "$dst" ]]; then
+    warn "skip $dst (not a symlink)"
+    continue
+  fi
+
+  current_src=$(readlink "$dst" || true)
+
+  if [[ "$current_src" != "$src" ]]; then
+    warn "skip $dst (link target changed)"
+    continue
+  fi
+  
+  echo "==> unlinked: $dst"
+  unlink "$dst"
+
+done <"$MANIFEST"

@@ -28,19 +28,12 @@ jobs:
         pip install vim-vint
     
     # Lint check
-    - name: ShellCheck (setup / scripts)
+    - name: ShellCheck
       env:
-        SHELLCHECK_OPTS: "-f gcc --exclude=SC1090"
+        DOTPATH: ${{ github.workspace }}
       run: |
-        shellcheck $SHELLCHECK_OPTS etc/setup
-        shellcheck $SHELLCHECK_OPTS etc/scripts/init
-        shellcheck $SHELLCHECK_OPTS etc/scripts/deploy
-
-    - name: ShellCheck (.bashrc)
-      run: |
-        shellcheck -f gcc \
-          --exclude=SC2148,SC1090 \
-          config/bash/.bashrc
+        set -eux
+        make lint
 
     - name: Vint (Neovim config)
       run: |

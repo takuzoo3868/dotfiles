@@ -2,7 +2,11 @@
 #
 # tmux weather status script
 # API: https://openweathermap.org/current
-# NEED API KEY in .bashrc_local: WEATHER_API
+# NEED: API KEY in .bashrc_local
+#   export WEATHER_API="xxxxxxxxxxxxxxxxxx"
+#
+# Author: takuzoo3868
+# Last Modified: 9 Feb 2026.
 #
 
 set -Eeuo pipefail
@@ -70,7 +74,9 @@ __get_location() {
   city=$(curl -sf "http://ip-api.com/json/?fields=city" | jq -r '.city // empty') || true
   echo "${city:-Japan}"
 }
-export WEATHER_LOCATION="$(__get_location)"
+
+WEATHER_LOCATION="$(__get_location)"
+export WEATHER_LOCATION
 
 #######################################
 # Helpers

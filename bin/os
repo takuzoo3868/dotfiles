@@ -2,6 +2,9 @@
 #
 # Detect operating system and distribution
 #
+# Author: takuzoo3868
+# Last Modified: 11 Dec 2018.
+#
 
 set -Eeuo pipefail
 trap 'echo "[ERROR] ${BASH_SOURCE[0]}:${LINENO} aborted." >&2' ERR INT

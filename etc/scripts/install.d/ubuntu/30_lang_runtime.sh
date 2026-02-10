@@ -14,8 +14,6 @@ trap 'echo "[ERROR] ${BASH_SOURCE[0]}:${LINENO} aborted." >&2' ERR INT
 : "${DOTPATH:=$HOME/.dotfiles}"
 export DOTPATH
 
-readonly CONFPATH="$DOTPATH/config"
-
 ###############################################################################
 # Load shared helpers
 ###############################################################################
@@ -41,24 +39,6 @@ if ! has sudo; then
   error "sudo is required on Ubuntu"
   return 0
 fi
-
-info "Installing build dependencies..."
-
-sudo apt-get update -qq
-sudo apt-get install -y -qq \
-  build-essential \
-  curl \
-  git \
-  ca-certificates \
-  libssl-dev \
-  zlib1g-dev \
-  libbz2-dev \
-  libreadline-dev \
-  libsqlite3-dev \
-  libffi-dev \
-  liblzma-dev \
-  tk-dev \
-  xz-utils
 
 ###############################################################################
 # anyenv

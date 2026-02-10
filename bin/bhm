@@ -1,80 +1,93 @@
 #!/usr/bin/env bash
-
-# Author: takuzoo3868
-# Last Modified: 07 Dec 2018.
-
+#
 # Backs up a user's home directory
+#
+# Author: takuzoo3868
+# Last Modified: 9 Feb 2026.
+#
 
 set -Eeuo pipefail
 trap 'echo "[ERROR] ${BASH_SOURCE[0]}:${LINENO} aborted." >&2' ERR INT
 
-PROGNAME=$(basename $0)
-VERSION="1.0.0"
+PROGNAME="$(basename "$0")"
 
+usage() {
+  cat <<EOF
+usage: $PROGNAME [OPTION]
 
-usage(){
-  echo "usage: ${PROGNAME} --option [argument]"
-  echo ""
-  echo "Back up a user's home directory"
-  echo ""
-  echo "optional arguments:"
-  echo "  --backup    Backs up a user's entire home directory."
-  echo "              Requires the username passed as an argument."
-  echo ""
-  echo "  --restore   Restores a user's home directory from backup."
-  echo "              Requires the username passed as an argument."
-  echo ""
-  echo "  -h, --help  Provides usage information for the script."
-  echo "              Hint: You're reading it :)"
-  exit 1
+Back up a user's home directory
+
+options:
+  --backup USERNAME
+              Backs up a user's entire home directory.
+              Requires the username passed as an argument.
+
+  --restore FILE
+              Restores a user's home directory from backup.
+              (Not implemented yet)
+
+  -h, --help
+              Provides usage information for the script.
+EOF
+  exit 0
 }
 
-for OPT in "$@"
-do
-  case $OPT in
-    '--backup' )
-      if [[ -z $2 ]]; then
-	      echo -e "Please specify the username you would like to backup."
-	      echo -e "For usage information, use: --help"
-	      exit 1
-	    fi
-      
-      OUTPUT_DIR="/home/$2/backups/"
-      OUTPUT_FILE="backup-$(date +%Y%m%d).tar.gz"
+if [[ $# -eq 0 ]]; then
+  usage
+fi
 
-      echo -e "Backing up $2's home directory, please wait..."
-      
-      if [ ! -d $OUTPUT_DIR ]; then
-        echo -e "Creating backup directory $OUTPUT_DIR..."
-	      mkdir -p $OUTPUT_DIR
-      fi
-
-	    echo -e "Compressing $2's home directory contents..."
-
-	    tar -pzcf $OUTPUT_DIR$OUTPUT_FILE /home/$2/ --exclude "/home/$2/backups"
-
-	    echo -e "Backup completed!"
-	    echo -e ""
-    	echo -e "It is recommended that you copy the compressed backup file, located"
-	    echo -e "in /home/$2/backups, to an external device for safe keeping."
-      ;;
-
-    '--restore' )
-      if [[ -z $2 ]]; then
-        echo -e "Please specify the backup file you would like to restore."
-        echo -e "For usage information, use: --help"
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --backup)
+      if [[ -z "${2:-}" ]]; then
+        echo "Please specify the username you would like to backup." >&2
+        echo "For usage information, use: --help" >&2
         exit 1
       fi
-      
-      echo -e "Sorry, this ability has not yet been implemented."
+
+      USERNAME="$2"
+      OUTPUT_DIR="/home/$USERNAME/backups"
+      OUTPUT_FILE="backup-$(date +%Y%m%d).tar.gz"
+
+      echo "Backing up ${USERNAME}'s home directory, please wait..."
+
+      if [[ ! -d "$OUTPUT_DIR" ]]; then
+        echo "Creating backup directory $OUTPUT_DIR..."
+        mkdir -p "$OUTPUT_DIR"
+      fi
+
+      echo "Compressing ${USERNAME}'s home directory contents..."
+
+      tar -pzcf \
+        "$OUTPUT_DIR/$OUTPUT_FILE" \
+        "/home/$USERNAME/" \
+        --exclude "/home/$USERNAME/backups"
+
+      echo "Backup completed!"
+      echo
+      echo "It is recommended that you copy the compressed backup file,"
+      echo "located in $OUTPUT_DIR, to an external device for safe keeping."
+
+      shift 2
       ;;
 
-    '-h' | '--help' )
+    --restore)
+      if [[ -z "${2:-}" ]]; then
+        echo "Please specify the backup file you would like to restore." >&2
+        echo "For usage information, use: --help" >&2
+        exit 1
+      fi
+
+      echo "Sorry, this ability has not yet been implemented."
+      exit 1
+      ;;
+
+    -h|--help)
       usage
       ;;
 
     -*)
-      echo "$PROGNAME: illegal option -- '$(echo $1 | sed 's/^-*//')'" 1>&2
+      echo "$PROGNAME: illegal option -- '${1##*-}'" >&2
       exit 1
       ;;
 

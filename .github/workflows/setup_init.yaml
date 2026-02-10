@@ -1,13 +1,14 @@
-name: Setup(init) Nightly
+name: Setup(init)
 
 on:
-  schedule:
-    - cron: '0 18 * * *'  # JST 03:00
-  workflow_dispatch:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
 jobs:
   ubuntu-init:
-    name: Nightly init on Ubuntu
+    name: Test init on Ubuntu
     runs-on: ubuntu-latest
     container:
       image: ubuntu:22.04

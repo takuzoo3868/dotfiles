@@ -1,191 +1,161 @@
 #!/usr/bin/env bash
+#
+# Author: takuzoo3868
+# Last Modified: 9 Feb 2026.
+#
 
-if [[ $COLORTERM = gnome-* && $TERM = xterm ]] && infocmp gnome-256color >/dev/null 2>&1; then
-	export TERM='gnome-256color';
+###############################################################################
+# Terminal capability
+###############################################################################
+
+if [[ ${COLORTERM:-} == gnome-* && ${TERM:-} == xterm ]] \
+   && infocmp gnome-256color >/dev/null 2>&1; then
+  export TERM='gnome-256color'
 elif infocmp xterm-256color >/dev/null 2>&1; then
-	export TERM='xterm-256color';
-fi;
+  export TERM='xterm-256color'
+fi
 
-if tput setaf 1 &> /dev/null; then
-	tput sgr0; # reset colors
-	bold=$(tput bold);
-	reset=$(tput sgr0);
+###############################################################################
+# Colors
+###############################################################################
 
-	black=$(tput setaf 234);
-	blue=$(tput setaf 27);
-	cyan=$(tput setaf 39);
-	green=$(tput setaf 76);
-	orange=$(tput setaf 166);
-	purple=$(tput setaf 125);
-	red=$(tput setaf 124);
-	violet=$(tput setaf 61);
-	white=$(tput setaf 15);
-	yellow=$(tput setaf 154);
+if tput setaf 1 >/dev/null 2>&1; then
+  tput sgr0
+
+  BOLD="$(tput bold)"
+  RESET="$(tput sgr0)"
+
+  BLUE="$(tput setaf 27)"
+  CYAN="$(tput setaf 39)"
+  GREEN="$(tput setaf 76)"
+  ORANGE="$(tput setaf 166)"
+  RED="$(tput setaf 124)"
+  YELLOW="$(tput setaf 154)"
 else
-	bold='';
-	reset="\e[00m";
-	black="\e[1;30m";
-	blue="\e[1;34m";
-	cyan="\e[1;36m";
-	green="\e[1;32m";
-	orange="\e[1;33m";
-	purple="\e[1;35m";
-	red="\e[1;31m";
-	violet="\e[1;35m";
-	white="\e[1;37m";
-	yellow="\e[1;33m";
-fi;
+  BOLD=''
+  RESET=$'\e[0m'
 
+  BLUE=$'\e[1;34m'
+  CYAN=$'\e[1;36m'
+  GREEN=$'\e[1;32m'
+  ORANGE=$'\e[1;33m'
+  RED=$'\e[1;31m'
+  YELLOW=$'\e[1;33m'
+fi
+
+readonly BOLD RESET BLUE CYAN GREEN ORANGE RED YELLOW
+export BLUE CYAN GREEN ORANGE RED YELLOW
 export PROMPT_DIRTRIM=2
 
-# icons set
-ICON_HOME=""
-ICON_DIR=""
-ICON_ETC=""
-ICON_USER=""
-ICON_HOST=""
+###############################################################################
+# Icons
+###############################################################################
 
-ICON_OK=""
-ICON_FAIL=""
-ICON_LOCK=""
-ICON_NOT_FOUND=""
-ICON_STOP=""
+readonly ICON_HOME=""
+readonly ICON_DIR=""
+readonly ICON_ETC=""
+readonly ICON_USER=""
+readonly ICON_HOST=""
 
-ICON_OCTOCAT=""
-ICON_GIT_BITBUCKET=""
-ICON_GIT_GITLAB=""
+readonly ICON_OK=""
+readonly ICON_FAIL=""
+readonly ICON_LOCK=""
+readonly ICON_NOT_FOUND=""
+readonly ICON_STOP=""
 
-ICON_GIT_BRANCH=""
-ICON_GIT_COMMIT=""
-ICON_GIT_REMOTE_BRANCH=""
-ICON_GIT_UNTRACKED=""
-ICON_GIT_UNSTAGED=""
-ICON_GIT_STAGED=""
-ICON_GIT_STASH=""
-ICON_GIT_INCOMING_CHANGES=""
-ICON_GIT_OUTGOING_CHANGES=""
-ICON_GIT_TAG=""
+readonly ICON_OCTOCAT=""
+# shellcheck disable=SC2034
+readonly ICON_GIT_BITBUCKET=""
+# shellcheck disable=SC2034
+readonly ICON_GIT_GITLAB=""
 
-# git status veiw
+readonly ICON_GIT_BRANCH=""
+readonly ICON_GIT_COMMIT=""
+# shellcheck disable=SC2034
+readonly ICON_GIT_REMOTE_BRANCH=""
+readonly ICON_GIT_UNTRACKED=""
+readonly ICON_GIT_UNSTAGED=""
+readonly ICON_GIT_STAGED=""
+readonly ICON_GIT_STASH=""
+# shellcheck disable=SC2034
+readonly ICON_GIT_INCOMING_CHANGES=""
+# shellcheck disable=SC2034
+readonly ICON_GIT_OUTGOING_CHANGES=""
+# shellcheck disable=SC2034
+readonly ICON_GIT_TAG=""
+
 prompt_git() {
-	local s='';
-	local branchName='';
-	local gitHash='';
+  git rev-parse --is-inside-work-tree >/dev/null 2>&1 || return 0
 
-	GIT_DIR="$(git rev-parse --git-dir 2>/dev/null)"
+  local status=''
+  local branch
+  local commit
 
-	# Check if the current directory is in a Git repository.
-	if [ $(git rev-parse --is-inside-work-tree &>/dev/null; echo "${?}") == '0' ]; then
+  if [[ $(git rev-parse --is-inside-git-dir 2>/dev/null) == false ]]; then
+    git update-index --really-refresh -q >/dev/null 2>&1 || true
 
-		# check if the current directory is in .git before running git checks
-		if [ "$(git rev-parse --is-inside-git-dir 2> /dev/null)" == 'false' ]; then
+    git diff --quiet --cached || status+="${ICON_GIT_STAGED}"
+    git diff-files --quiet || status+="${ICON_GIT_UNSTAGED}"
 
-			# Ensure the index is up to date.
-			git update-index --really-refresh -q &>/dev/null;
+    [[ -n $(git ls-files --others --exclude-standard) ]] \
+      && status+="${ICON_GIT_UNTRACKED}"
 
-			# Check for uncommitted changes in the index.
-			if ! $(git diff --quiet --ignore-submodules --cached); then
-				s+=${ICON_GIT_STAGED};
-			fi;
+    git rev-parse --verify refs/stash >/dev/null 2>&1 \
+      && status+="${ICON_GIT_STASH}"
+  fi
 
-			# Check for unstaged changes.
-			if ! $(git diff-files --quiet --ignore-submodules --); then
-				s+=${ICON_GIT_UNSTAGED};
-			fi;
+  branch="$(git symbolic-ref --quiet --short HEAD \
+            || git rev-parse --short HEAD \
+            || printf '(unknown)')"
 
-			# Check for untracked files.
-			if [ -n "$(git ls-files --others --exclude-standard)" ]; then
-				s+=${ICON_GIT_UNTRACKED};
-			fi;
+  commit="$(git rev-parse --short HEAD)"
 
-			# Check for stashed files.
-			if $(git rev-parse --verify refs/stash &>/dev/null); then
-				s+=${ICON_GIT_STASH};
-			fi;
-
-		fi;
-
-		# Get the short symbolic ref.
-		# If HEAD isn’t a symbolic ref, get the short SHA for the latest commit
-		# Otherwise, just give up.
-		branchName=" ${ICON_GIT_BRANCH} $(git symbolic-ref --quiet --short HEAD 2> /dev/null || \
-			git rev-parse --short HEAD 2> /dev/null || \
-			echo '(unknown)')";
-
-		[ -n "${s}" ] && s=" ${s}";
-
-		# Get commit hash
-		gitHash=" ${ICON_GIT_COMMIT} $(git rev-parse --short HEAD)";
-
-
-		echo -e "${ICON_OCTOCAT}${1}${branchName}${gitHash}${2}${s}";
-	else
-		return;
-	fi;
+  printf '%s %s %s%s' \
+    "${ICON_OCTOCAT}" \
+    "${ICON_GIT_BRANCH} ${branch}" \
+    "${ICON_GIT_COMMIT} ${commit}" \
+    "${status:+ ${status}}"
 }
 
-prompt_dir_icon(){
-	case $PWD in
-	    $HOME)
-	        echo ${ICON_HOME}
-		    ;;
-		"/etc")
-		    echo ${ICON_ETC}
-			;;
-        *) 
-	        echo ${ICON_DIR}
-		    ;;
-	esac
+prompt_dir_icon() {
+  case "$PWD" in
+    "$HOME") printf '%s' "${ICON_HOME}" ;;
+    /etc)   printf '%s' "${ICON_ETC}" ;;
+    *)      printf '%s' "${ICON_DIR}" ;;
+  esac
 }
 
-prompt_user(){
-	if [[ "${USER}" == "root" ]]; then
-	    user_state="${orange}";
-    else
-	    user_state="${blue}";
-    fi;
-
-	# the hostname when connected via SSH.
-    if [[ "${SSH_TTY}" ]]; then
-	    hostStyle="${bold}${red}";
-    else
-	    hostStyle="${yellow}";
-    fi;
-
-	echo -e "${user_state}${ICON_USER}"
+prompt_user() {
+  local color="${BLUE}"
+  [[ ${USER:-} == root ]] && color="${ORANGE}"
+  printf '%s%s' "${color}" "${ICON_USER}"
 }
 
-prompt_host(){
-	echo -e "${cyan}${ICON_HOST}"
+prompt_host() {
+  printf '%s%s' "${CYAN}" "${ICON_HOST}"
 }
 
 prompt_result() {
-  code=$?
-  if [ ${code} == 0 ]; then
-    echo -e "${ICON_OK}";
-  elif [ ${code} == 126 ]; then
-    echo -e "${ICON_LOCK}";            # Command invoked cannot execute
-  elif [ ${code} == 127 ]; then
-    echo -e "${ICON_NOT_FOUND}";       # Command not found
-  elif [ ${code} == 130 ]; then
-    echo -e "${ICON_STOP}";            # Script terminated by Control-C
-  else
-    echo -e "${ICON_FAIL} ${bold}${code}${reset}";
-  fi;
+  local code=$?
+  case "$code" in
+    0)   printf '%s' "${ICON_OK}" ;;
+    126) printf '%s' "${ICON_LOCK}" ;;
+    127) printf '%s' "${ICON_NOT_FOUND}" ;;
+    130) printf '%s' "${ICON_STOP}" ;;
+    *)   printf '%s %s%s%s' "${ICON_FAIL}" "${BOLD}" "$code" "${RESET}" ;;
+  esac
 }
 
-# Set the terminal title and prompt.
-PS1=" ";
-PS1+="\$(prompt_user) \[${bold}\]\u ";
-PS1+="\[${reset}\]";
-PS1+="\$(prompt_host) \[${bold}\]\h ";
-PS1+="\[${reset}\]";
-PS1+="\[${green}\]\$(prompt_dir_icon) \[${bold}\]\w ";
-PS1+="\[${reset}\]";
-PS1+="\[${yellow}\]\$(prompt_git) ";
-PS1+="\[${reset}\]";                                        
-PS1+="\[${yellow}\]\$(prompt_result)";
-PS1+="\[${reset}\]";                                    
-PS1+="\n";
-PS1+="\$ ";                            
-export PS1;
+###############################################################################
+# PS1
+###############################################################################
+
+PS1=""
+PS1+="\$(prompt_user) \[${BOLD}\]\u\[${RESET}\] "
+PS1+="\$(prompt_host) \[${BOLD}\]\h\[${RESET}\] "
+PS1+="\[${GREEN}\]\$(prompt_dir_icon) \[${BOLD}\]\w\[${RESET}\] "
+PS1+="\[${YELLOW}\]\$(prompt_git)\[${RESET}\] "
+PS1+="\[${YELLOW}\]\$(prompt_result)\[${RESET}\]"
+PS1+=$'\n$ '
+
+export PS1

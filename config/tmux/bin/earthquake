@@ -2,6 +2,9 @@
 #
 # tmux earthquake status script
 #
+# Author: takuzoo3868
+# Last Modified: 9 Feb 2026.
+#
 
 set -Eeuo pipefail
 trap 'echo "[ERROR] ${BASH_SOURCE[0]}:${LINENO} aborted." >&2' ERR INT
@@ -130,7 +133,8 @@ __p2pquake_earthquake() {
     fi
   fi
 
-  local data location magnitude scale tsunami timestamp timestamp_24
+  # local data location magnitude scale tsunami timestamp timestamp_24
+  local data location scale tsunami timestamp timestamp_24
 
   data=$(curl --max-time 4 -s \
     "https://api.p2pquake.net/v2/jma/quake?limit=${EARTHQUAKE_GET_DATA_LIMIT}&min_scale=${EARTHQUAKE_MIN_SCALE}" \
@@ -139,7 +143,7 @@ __p2pquake_earthquake() {
   [[ -z "$data" ]] && __read_tmp_file && return
 
   location=$(jq -r '.[].earthquake.hypocenter.name' <<<"$data")
-  magnitude=$(jq -r '.[].earthquake.hypocenter.magnitude' <<<"$data")
+  # magnitude=$(jq -r '.[].earthquake.hypocenter.magnitude' <<<"$data")
   scale=$(jq -r '.[].earthquake.maxScale' <<<"$data")
   tsunami=$(jq -r '.[].earthquake.domesticTsunami' <<<"$data")
   timestamp=$(jq -r '.[].earthquake.time' <<<"$data")

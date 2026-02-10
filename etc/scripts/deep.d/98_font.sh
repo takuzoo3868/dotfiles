@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-
+#
 # Author: takuzoo3868
-# Last Modified: 15 Feb 2021.
+# Last Modified: 9 Feb 2026.
+#
 
 set -Eeuo pipefail
-trap 'echo "[ERROR] ${BASH_SOURCE[0]}:${LINENO} aborted." >&2' ERR INT
+trap 'cleanup; echo "[ERROR] ${BASH_SOURCE[0]}:${LINENO} aborted." >&2' ERR INT
 
 ###############################################################################
 # Globals
@@ -12,6 +13,12 @@ trap 'echo "[ERROR] ${BASH_SOURCE[0]}:${LINENO} aborted." >&2' ERR INT
 
 : "${DOTPATH:=$HOME/.dotfiles}"
 export DOTPATH
+
+: "${FONTS_DIR:=${fonts_dir:-$HOME/.local/share/fonts}}"
+export FONTS_DIR
+
+NERD_REPO_URL="https://github.com/ryanoasis/nerd-fonts.git"
+CICA_API_URL="https://api.github.com/repos/miiton/Cica/releases/latest"
 
 ###############################################################################
 # Load shared helpers
@@ -26,38 +33,112 @@ else
   exit 1
 fi
 
+###############################################################################
+# Cleanup handler
+###############################################################################
 
+cleanup() {
+  if [[ -n "${TMPDIR_WORK:-}" && -d "$TMPDIR_WORK" ]]; then
+    rm -rf "$TMPDIR_WORK"
+  fi
+}
 
-if is_exists "fontforge"; then
-  info "98 Install fonts..."
-else
-  error "fontforge required"
+###############################################################################
+# Preconditions
+###############################################################################
+
+if ! is_exists "fontforge"; then
+  error "fontforge is required"
   exit 1
 fi
 
-mkdir -p $DOTPATH/tmp && cd $DOTPATH/tmp
+if ! is_exists "git"; then
+  error "git is required"
+  exit 1
+fi
 
-# Download Nerd fonts
-nerd_url="https://github.com/ryanoasis/nerd-fonts.git"
-git clone --depth 1 "$nerd_url" && cd nerd-fonts && mkdir -p orig dist
+if ! is_exists unzip; then
+  error "unzip required"
+  exit 1
+fi
 
-# Download Cica fonts
-cica_url=$(curl -s https://api.github.com/repos/miiton/Cica/releases/latest | grep "browser_download_url.*zip" | grep "with_emoji" | cut -d '"' -f 4)
-curl -L "$cica_url" | tar -xvz -C orig
+info "98 Install patched fonts"
 
-# Cica fonts repatched mapping
-for font in $(find orig/ -type f -name "*.ttf"); do
-  fontforge -script font-patcher -c $font --out dist
+###############################################################################
+# Working directory
+###############################################################################
+
+TMPDIR_WORK="$(mktemp -d "${DOTPATH}/tmp.XXXXXX")"
+cd "$TMPDIR_WORK"
+
+###############################################################################
+# Clone Nerd Fonts (shallow, idempotent)
+###############################################################################
+
+if [[ ! -d nerd-fonts ]]; then
+  git clone --depth 1 "$NERD_REPO_URL" nerd-fonts
+fi
+
+cd nerd-fonts
+mkdir -p orig dist
+
+###############################################################################
+# Fetch latest Cica font release
+###############################################################################
+
+cica_url="$(
+  curl -fsSL "$CICA_API_URL" \
+    | grep -E 'browser_download_url.*Cica_v[0-9]+\.[0-9]+\.[0-9]+\.zip' \
+    | head -n 1 \
+    | cut -d '"' -f 4
+)"
+
+if [[ -z "$cica_url" ]]; then
+  error "Failed to resolve Cica font download URL"
+  exit 1
+fi
+
+cica_zip="$TMPDIR_WORK/Cica.zip"
+
+curl -fsSL "$cica_url" -o "$cica_zip"
+unzip -oq "$cica_zip" -d orig
+
+###############################################################################
+# Patch fonts with Nerd Fonts
+###############################################################################
+
+find orig -type f -name '*.ttf' -print0 |
+while IFS= read -r -d '' font; do
+  fontforge -script font-patcher -c "$font" --out dist
 done
 
-# Rename whitespace to underscore
-find dist -type f -name "*.ttf" | while read org_name; do
-  new_name=$(echo $org_name | sed 's/ /_/g')
-  mv "$org_name" "$new_name"
+###############################################################################
+# Normalize filenames (space → underscore)
+###############################################################################
+
+find dist -type f -name '*.ttf' -print0 |
+while IFS= read -r -d '' src; do
+  dst="${src// /_}"
+  if [[ "$src" != "$dst" ]]; then
+    mv "$src" "$dst"
+  fi
 done
 
-# Copy to font directory
-cp -u dist/* $fonts_dir
+###############################################################################
+# Install fonts (idempotent)
+###############################################################################
 
-cd $DOTPATH
-rm -rf tmp
+mkdir -p "$FONTS_DIR"
+
+if compgen -G "dist/*.ttf" > /dev/null; then
+  cp -u dist/*.ttf "$FONTS_DIR"
+else
+  warn "No patched font files found"
+fi
+
+###############################################################################
+# Done
+###############################################################################
+
+info "Font installation completed successfully"
+cleanup

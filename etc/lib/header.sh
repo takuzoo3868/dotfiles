@@ -23,6 +23,8 @@ else
   RED=""; GREEN=""; YELLOW=""; BOLD=""; RESET=""
 fi
 
+export RED GREEN YELLOW BOLD RESET
+
 ###############################################################################
 # Logging helpers
 ###############################################################################
@@ -77,11 +79,13 @@ symlink() {
   fi
 
   if [[ -L "$dst" ]] && [[ "$(readlink "$dst")" == "$src" ]]; then
+    printf '%s -> %s\n' "$dst" "$src" >>"$MANIFEST"
     echo "==> already linked: $dst"
     return 0
   fi
 
   ln -sfn "$src" "$dst"
+  printf '%s -> %s\n' "$dst" "$src" >>"$MANIFEST"
   echo "==> linked: $dst -> $src"
 }
 

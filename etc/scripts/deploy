@@ -19,6 +19,9 @@ export DOTPATH
 readonly CONFPATH="$DOTPATH/config"
 readonly LOCAL_BIN="$HOME/.local/bin"
 
+MANIFEST="$HOME/.dotfiles.manifest"
+export MANIFEST
+
 ###############################################################################
 # Load shared helpers
 ###############################################################################
@@ -51,6 +54,13 @@ ensure_git_repo() {
 
   git clone --depth=1 "$repo" "$dir"
 }
+
+###############################################################################
+# Manifest
+###############################################################################
+
+info "manifest"
+: >"$MANIFEST"
 
 ###############################################################################
 # Local bin
@@ -159,5 +169,7 @@ for bin in "$DOTPATH"/bin/*; do
   ln -sfn "$bin" "$LOCAL_BIN/$(basename "$bin")"
 done
 
+# shellcheck disable=SC2016
 echo '==> Add PATH: export PATH="$HOME/.local/bin:$PATH"'
+# shellcheck disable=SC2016
 echo '==> Add PATH (macOS/MacPorts): export PATH="/opt/local/bin:/opt/local/sbin:$PATH"'

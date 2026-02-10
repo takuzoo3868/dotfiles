@@ -1,41 +1,29 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#
 # octocatsay
-# Coby Chapple - https://github.com/cobyism/octocatsay
+#
+# Author: takuzoo3868
+# Last Modified: 9 Feb 2026.
+#
 
 set -Eeuo pipefail
 trap 'echo "[ERROR] ${BASH_SOURCE[0]}:${LINENO} aborted." >&2' ERR INT
 
-if [ $# -eq 0 ];then
-  read line
-  text="$line"
+if (($# == 0)); then
+  read -r text
 else
-  text=$1
-  shift
-  while (( "$#" )); do
-    text="$text $1"
-    shift
-  done
+  text="$*"
 fi
 
-echo -n "
+text_len=${#text}
+
+printf '%s\n' "
            MMM.           .MMM
            MMMMMMMMMMMMMMMMMMM
-           MMMMMMMMMMMMMMMMMMM      _";
-for ((i = 0; i < ${#text}; i++)); do
-   echo -n "_";
-done
-echo -n "_
-          MMMMMMMMMMMMMMMMMMMMM    | ";
-for ((i = 0; i < ${#text}; i++)); do
-  echo -n " ";
-done
-echo -n " |
+           MMMMMMMMMMMMMMMMMMM      _$(printf '%*s' "$text_len" '' | tr ' ' '_')_
+          MMMMMMMMMMMMMMMMMMMMM    | $(printf '%*s' "$text_len" '') |
          MMMMMMMMMMMMMMMMMMMMMMM   | $text |
-        MMMMMMMMMMMMMMMMMMMMMMMM   |_   ";
-for ((i = 0; i < ${#text} -2; i++)); do
-  echo -n "_";
-done
-echo -n "|
+        MMMMMMMMMMMMMMMMMMMMMMMM   |_   $(printf '%*s' "$((text_len - 2))" '' | tr ' ' '_')|
         MMMM::- -:::::::- -::MMMM    |/
          MM~:~ 00~:::::~ 00~:~MM
     .. MMMMM::.00:::+:::.00::MMMMM ..
@@ -51,4 +39,4 @@ echo -n "|
         ~~~~~~==~==~~~==~==~~~~~~
          ~~~~~~==~==~==~==~~~~~~
              :~==~==~==~==~~
-";
+"octo

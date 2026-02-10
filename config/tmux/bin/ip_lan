@@ -2,6 +2,9 @@
 #
 # tmux LAN IPv4 script
 #
+# Author: takuzoo3868
+# Last Modified: 9 Feb 2026.
+#
 
 set -Eeuo pipefail
 trap 'echo "[ERROR] ${BASH_SOURCE[0]}:${LINENO} aborted." >&2' ERR INT
