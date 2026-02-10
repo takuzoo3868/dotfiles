@@ -10,6 +10,15 @@ set -Eeuo pipefail
 trap 'echo "[ERROR] ${BASH_SOURCE[0]}:${LINENO} aborted." >&2' ERR INT
 
 ###############################################################################
+# Load mise (non-interactive / CI safe)
+###############################################################################
+
+if [ -x "$HOME/.local/bin/mise" ]; then
+  export PATH="$HOME/.local/bin:$PATH"
+  eval "$("$HOME/.local/bin/mise" activate bash --shims || true)"
+fi
+
+###############################################################################
 # Terminal colors (safe)
 ###############################################################################
 
