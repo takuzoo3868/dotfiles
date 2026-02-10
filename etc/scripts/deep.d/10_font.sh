@@ -62,7 +62,9 @@ if ! is_exists unzip; then
   exit 1
 fi
 
-info "98 Install patched fonts"
+echo ""
+info "10 Build fonts (Cica patched by nerd-fonts)"
+echo ""
 
 ###############################################################################
 # Working directory
@@ -137,8 +139,8 @@ else
 fi
 
 ###############################################################################
-# Done
+# Cleanup
 ###############################################################################
 
-info "Font installation completed successfully"
+info "Font installation completed successfully!"
 cleanup

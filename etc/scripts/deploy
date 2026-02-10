@@ -56,120 +56,145 @@ ensure_git_repo() {
 }
 
 ###############################################################################
-# Manifest
+# Deploy symlinks runner
 ###############################################################################
 
-info "manifest"
-: >"$MANIFEST"
+run_deploy() {
+
+  ###############################################################################
+  # Manifest
+  ###############################################################################
+
+  info "manifest"
+  : >"$MANIFEST"
+  echo "==> init: $MANIFEST"
+
+  ###############################################################################
+  # Local bin
+  ###############################################################################
+
+  info "local bin"
+  ensure_dir "$LOCAL_BIN"
+  symlink "$DOTPATH/etc/scripts/deploy" "$LOCAL_BIN/deploy"
+
+  ###############################################################################
+  # Bash
+  ###############################################################################
+
+  info "bash"
+  ensure_dir "$HOME/.bash"
+  symlink "$CONFPATH/bash/.bashrc" "$HOME/.bashrc"
+  symlink "$CONFPATH/bash/aliases.bash" "$HOME/.bash/aliases.bash"
+  symlink "$CONFPATH/bash/prompt.bash" "$HOME/.bash/prompt.bash"
+
+  ###############################################################################
+  # Git
+  ###############################################################################
+
+  info "git"
+  ensure_dir "$HOME/.git_template/hooks"
+  symlink "$CONFPATH/git/.gitconfig" "$HOME/.gitconfig"
+  symlink "$CONFPATH/git/.gitignore.global" "$HOME/.gitignore.global"
+  symlink "$CONFPATH/git/.gitmessage" "$HOME/.gitmessage"
+
+  ###############################################################################
+  # Vim / Neovim / Nyaovim
+  ###############################################################################
+
+  info "vim"
+  symlink "$CONFPATH/vim/.vimrc" "$HOME/.vimrc"
+
+  info "neovim"
+  ensure_dir "$HOME/.config"
+  symlink "$CONFPATH/nvim" "$HOME/.config/nvim"
+
+  info "nyaovim"
+  symlink "$CONFPATH/nyaovim" "$HOME/.config/nyaovim"
+
+  ###############################################################################
+  # tmux
+  ###############################################################################
+
+  info "tmux"
+  ensure_git_repo \
+    "https://github.com/tmux-plugins/tpm" \
+    "$HOME/.tmux/plugins/tpm"
+
+  symlink "$CONFPATH/tmux/.tmux.conf" "$HOME/.tmux.conf"
+  symlink "$CONFPATH/tmux/.tmux.conf.local" "$HOME/.tmux.conf.local"
+  symlink "$CONFPATH/tmux/bin" "$HOME/.tmux/bin"
+  symlink "$CONFPATH/tmux/work.yaml" "$HOME/.tmux/work.yaml"
+
+  echo "==> Docs: doc/tmux.md"
+  # shellcheck disable=SC2016
+  echo '==> Add PATH: export PATH="$HOME/.tmux/bin:$PATH"'
+
+  ###############################################################################
+  # mise
+  ###############################################################################
+
+  info "mise"
+  ensure_dir "$HOME/.config/mise"
+  symlink "$CONFPATH/mise/config.toml" "$HOME/.config/mise/config.toml"
+  symlink "$CONFPATH/mise/default-python-packages" "$HOME/.config/mise/default-python-packages"
+
+  ###############################################################################
+  # yazi
+  ###############################################################################
+
+  info "yazi"
+  ensure_dir "$HOME/.config/yazi"
+  symlink "$CONFPATH/yazi/init.lua" "$HOME/.config/yazi/init.lua"
+  symlink "$CONFPATH/yazi/yazi.toml" "$HOME/.config/yazi/yazi.toml"
+  symlink "$CONFPATH/yazi/keymap.toml" "$HOME/.config/yazi/keymap.toml"
+  symlink "$CONFPATH/yazi/theme.toml" "$HOME/.config/yazi/theme.toml"
+
+  ###############################################################################
+  # SQLite3
+  ###############################################################################
+
+  info "sqlite3"
+  symlink "$CONFPATH/sqlite/.sqliterc" "$HOME/.sqliterc"
+  echo "==> Install sqlite3 if necessary"
+
+  ###############################################################################
+  # Radare2
+  ###############################################################################
+
+  info "radare2"
+  symlink "$CONFPATH/radare2/.radare2rc" "$HOME/.radare2rc"
+  echo "==> Install radare2 if necessary"
+
+  ###############################################################################
+  # WeeChat
+  ###############################################################################
+
+  info "weechat"
+  echo "==> Docs: doc/weechat.md"
+  echo "==> Install weechat if necessary"
+
+  ###############################################################################
+  # User binaries
+  ###############################################################################
+
+  info "user binaries"
+  ensure_dir "$LOCAL_BIN"
+
+  for bin in "$DOTPATH"/bin/*; do
+    [[ -e "$bin" ]] || continue
+    ln -sfn "$bin" "$LOCAL_BIN/$(basename "$bin")"
+  done
+
+  # shellcheck disable=SC2016
+  echo '==> Add PATH: export PATH="$HOME/.local/bin:$PATH"'
+  # shellcheck disable=SC2016
+  echo '==> Add PATH (macOS/MacPorts): export PATH="/opt/local/bin:/opt/local/sbin:$PATH"'
+}
 
 ###############################################################################
-# Local bin
+# Main
 ###############################################################################
 
-info "local bin"
-ensure_dir "$LOCAL_BIN"
-symlink "$DOTPATH/etc/scripts/deploy" "$LOCAL_BIN/deploy"
-
-###############################################################################
-# Bash
-###############################################################################
-
-info "bash"
-ensure_dir "$HOME/.bash"
-symlink "$CONFPATH/bash/.bashrc" "$HOME/.bashrc"
-symlink "$CONFPATH/bash/aliases.bash" "$HOME/.bash/aliases.bash"
-symlink "$CONFPATH/bash/prompt.bash" "$HOME/.bash/prompt.bash"
-
-###############################################################################
-# Git
-###############################################################################
-
-info "git"
-ensure_dir "$HOME/.git_template/hooks"
-symlink "$CONFPATH/git/.gitconfig" "$HOME/.gitconfig"
-symlink "$CONFPATH/git/.gitignore.global" "$HOME/.gitignore.global"
-symlink "$CONFPATH/git/.gitmessage" "$HOME/.gitmessage"
-
-###############################################################################
-# Vim / Neovim / Nyaovim
-###############################################################################
-
-info "vim"
-symlink "$CONFPATH/vim/.vimrc" "$HOME/.vimrc"
-
-info "neovim"
-ensure_dir "$HOME/.config"
-symlink "$CONFPATH/nvim" "$HOME/.config/nvim"
-
-info "nyaovim"
-symlink "$CONFPATH/nyaovim" "$HOME/.config/nyaovim"
-
-###############################################################################
-# tmux
-###############################################################################
-
-info "tmux"
-ensure_git_repo \
-  "https://github.com/tmux-plugins/tpm" \
-  "$HOME/.tmux/plugins/tpm"
-
-symlink "$CONFPATH/tmux/.tmux.conf" "$HOME/.tmux.conf"
-symlink "$CONFPATH/tmux/.tmux.conf.local" "$HOME/.tmux.conf.local"
-symlink "$CONFPATH/tmux/bin" "$HOME/.tmux/bin"
-symlink "$CONFPATH/tmux/work.yaml" "$HOME/.tmux/work.yaml"
-
-echo "==> Docs: doc/tmux.md"
-# shellcheck disable=SC2016
-echo '==> Add PATH: export PATH="$HOME/.tmux/bin:$PATH"'
-
-###############################################################################
-# yazi
-###############################################################################
-
-info "yazi"
-ensure_dir "$HOME/.config/yazi"
-symlink "$CONFPATH/yazi/init.lua" "$HOME/.config/yazi/init.lua"
-symlink "$CONFPATH/yazi/yazi.toml" "$HOME/.config/yazi/yazi.toml"
-symlink "$CONFPATH/yazi/keymap.toml" "$HOME/.config/yazi/keymap.toml"
-symlink "$CONFPATH/yazi/theme.toml" "$HOME/.config/yazi/theme.toml"
-
-###############################################################################
-# SQLite3
-###############################################################################
-
-info "sqlite3"
-symlink "$CONFPATH/sqlite/.sqliterc" "$HOME/.sqliterc"
-echo "==> Install sqlite3 if necessary"
-
-###############################################################################
-# Radare2
-###############################################################################
-
-info "radare2"
-symlink "$CONFPATH/radare2/.radare2rc" "$HOME/.radare2rc"
-echo "==> Install radare2 if necessary"
-
-###############################################################################
-# WeeChat
-###############################################################################
-
-info "weechat"
-echo "==> Docs: doc/weechat.md"
-echo "==> Install weechat if necessary"
-
-###############################################################################
-# User binaries
-###############################################################################
-
-info "user binaries"
-ensure_dir "$LOCAL_BIN"
-
-for bin in "$DOTPATH"/bin/*; do
-  [[ -e "$bin" ]] || continue
-  ln -sfn "$bin" "$LOCAL_BIN/$(basename "$bin")"
-done
-
-# shellcheck disable=SC2016
-echo '==> Add PATH: export PATH="$HOME/.local/bin:$PATH"'
-# shellcheck disable=SC2016
-echo '==> Add PATH (macOS/MacPorts): export PATH="/opt/local/bin:/opt/local/sbin:$PATH"'
+info "Deploy dotfile symlinks..."
+run_deploy
+info "Deployed dotfile symlinks!"

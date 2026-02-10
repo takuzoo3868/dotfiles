@@ -85,7 +85,7 @@ jobs:
 
       - name: Post deploy sanity check
         env:
-          MANIFEST: "$HOME/.dotfiles.manifest"
+          MANIFEST: $HOME/.dotfiles.manifest
         run: |
           set -eux
           test -f "$MANIFEST"

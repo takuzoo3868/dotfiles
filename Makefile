@@ -13,24 +13,18 @@ all:
 update: ## Fetch changes for this repo
 	git pull origin master
 
-deploy: ## Create dotfile symlinks
-	@echo '==> Start to deploy dotfiles to $$HOME.'
+deploy: ## Deploy dotfile symlinks to $HOME
 	@DOTPATH=$(DOTPATH) bash $(DOTPATH)/etc/scripts/deploy
 
-init: ## Setup develop environment settings
+init: ## Install development packages & setup settings
 	@echo '==> Start to install app using pkg manager.'
 	@DOTPATH=$(DOTPATH) bash $(DOTPATH)/etc/scripts/init
 
-deep: ## Setup more finicky settings
-	@echo '==> Start to install a variety of tools.'
+deep: ## Setup more minor settings
 	@find $(DOTPATH)/etc/scripts/deep.d -name "[0-9][0-9]*.sh"
 
-install: deploy init ## Run make deploy, init
+install: deploy init deep ## Run make deploy, init, deep
 	@exec $$SHELL
-
-check: ## Check if it is ready to install
-	@echo 'PATH:' $(DOTPATH)
-	@echo 'TARGET:' $(DOTFILES)
 
 lint: ## Run shellcheck against bash scripts
 	@echo '==> Running shellcheck'
@@ -40,8 +34,7 @@ lint: ## Run shellcheck against bash scripts
 	| xargs -0 awk 'FNR==1 && $$0=="#!/usr/bin/env bash"{print FILENAME}' \
 	| xargs $(SHELLCHECK) -f $(SHELLCHECK_FORMAT) --exclude=$(SHELLCHECK_EXCLUDE)
 
-clean: ## Unlink deployed dotfile symlinks (safe)
-	@echo '==> Start to unlink dotfile symlinks from $$HOME.'
+clean: ## Unlink deployed dotfile symlinks from $HOME
 	@DOTPATH=$(DOTPATH) bash $(DOTPATH)/etc/scripts/clean
 
 help: ## Self-documented Makefile

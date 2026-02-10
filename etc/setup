@@ -14,7 +14,7 @@ trap 'echo "[ERROR] ${BASH_SOURCE[0]}:${LINENO} aborted." >&2' ERR INT
 ###############################################################################
 
 readonly DOTFILES_REPO="https://github.com/takuzoo3868/dotfiles.git"
-readonly DOTFILES_ZIP="https://github.com/takuzoo3868/dotfiles/archive/master.zip"
+readonly DOTFILES_GZIP="https://github.com/takuzoo3868/dotfiles/archive/master.tar.gz"
 
 : "${DOTPATH:=$HOME/.dotfiles}"
 export DOTPATH
@@ -71,8 +71,9 @@ show_banner() {
 
 *** WHAT THIS SCRIPT DOES ***
 1. Download dotfiles repository
-2. Deploy dotfiles into your HOME directory
-3. Optionally initialize environment
+2. Deploy dotfile symlinks to your HOME directory
+3. Optionally initialize develop packages via apt/pacman/brew, mise
+4. Optionally build fonts (Cica patched by nerd-fonts) 
 
 MIT License
 
@@ -88,8 +89,8 @@ confirm() {
   echo "*** ATTENTION ***"
   echo "This script may modify your shell environment."
   echo "I recommend to read first. You can even copy commands one by one."
-  echo "If you use termux on Android, try this."
-  echo "$ /data/data/com.termux/files/usr/bin/bash"
+  # echo "If you use termux on Android, try this."
+  # echo "$ /data/data/com.termux/files/usr/bin/bash"
   echo ""
   read -r -p "$(printf "%s(U^w^) < Proceed with installation? [y/N] %s" "$YELLOW" "$RESET")" ans
   [[ "${ans:-}" =~ ^[Yy]$ ]]
@@ -101,7 +102,7 @@ confirm() {
 
 download_dotfiles() {
   if [[ -d "$DOTPATH/.git" ]]; then
-    info "Dotfiles already installed: $DOTPATH"
+    warn "Dotfiles already installed: $DOTPATH"
     return 0
   fi
 
@@ -109,7 +110,7 @@ download_dotfiles() {
 
   if has git; then
     git clone --depth=1 "$DOTFILES_REPO" "$DOTPATH"
-    info "Cloned via git"
+    info "Cloned dotfiles via git"
     return 0
   fi
 
@@ -120,13 +121,13 @@ download_dotfiles() {
   trap 'rm -rf "$tmp"' RETURN
 
   if has curl; then
-    curl -fsSL "$DOTFILES_ZIP" | tar -xz -C "$tmp"
+    curl -fsSL "$DOTFILES_GZIP" | tar -xvzf -C "$tmp"
   else
-    wget -qO- "$DOTFILES_ZIP" | tar -xz -C "$tmp"
+    wget -qO- "$DOTFILES_GZIP" | tar -xvzf -C "$tmp"
   fi
 
   mv "$tmp"/dotfiles-* "$DOTPATH"
-  info "Downloaded via archive"
+  info "Downloaded dotfiles via archive"
 }
 
 ###############################################################################
@@ -135,14 +136,9 @@ download_dotfiles() {
 
 deploy_dotfiles() {
   [[ -d "$DOTPATH" ]] || die "$DOTPATH not found"
-
-  info "Deploying dotfiles"
   cd "$DOTPATH"
-
   [[ -f Makefile ]] || die "Makefile not found"
-
   make deploy
-  info "Deploy completed"
 }
 
 ###############################################################################
@@ -152,13 +148,11 @@ deploy_dotfiles() {
 initialize_dotfiles() {
   case "${1:-}" in
     init|-i|--init)
-      info "Running initialization"
       cd "$DOTPATH"
       make init
-      info "Initialization completed"
       ;;
     *)
-      info "Initialization skipped"
+      info "Skipped development packages install"
       ;;
   esac
 }

@@ -31,11 +31,11 @@ else
 fi
 
 ###############################################################################
-# Development packages (mise-en-place)
+# Setup local rc setting
 ###############################################################################
 
 echo ""
-info "30 Development packages (mise-en-place)"
+info "50 Setup local rc setting"
 echo ""
 
 if ! has sudo; then
@@ -44,39 +44,69 @@ if ! has sudo; then
 fi
 
 ###############################################################################
-# mise-en-place
+# bashrc.local
 ###############################################################################
 
-info "mise-en-place"
-if ! has mise; then
-  warn "Not available mise, installing via curl..."
-  curl https://mise.run | sh
-  eval "$("$HOME"/.local/bin/mise activate bash || true)"
-
+setup_bashrc_local() {
+  info ".bashrc.local"
   if [ ! -f "$LOCALRC" ]; then
     touch "$LOCALRC"
   fi
 
-  if grep -q '### mise' "$LOCALRC"; then
-    info "Already configured mise in $LOCALRC"
+  if grep -q '### path' "$LOCALRC"; then
+    info "Already configured path in $LOCALRC"
   else
-    warn "Add mise init to $LOCALRC"
+    warn "Add path to $LOCALRC"
 
     cat >> "$LOCALRC" <<'EOF'
 
-### mise
-eval "$(mise activate bash)"
-export PATH="$HOME/.local/share/mise/shims:$PATH"
+### path
+export PATH="$HOME/.local/bin:$PATH"
+export PATH="/opt/local/bin:/opt/local/sbin:$PATH"
 
 EOF
-  info "Installed mise!!!"
   fi
-else
-  info "Already installed mise!"
-fi
 
-info "Install development packages via mise"
-mise install -y
-# shellcheck disable=SC1091
-source "$HOME/.bashrc"
-info "Installed development packages via mise"
+  if grep -q '### tmux' "$LOCALRC"; then
+    info "Already configured tmux in $LOCALRC"
+  else
+    warn "Add tmux to $LOCALRC"
+    echo "==> NEED WEATHER_API KEY to $LOCALRC from https://openweathermap.org/"
+
+    cat >> "$LOCALRC" <<'EOF'
+
+### tmux
+export PATH="$HOME/.tmux/bin:$PATH"
+
+### tmux powerline: weather
+export WEATHER_API="!!! Replace your API key !!!"
+export WEATHER_UNIT="metric"
+
+EOF
+  fi
+
+  if grep -q '### python uv' "$LOCALRC"; then
+    info "Already configured uv in $LOCALRC"
+  else
+    warn "Add uv to $LOCALRC"
+
+    cat >> "$LOCALRC" <<'EOF'
+
+### python uv
+export UV_SYSTEM_PYTHON=1
+export UV_PROJECT_ENVIRONMENT="/usr/local/"
+export UV_NO_DEV=1
+export UV_LINK_MODE=copy
+export UV_COMPILE_BYTECODE=1
+
+EOF
+  fi
+}
+
+###############################################################################
+# Main
+###############################################################################
+
+info "Setup .bashrc.local settings"
+setup_bashrc_local
+info "Finished .bashrc.local settings!"

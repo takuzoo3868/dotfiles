@@ -1,0 +1,27 @@
+[tools]
+go = "latest"
+python = "latest"
+rust = "latest"
+
+bat = "latest"
+fd = "latest"
+ffmpeg = "latest"
+fzf = "latest"
+imagemagick = "latest"
+jq = "latest"
+neovim = "latest"
+podman = "latest"
+ripgrep = "latest"
+shellcheck = "latest"
+tmux = "latest"
+trivy = "latest"
+uv = "latest"
+vim = "latest"
+yazi = "latest"
+zoxide = "latest"
+
+[settings]
+experimental = true
+
+[env]
+MISE_PYTHON_DEFAULT_PACKAGES_FILE = "$HOME/.config/mise/default-python-packages"

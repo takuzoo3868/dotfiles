@@ -28,15 +28,15 @@ else
 fi
 
 ###############################################################################
-# Ubuntu base APT setup
+# Base packages (Ubuntu)
 ###############################################################################
 
 echo ""
-info "10 APT base setup (Ubuntu)"
+info "10 Base packages (Ubuntu)"
 echo ""
 
 if ! has sudo; then
-  error "sudo is required on Ubuntu"
+  error "Required: sudo"
   return 0
 fi
 
@@ -53,5 +53,6 @@ APT_BASE_PACKAGES=(
   libssl-dev
 )
 
-info "Installing base APT packages"
+info "Install base packages via apt"
 sudo apt-get install -y -qq "${APT_BASE_PACKAGES[@]}"
+info "Installed base packages via apt"

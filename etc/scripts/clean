@@ -33,41 +33,51 @@ else
 fi
 
 ###############################################################################
-# Manifest
+# Unlink runner via Manifest
 ###############################################################################
 
-[ -f "$MANIFEST" ] || {
-  die "No manifest found. Nothing to clean."
+run_clean_symlinks() {
+  [ -f "$MANIFEST" ] || {
+    die "No manifest found. Nothing to clean."
+  }
+
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    # skip comments / empty
+    [[ -z "$line" || "$line" == \#* ]] && continue
+    
+    # split: "dst -> src"
+    dst=${line%% ->*}
+    src=${line##*-> }
+
+    # sanity check
+    if [[ -z "$dst" || -z "$src" ]]; then
+      warn "invalid manifest entry: $line"
+      continue
+    fi
+
+    # only touch symlinks
+    if [[ ! -L "$dst" ]]; then
+      warn "skip $dst (not a symlink)"
+      continue
+    fi
+
+    current_src=$(readlink "$dst" || true)
+
+    if [[ "$current_src" != "$src" ]]; then
+      warn "skip $dst (link target changed)"
+      continue
+    fi
+    
+    echo "==> unlinked: $dst"
+    unlink "$dst"
+
+  done <"$MANIFEST"
 }
 
-while IFS= read -r line || [[ -n "$line" ]]; do
-  # skip comments / empty
-  [[ -z "$line" || "$line" == \#* ]] && continue
-  
-  # split: "dst -> src"
-  dst=${line%% ->*}
-  src=${line##*-> }
+###############################################################################
+# Main
+###############################################################################
 
-  # sanity check
-  if [[ -z "$dst" || -z "$src" ]]; then
-    warn "invalid manifest entry: $line"
-    continue
-  fi
-
-  # only touch symlinks
-  if [[ ! -L "$dst" ]]; then
-    warn "skip $dst (not a symlink)"
-    continue
-  fi
-
-  current_src=$(readlink "$dst" || true)
-
-  if [[ "$current_src" != "$src" ]]; then
-    warn "skip $dst (link target changed)"
-    continue
-  fi
-  
-  echo "==> unlinked: $dst"
-  unlink "$dst"
-
-done <"$MANIFEST"
+info "Unlink deployed dotfile symlinks..."
+run_clean_symlinks
+info "Unlinked dotfile symlinks!"

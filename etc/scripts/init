@@ -47,7 +47,7 @@ start_sudo_keepalive() {
     return 0
   fi
 
-  info "Requesting sudo privileges"
+  info "Requesting sudo privileges..."
   sudo -v
 
   (
@@ -103,10 +103,11 @@ run_install_scripts() {
 ###############################################################################
 # Main
 ###############################################################################
-info "Development environment initialization"
 
+info "Install development packages"
 start_sudo_keepalive
 run_install_scripts
+info "Installed development packages!"
 
 # TODO: Replace Android termux support
 # android() {

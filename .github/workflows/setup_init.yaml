@@ -24,7 +24,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name:  Initialize development environment
+      - name: Install development packages
         env:
           DOTPATH: ${{ github.workspace }}
           TERM: xterm-256color

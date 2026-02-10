@@ -32,26 +32,33 @@ fi
 ###############################################################################
 
 echo ""
-info "40 Install useful tools"
+info "40 Useful tools"
 echo ""
 
 if ! has sudo; then
-  error "sudo is required on Ubuntu"
+  error "Required: sudo"
   return 0
 fi
 
 ###############################################################################
-# yazi
+# yazi plugins
 ###############################################################################
 
-if ! has yazi; then
-  info "Installing yazi"
-  cargo install --force yazi-build
+# if ! has yazi; then
+#   info "Installing yazi"
+#   cargo install --force yazi-build
+# fi
 
+info "yazi plugins"
+if ! has yazi; then
+  warn "Not available yazi, skipping"
+else
+  info "Install yazi plugins via ya"
   install_yazi_plugin() {
     ya pack --list | grep -q "$1" || ya pack -a "$1"
   }
   install_yazi_plugin AdithyanA2005/nord
   install_yazi_plugin yazi-rs/plugins:git
   install_yazi_plugin yazi-rs/plugins:smart-enter
+  info "Installed yazi plugins via ya"
 fi
