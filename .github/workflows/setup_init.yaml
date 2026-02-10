@@ -30,4 +30,5 @@ jobs:
           TERM: xterm-256color
         run: |
           set -eux
+          make deploy
           make init
