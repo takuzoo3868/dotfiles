@@ -63,7 +63,7 @@ if ! grep -Rs "^deb .*jonathonf/vim" /etc/apt/sources.list /etc/apt/sources.list
   sudo apt-get update -y -qq
   sudo apt-get install -y -qq vim
   info "Installed vim(latest)"
-figit 
+fi 
 
 # if ! has nvim; then
 #   warn "neovim not found, installing via snap"
