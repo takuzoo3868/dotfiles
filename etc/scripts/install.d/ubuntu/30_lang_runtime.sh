@@ -67,7 +67,7 @@ if ! has mise; then
 
 ### mise
 if [ -f "$HOME/.local/bin/mise" ]; then
-  eval "$("$HOME"/.local/bin/mise activate bash || true)"
+  eval "$("$HOME/.local/bin/mise" activate bash || true)"
 fi
 
 EOF

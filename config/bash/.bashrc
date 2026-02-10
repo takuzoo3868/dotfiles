@@ -119,7 +119,3 @@ load_conf "$HOME"/.bash/prompt.bash
 
 ### USE neovim as default editor
 export EDITOR=nvim
-
-### USE fish as default shell
-#exec fish
-. "$HOME/.cargo/env"

@@ -55,7 +55,7 @@ if ! has yazi; then
 else
   info "Install yazi plugins via ya"
   install_yazi_plugin() {
-    ya pack --list | grep -q "$1" || ya pack -a "$1"
+    ya pkg list | grep -q "$1" || ya pkg add "$1"
   }
   install_yazi_plugin AdithyanA2005/nord
   install_yazi_plugin yazi-rs/plugins:git
