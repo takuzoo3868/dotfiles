@@ -82,7 +82,7 @@ run_install_scripts() {
     "$base/$OS"
   )
 
-  mapfile -t scripts < <(find "$dir" -type f -name '[0-9][0-9]*.sh' | sort)
+  mapfile -t scripts < <(find "$dirs" -type f -name '[0-9][0-9]*.sh' | sort)
 
   for dir in "${dirs[@]}"; do
     [[ -d "$dir" ]] || continue

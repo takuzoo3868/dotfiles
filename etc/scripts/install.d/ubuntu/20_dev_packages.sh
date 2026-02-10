@@ -53,6 +53,7 @@ DEV_PACKAGES=(
   poppler-utils  
   ffmpeg
   fontforge
+  imagemagick
 )
 
 info "Install development packages via apt"
