@@ -15,7 +15,6 @@ shellcheck = "latest"
 tmux = "latest"
 trivy = "latest"
 uv = "latest"
-vim = "latest"
 yazi = "latest"
 zoxide = "latest"
 
