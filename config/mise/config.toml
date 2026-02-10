@@ -5,7 +5,6 @@ rust = "latest"
 
 bat = "latest"
 fd = "latest"
-ffmpeg = "latest"
 fzf = "latest"
 imagemagick = "latest"
 jq = "latest"

@@ -51,6 +51,7 @@ DEV_PACKAGES=(
   p7zip-full
   7zip
   poppler-utils  
+  ffmpeg
 )
 
 info "Install development packages via apt"
