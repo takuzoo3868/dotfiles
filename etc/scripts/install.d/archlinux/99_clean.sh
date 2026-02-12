@@ -41,7 +41,11 @@ fi
 # keep latest 2 versions by default
 sudo paccache -r -k2
 
-# cleanup AUR cache
-yay -Sc --noconfirm
+if [[ -n "${CI:-}" ]]; then
+  warn "CI detected, skipping yay cleanup"
+else
+  # cleanup AUR cache
+  yay -Sc --noconfirm
+fi
 
 mise cache clear

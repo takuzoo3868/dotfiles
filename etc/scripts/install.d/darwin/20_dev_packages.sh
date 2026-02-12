@@ -53,5 +53,5 @@ DEV_PACKAGES=(
 )
 
 info "Install base packages via homebrew"
-brew install --quiet "${DEV_PACKAGES[@]}"
+brew install "${DEV_PACKAGES[@]}"
 info "Installed base packages via homebrew"
