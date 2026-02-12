@@ -28,25 +28,20 @@ else
 fi
 
 ###############################################################################
-# Finalize panman+AUR installation
+# Cleanup
 ###############################################################################
 
-echo ""
-info "99 Finalizing package installation (cleanup)"
-echo ""
-
-info "Removing orphan packages"
+# cleanup orphan packages
 orphans=$(pacman -Qtdq 2>/dev/null || true)
 if [[ -n "$orphans" ]]; then
   # shellcheck disable=SC2086
   sudo pacman -Rns $orphans --noconfirm
-else
-  info "No orphan packages found"
 fi
 
-info "Cleaning package cache"
 # keep latest 2 versions by default
 sudo paccache -r -k2
 
-info "Cleaning AUR cache"
+# cleanup AUR cache
 yay -Sc --noconfirm
+
+mise cache clear

@@ -14,6 +14,8 @@ trap 'echo "[ERROR] ${BASH_SOURCE[0]}:${LINENO} aborted." >&2' ERR INT
 : "${DOTPATH:=$HOME/.dotfiles}"
 export DOTPATH
 
+readonly LOCAL_BIN="$HOME/.local/bin"
+
 ###############################################################################
 # Load shared helpers
 ###############################################################################
@@ -31,16 +33,12 @@ fi
 # Useful tools
 ###############################################################################
 
-echo ""
-info "40 Install useful tools"
-echo ""
-
 if [ "$EUID" -eq 0 ]; then
   warn "Running as root is not recommended. sudo will be used instead."
 fi
 
 if ! has sudo; then
-  error "sudo is required on Debian"
+  error "Required: sudo"
   return 0
 fi
 
@@ -48,14 +46,24 @@ fi
 # yazi
 ###############################################################################
 
+info "yazi plugins"
 if ! has yazi; then
-  info "Installing yazi"
-  cargo install --force yazi-build
-
+  warn "Not available yazi, skipping"
+else
+  info "Install yazi plugins via ya"
   install_yazi_plugin() {
-    ya pack --list | grep -q "$1" || ya pack -a "$1"
+    ya pkg list | grep -q "$1" || ya pkg add "$1"
   }
   install_yazi_plugin AdithyanA2005/nord
   install_yazi_plugin yazi-rs/plugins:git
   install_yazi_plugin yazi-rs/plugins:smart-enter
+  info "Installed yazi plugins via ya"
+fi
+
+###############################################################################
+# fd-find compatibility (Debian specific)
+###############################################################################
+
+if command -v fdfind >/dev/null 2>&1 && ! command -v fd >/dev/null 2>&1; then
+  ln -sf "$(command -v fdfind)" "$LOCAL_BIN/fd"
 fi

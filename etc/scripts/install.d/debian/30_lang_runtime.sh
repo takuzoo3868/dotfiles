@@ -14,6 +14,9 @@ trap 'echo "[ERROR] ${BASH_SOURCE[0]}:${LINENO} aborted." >&2' ERR INT
 : "${DOTPATH:=$HOME/.dotfiles}"
 export DOTPATH
 
+: "${LOCALRC:=$HOME/.bash/local.bash}"
+export LOCALRC
+
 ###############################################################################
 # Load shared helpers
 ###############################################################################
@@ -28,180 +31,56 @@ else
 fi
 
 ###############################################################################
-# Debian language runtimes (python / go / anyenv)
+# Development packages (mise-en-place)
 ###############################################################################
-
-echo ""
-info "30 Install language runtimes (python / go / anyenv)"
-echo ""
 
 if [ "$EUID" -eq 0 ]; then
   warn "Running as root is not recommended. sudo will be used instead."
 fi
 
 if ! has sudo; then
-  error "sudo is required on Debian"
+  error "Required: sudo"
   return 0
 fi
 
 ###############################################################################
-# anyenv
+# mise-en-place
 ###############################################################################
 
-install_anyenv() {
-  ANYENV_ROOT="$HOME/.anyenv"
-  LOCALRC="${LOCALRC:-$HOME/.bashrc.local}"
+info "mise-en-place"
+if ! has mise; then
+  warn "Not available mise, installing via curl..."
+  curl https://mise.run | sh
+  eval "$("$HOME"/.local/bin/mise activate bash --shims)"
 
-  # ---------------------------------------------------------------------------
-  # anyenv
-  # ---------------------------------------------------------------------------
-  info "Setup anyenv"
-  if [ -d "$ANYENV_ROOT" ]; then
-    info "anyenv already installed"
-  else
-    git clone https://github.com/anyenv/anyenv.git "$ANYENV_ROOT"
-  fi
-
-  export PATH="$ANYENV_ROOT/bin:$PATH"
-
-  if ! command -v anyenv >/dev/null 2>&1; then
-    die "anyenv not found in PATH"
-  fi
-
-  # ---------------------------------------------------------------------------
-  # plugins
-  # ---------------------------------------------------------------------------
-  info "Setup anyenv plugins"
-
-  mkdir -p "$ANYENV_ROOT/plugins"
-
-  install_plugin() {
-    local repo="$1"
-    local name="$2"
-    local dst="$ANYENV_ROOT/plugins/$name"
-
-    if [ -d "$dst" ]; then
-      info "plugin already exists: $name"
-    else
-      git clone "$repo" "$dst"
-    fi
-  }
-
-  install_plugin https://github.com/znz/anyenv-update.git anyenv-update
-  install_plugin https://github.com/znz/anyenv-git.git    anyenv-git
-
-  # ---------------------------------------------------------------------------
-  # shell init (idempotent)
-  # ---------------------------------------------------------------------------
   if [ ! -f "$LOCALRC" ]; then
+    ensure_dir "$HOME/.bash"
     touch "$LOCALRC"
   fi
 
-  if grep -q '### anyenv' "$LOCALRC"; then
-    info "anyenv init already configured"
+  if grep -q '### mise' "$LOCALRC"; then
+    info "Already configured mise in $LOCALRC"
   else
-    warn "Adding anyenv init to $LOCALRC"
+    warn "Add mise init to $LOCALRC"
 
     cat >> "$LOCALRC" <<'EOF'
 
-### anyenv
-if [ -d "$HOME/.anyenv" ]; then
-  export PATH="$HOME/.anyenv/bin:$PATH"
-  eval "$(anyenv init -)"
-  # tmux
-  for D in $(ls "$HOME"/.anyenv/envs); do
-    export PATH="$HOME/.anyenv/envs/$D/shims:$PATH"
-  done
+### mise
+if [ -x "$HOME/.local/bin/mise" ]; then
+  eval "$("$HOME/.local/bin/mise" activate bash)"
 fi
-
+export MISE_DATA_DIR="$HOME/.local/share/mise"
+export MISE_STATE_DIR="$HOME/.local/state/mise"
+export MISE_CONFIG_DIR="$HOME/.config/mise"
 EOF
+  info "Installed mise!!!"
   fi
-
-  # ---------------------------------------------------------------------------
-  # anyenv init
-  # ---------------------------------------------------------------------------
-  info "Initializing anyenv"
-  anyenv init -q || true
-
-  if [ ! -d "$ANYENV_ROOT/envs" ]; then
-    anyenv install --init
-  fi
-
-  # ---------------------------------------------------------------------------
-  # install envs
-  # ---------------------------------------------------------------------------
-  info "Installing language envs"
-
-  install_env() {
-    local env="$1"
-    if anyenv envs | grep -qx "$env"; then
-      info "$env already installed"
-    else
-      anyenv install "$env"
-    fi
-  }
-
-  for env in pyenv goenv; do
-    install_env "$env"
-  done
-}
-
-install_anyenv
-
-###############################################################################
-# pyenv (Python)
-###############################################################################
-
-export PATH="$HOME/.pyenv/bin:$PATH"
-
-if command -v pyenv >/dev/null 2>&1; then
-  PYTHON_VERSION_DEFAULT="3.12.2"
-
-  if ! pyenv versions --bare | grep -q "^${PYTHON_VERSION_DEFAULT}$"; then
-    info "Installing Python ${PYTHON_VERSION_DEFAULT}"
-    pyenv install "$PYTHON_VERSION_DEFAULT"
-  fi
-
-  pyenv global "$PYTHON_VERSION_DEFAULT"
 else
-  warn "pyenv not available"
+  warn "Already installed mise!"
 fi
 
-###############################################################################
-# goenv (Go)
-###############################################################################
-
-export PATH="$HOME/.goenv/bin:$PATH"
-
-if command -v goenv >/dev/null 2>&1; then
-  GO_VERSION_DEFAULT="1.22.1"
-
-  if ! goenv versions --bare | grep -q "^${GO_VERSION_DEFAULT}$"; then
-    info "Installing Go ${GO_VERSION_DEFAULT}"
-    goenv install "$GO_VERSION_DEFAULT"
-  fi
-
-  goenv global "$GO_VERSION_DEFAULT"
-else
-  warn "goenv not available"
-fi
-
-###############################################################################
-# rust (rustup)
-###############################################################################
-
-if command -v rustup >/dev/null 2>&1; then
-  info "Rust already installed"
-else
-  info "Installing Rust (rustup)..."
-  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
-    | sh -s -- -y
-fi
-
-###############################################################################
-# summary
-###############################################################################
-
-info "Language runtimes installed"
+info "Install development packages via mise"
+mise install -y -j 2
 # shellcheck disable=SC1091
 source "$HOME/.bashrc"
+info "Installed development packages via mise"

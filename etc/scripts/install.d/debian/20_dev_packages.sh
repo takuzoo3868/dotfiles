@@ -14,8 +14,6 @@ trap 'echo "[ERROR] ${BASH_SOURCE[0]}:${LINENO} aborted." >&2' ERR INT
 : "${DOTPATH:=$HOME/.dotfiles}"
 export DOTPATH
 
-readonly LOCAL_BIN="$HOME/.local/bin"
-
 ###############################################################################
 # Load shared helpers
 ###############################################################################
@@ -30,92 +28,38 @@ else
 fi
 
 ###############################################################################
-# Debian development packages
+# Development packages (Debian)
 ###############################################################################
-
-echo ""
-info "20 Development packages (Debian)"
-echo ""
 
 if [ "$EUID" -eq 0 ]; then
   warn "Running as root is not recommended. sudo will be used instead."
 fi
 
 if ! has sudo; then
-  error "sudo is required on Debian"
+  error "Required: sudo"
   return 0
 fi
 
 DEV_PACKAGES=(
   coreutils
   moreutils
-  bash
-  git
-  python3
-  python3-pip
-  tmux
-  tmuxp
-  curl
-  wget
-  jq
-  p7zip-full
   tree
-  ripgrep
-  fd-find
+  unzip
+  p7zip-full
+  7zip
+  vim
+  xclip
+  xsel
+  poppler-utils
+  ffmpeg
+  resvg
+  imagemagick
+  fontforge
+  mpv
   openssh-client
   openssh-server
-  ffmpeg
-  7zip
-  poppler-utils
-  fzf
-  zoxide
-  imagemagick
 )
 
-info "Installing development packages"
-sudo apt-get install -y -qq "${DEV_PACKAGES[@]}"
-
-info "Installing Vim (latest)"
-VIM_APPIMAGE="$VIM_BIN_DIR/vim"
-VIM_URL=$(
-  curl -fsSL https://api.github.com/repos/vim/vim-appimage/releases/latest \
-  | grep browser_download_url \
-  | grep AppImage \
-  | cut -d '"' -f 4 \
-  | head -n 1
-)
-
-if [[ -z "$VIM_URL" ]]; then
-  warn "Failed to resolve Vim download URL"
-else
-  curl -fLo "$VIM_APPIMAGE" "$VIM_URL"
-  chmod +x "$VIM_APPIMAGE"
-fi
-
-if ! has nvim; then
-  warn "neovim not found, installing via appimage"
-
-  NVIM_APPIMAGE="$LOCAL_BIN/nvim"
-  NVIM_URL=$(
-    curl -fsSL https://api.github.com/repos/neovim/neovim/releases/latest \
-    | grep browser_download_url \
-    | grep appimage \
-    | cut -d '"' -f 4 \
-    | head -n 1
-  )
-
-  if [[ -z "$NVIM_URL" ]]; then
-    warn "Failed to resolve Neovim download URL"
-  else
-    curl -fLo "$NVIM_APPIMAGE" "$NVIM_URL"
-    chmod +x "$NVIM_APPIMAGE"
-  fi
-fi
-
-###############################################################################
-# fd-find compatibility (Debian specific)
-###############################################################################
-
-if command -v fdfind >/dev/null 2>&1 && ! command -v fd >/dev/null 2>&1; then
-  ln -sf "$(command -v fdfind)" "$LOCAL_BIN/fd"
-fi
+info "Install development packages via apt"
+sudo apt-get install -y -q "${DEV_PACKAGES[@]}"
+info "Installed development packages via apt"

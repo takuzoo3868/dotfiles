@@ -28,7 +28,7 @@ else
 fi
 
 ###############################################################################
-# Base packages (Ubuntu)
+# Useful tools
 ###############################################################################
 
 if ! has sudo; then
@@ -36,21 +36,20 @@ if ! has sudo; then
   return 0
 fi
 
-sudo apt-get update -y -q
-sudo apt-get upgrade -y -q
+###############################################################################
+# yazi plugins
+###############################################################################
 
-APT_BASE_PACKAGES=(
-  build-essential
-  git
-  curl
-  wget
-  libreadline-dev
-  apt-transport-https
-  ca-certificates
-  software-properties-common
-  locales-all
-)
-
-info "Install base packages via apt"
-sudo apt-get install -y -q "${APT_BASE_PACKAGES[@]}"
-info "Installed base packages via apt"
+info "yazi plugins"
+if ! has yazi; then
+  warn "Not available yazi, skipping"
+else
+  info "Install yazi plugins via ya"
+  install_yazi_plugin() {
+    ya pkg list | grep -q "$1" || ya pkg add "$1"
+  }
+  install_yazi_plugin AdithyanA2005/nord
+  install_yazi_plugin yazi-rs/plugins:git
+  install_yazi_plugin yazi-rs/plugins:smart-enter
+  info "Installed yazi plugins via ya"
+fi

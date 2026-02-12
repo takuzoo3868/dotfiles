@@ -28,12 +28,10 @@ else
 fi
 
 ###############################################################################
-# Finalize apt-based installation
+# Cleanup
 ###############################################################################
-
-echo ""
-info "99 Finalizing package installation (cleanup)"
-echo ""
 
 sudo apt-get -y autoremove --purge
 sudo apt-get -y autoclean
+
+mise cache clear

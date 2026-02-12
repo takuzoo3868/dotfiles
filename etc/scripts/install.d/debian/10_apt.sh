@@ -28,26 +28,29 @@ else
 fi
 
 ###############################################################################
-# Debian base APT setup
+# Base packages (Debian)
 ###############################################################################
-
-echo ""
-info "10 APT base setup (Debian)"
-echo ""
 
 if [ "$EUID" -eq 0 ]; then
   warn "Running as root is not recommended. sudo will be used instead."
 fi
 
 if ! has sudo; then
-  error "sudo is required on Debian"
+  error "Required: sudo"
   return 0
 fi
 
 sudo apt-get update -y -q
+sudo apt-get upgrade -y -q
 
 APT_BASE_PACKAGES=(
   build-essential
+  git
+  curl
+  wget
+  libtinfo-dev
+  libncurses-dev
+  libreadline-dev
   apt-transport-https
   ca-certificates
   software-properties-common
@@ -57,14 +60,16 @@ APT_BASE_PACKAGES=(
   locales
 )
 
-info "Installing base APT packages"
+info "Install base packages via apt"
 sudo apt-get install -y -q "${APT_BASE_PACKAGES[@]}"
+info "Installed base packages via apt"
 
 ###############################################################################
 # Locale setup (Debian-safe)
 ###############################################################################
 
 if ! locale -a | grep -q '^en_US\.utf8$'; then
-  info "Generating locale: en_US.UTF-8"
+  info "Generate locale: en_US.UTF-8"
   sudo locale-gen en_US.UTF-8
+  info "Generated locale: en_US.UTF-8"
 fi

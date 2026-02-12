@@ -28,11 +28,8 @@ else
 fi
 
 ###############################################################################
-# Finalize Homebrew-based installation
+# Cleanup
 ###############################################################################
 
-echo ""
-info "99 Finalizing package installation (cleanup)"
-echo ""
-
-brew cleanup -s
+brew autoremove
+brew cleanup

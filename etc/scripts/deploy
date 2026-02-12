@@ -116,6 +116,7 @@ run_deploy() {
   ###############################################################################
 
   info "tmux"
+  ensure_dir "$HOME/.tmux"
   ensure_git_repo \
     "https://github.com/tmux-plugins/tpm" \
     "$HOME/.tmux/plugins/tpm"

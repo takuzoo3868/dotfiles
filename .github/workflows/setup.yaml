@@ -1,4 +1,4 @@
-name: Setup(deploy)
+name: Setup deploy & init
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   linux:
-    name: Test deploy on ${{ matrix.os }}
+    name: Test deploy & init on ${{ matrix.os }}
     runs-on: ubuntu-latest
 
     strategy:
@@ -20,20 +20,20 @@ jobs:
             pkg_install: |
               apt-get update
               DEBIAN_FRONTEND=noninteractive apt-get install -y \
-                git make ca-certificates
+                git make ca-certificates sudo
 
           - os: debian
-            container: debian:12
+            container: debian:13
             pkg_install: |
               apt-get update
               DEBIAN_FRONTEND=noninteractive apt-get install -y \
-                git make ca-certificates
+                git make ca-certificates sudo
 
           - os: archlinux
             container: archlinux:latest
             pkg_install: |
               pacman -Syu --noconfirm --needed \
-                git make which ca-certificates
+                git make which ca-certificates sudo
 
     container: 
       image: ${{ matrix.container }}
@@ -43,18 +43,18 @@ jobs:
         run: |
           set -eux
           ${{ matrix.pkg_install }}
-      
+
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Deploy dotfiles
+      - name: Deploy dotfile symlinks
         env:
           TERM: xterm-256color
           DOTPATH: ${{ github.workspace }}
         run: |
           set -eux
           make deploy
-      
+
       - name: Post deploy sanity check
         shell: bash
         run: |
@@ -65,9 +65,17 @@ jobs:
             dst=${line%% ->*}
             test -L "$dst"
           done <"$MANIFEST"
-  
+
+      - name: Install develop packages
+        env:
+          DOTPATH: ${{ github.workspace }}
+          TERM: xterm-256color
+        run: |
+          set -eux
+          make init
+
   darwin:
-    name: Test deploy on macOS
+    name: Test deploy & init on macOS
     runs-on: macos-latest
 
     steps:
@@ -80,7 +88,7 @@ jobs:
           brew update
           brew install git make
 
-      - name: Deploy dotfiles
+      - name: Deploy dotfile symlinks
         env:
           DOTPATH: ${{ github.workspace }}
           TERM: xterm-256color
@@ -98,3 +106,11 @@ jobs:
             dst=${line%% ->*}
             test -L "$dst"
           done <"$MANIFEST"
+
+      - name: Install develop packages
+        env:
+          DOTPATH: ${{ github.workspace }}
+          TERM: xterm-256color
+        run: |
+          set -eux
+          make init

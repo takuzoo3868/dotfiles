@@ -28,50 +28,32 @@ else
 fi
 
 ###############################################################################
-# Arch Linux development packages
+# Development packages (Arch Linux)
 ###############################################################################
 
-echo ""
-info "20 Development packages (Arch Linux)"
-echo ""
+if ! has sudo; then
+  error "Required: sudo"
+  return 0
+fi
 
 DEV_PACKAGES=(
   coreutils
   moreutils
-  bat
-  bash
-  python3
-  python3-pip
-  tmux
-  tmuxp
-  jq
-  7zip
   tree
+  unzip
+  7zip
   vim
-  neovim
-  yazi
-  fzf
+  xclip
+  xsel
   poppler
   ffmpeg
-  fd
-  ripgrep
-  zoxide
   resvg
   imagemagick
+  fontforge
+  mpv
+  openssh
 )
 
-info "Installing development packages"
-yay -S --needed "${DEV_PACKAGES[@]}"
-
-###############################################################################
-# yazi
-###############################################################################
-
-info "Installing yazi plugins"
-
-install_yazi_plugin() {
-  ya pack --list | grep -q "$1" || ya pack -a "$1"
-}
-install_yazi_plugin AdithyanA2005/nord
-install_yazi_plugin yazi-rs/plugins:git
-install_yazi_plugin yazi-rs/plugins:smart-enter
+info "Install development packages via pacman"
+sudo pacman -S --needed --noconfirm "${DEV_PACKAGES[@]}"
+info "Installed development packages via pacman"
