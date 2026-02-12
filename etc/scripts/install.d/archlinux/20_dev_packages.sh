@@ -49,7 +49,6 @@ DEV_PACKAGES=(
   ffmpeg
   resvg
   imagemagick
-  fontforge
   mpv
   openssh
   pacman-contrib

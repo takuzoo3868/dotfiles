@@ -46,12 +46,10 @@ DEV_PACKAGES=(
   ffmpeg
   resvg
   imagemagick
-  font-symbols-only-nerd-font
-  fontforge
   mpv
   openssl
 )
 
 info "Install base packages via homebrew"
-brew install "${DEV_PACKAGES[@]}"
+brew install --quiet "${DEV_PACKAGES[@]}"
 info "Installed base packages via homebrew"

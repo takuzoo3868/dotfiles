@@ -54,7 +54,6 @@ DEV_PACKAGES=(
   ffmpeg
   resvg
   imagemagick
-  fontforge
   mpv
   openssh-client
   openssh-server
