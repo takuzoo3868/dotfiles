@@ -87,11 +87,8 @@ run_install_scripts() {
 
     info "Processing install scripts in: $(basename "$dir")"
 
-    mapfile -t scripts < <(
-      find "$dir" -type f -name '[0-9][0-9]*.sh' | sort
-    )
-
-    for script in "${scripts[@]}"; do
+    find "$dir" -type f -name '[0-9][0-9]*.sh' | sort | \
+    while IFS= read -r script; do
       echo ""
       info "Running $(basename "$script")..."
       bash "$script"
