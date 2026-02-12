@@ -40,7 +40,7 @@ jobs:
       - name: Calculate script hash
         id: script
         run: |
-          HASH=$(shasum -a 256 etc/scripts/deep.d/10_build_fonts.sh | cut -d ' ' -f1)
+          HASH=$(shasum -a 256 etc/scripts/deep.d/10_font.sh | cut -d ' ' -f1)
           echo "hash=$HASH" >> $GITHUB_OUTPUT
 
       ############################################################
@@ -110,8 +110,8 @@ jobs:
           DOTPATH: ${{ github.workspace }}
           FONTS_DIR: ${{ github.workspace }}/artifacts
         run: |
-          chmod +x etc/scripts/deep.d/10_build_fonts.sh
-          bash /etc/scripts/deep.d/10_build_fonts.sh
+          chmod +x etc/scripts/deep.d/10_font.sh
+          bash /etc/scripts/deep.d/10_font.sh
 
       ############################################################
       # Upload artifact
