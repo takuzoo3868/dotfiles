@@ -31,10 +31,6 @@ fi
 # Cleanup
 ###############################################################################
 
-echo ""
-info "99 Cleanup"
-echo ""
-
 sudo apt-get -y autoremove --purge
 sudo apt-get -y autoclean
 

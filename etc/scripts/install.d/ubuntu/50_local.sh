@@ -14,7 +14,7 @@ trap 'echo "[ERROR] ${BASH_SOURCE[0]}:${LINENO} aborted." >&2' ERR INT
 : "${DOTPATH:=$HOME/.dotfiles}"
 export DOTPATH
 
-: "${LOCALRC:=$HOME/.bash/.bashrc.local}"
+: "${LOCALRC:=$HOME/.bash/local.bash}"
 export LOCALRC
 
 ###############################################################################
@@ -34,10 +34,6 @@ fi
 # Setup local rc setting
 ###############################################################################
 
-echo ""
-info "50 Setup local rc setting"
-echo ""
-
 if ! has sudo; then
   error "Required: sudo"
   return 0
@@ -48,30 +44,29 @@ fi
 ###############################################################################
 
 setup_bashrc_local() {
-  info ".bashrc.local"
+  info "local.bash"
   if [ ! -f "$LOCALRC" ]; then
     ensure_dir "$HOME/.bash"
     touch "$LOCALRC"
   fi
 
   if grep -q '### path' "$LOCALRC"; then
-    info "Already configured path in $LOCALRC"
+    warn "Already configured path in $LOCALRC"
   else
-    warn "Add path to $LOCALRC"
+    echo "==> Add path to $LOCALRC"
 
     cat >> "$LOCALRC" <<'EOF'
 
 ### path
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="/opt/local/bin:/opt/local/sbin:$PATH"
-
 EOF
   fi
 
   if grep -q '### tmux' "$LOCALRC"; then
-    info "Already configured tmux in $LOCALRC"
+    warn "Already configured tmux in $LOCALRC"
   else
-    warn "Add tmux to $LOCALRC"
+    echo "==> Add tmux to $LOCALRC"
     echo "==> NEED WEATHER_API KEY to $LOCALRC from https://openweathermap.org/"
 
     cat >> "$LOCALRC" <<'EOF'
@@ -82,24 +77,32 @@ export PATH="$HOME/.tmux/bin:$PATH"
 ### tmux powerline: weather
 export WEATHER_API="!!! Replace your API key !!!"
 export WEATHER_UNIT="metric"
-
 EOF
   fi
 
   if grep -q '### python uv' "$LOCALRC"; then
-    info "Already configured uv in $LOCALRC"
+    warn "Already configured uv in $LOCALRC"
   else
-    warn "Add uv to $LOCALRC"
+    echo "==> Add uv to $LOCALRC"
 
     cat >> "$LOCALRC" <<'EOF'
 
 ### python uv
-export UV_SYSTEM_PYTHON=1
-export UV_PROJECT_ENVIRONMENT="/usr/local/"
-export UV_NO_DEV=1
 export UV_LINK_MODE=copy
 export UV_COMPILE_BYTECODE=1
+export UV_CACHE_DIR="$HOME/.cache/uv"
+EOF
+  fi
 
+  if grep -q '### python ruff' "$LOCALRC"; then
+    warn "Already configured ruff in $LOCALRC"
+  else
+    echo "==> Add ruff to $LOCALRC"
+
+    cat >> "$LOCALRC" <<'EOF'
+
+### python ruff
+export RUFF_CACHE_DIR="$HOME/.cache/ruff"
 EOF
   fi
 }
@@ -108,6 +111,6 @@ EOF
 # Main
 ###############################################################################
 
-info "Setup .bashrc.local settings"
+info "Setup local.bash settings"
 setup_bashrc_local
-info "Finished .bashrc.local settings!"
+info "Finished local.bash settings!"

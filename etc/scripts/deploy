@@ -125,9 +125,8 @@ run_deploy() {
   symlink "$CONFPATH/tmux/bin" "$HOME/.tmux/bin"
   symlink "$CONFPATH/tmux/work.yaml" "$HOME/.tmux/work.yaml"
 
-  echo "==> Docs: doc/tmux.md"
   # shellcheck disable=SC2016
-  echo '==> Add PATH: export PATH="$HOME/.tmux/bin:$PATH"'
+  echo "==> Wiki: $DOTPATH/doc/tmux.md"
 
   ###############################################################################
   # mise
@@ -136,7 +135,7 @@ run_deploy() {
   info "mise"
   ensure_dir "$HOME/.config/mise"
   symlink "$CONFPATH/mise/config.toml" "$HOME/.config/mise/config.toml"
-  symlink "$CONFPATH/mise/default-python-packages" "$HOME/.config/mise/default-python-packages"
+  # symlink "$CONFPATH/mise/default-python-packages" "$HOME/.config/mise/default-python-packages"
 
   ###############################################################################
   # yazi
@@ -170,7 +169,7 @@ run_deploy() {
   ###############################################################################
 
   info "weechat"
-  echo "==> Docs: doc/weechat.md"
+  echo "==> Wiki: $DOTPATH/doc/weechat.md"
   echo "==> Install weechat if necessary"
 
   ###############################################################################
@@ -182,13 +181,8 @@ run_deploy() {
 
   for bin in "$DOTPATH"/bin/*; do
     [[ -e "$bin" ]] || continue
-    ln -sfn "$bin" "$LOCAL_BIN/$(basename "$bin")"
+    symlink "$bin" "$LOCAL_BIN/$(basename "$bin")"
   done
-
-  # shellcheck disable=SC2016
-  echo '==> Add PATH: export PATH="$HOME/.local/bin:$PATH"'
-  # shellcheck disable=SC2016
-  echo '==> Add PATH (macOS/MacPorts): export PATH="/opt/local/bin:/opt/local/sbin:$PATH"'
 }
 
 ###############################################################################

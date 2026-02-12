@@ -1,21 +1,39 @@
 [tools]
+# language runtime
 go = "latest"
 python = "latest"
 rust = "latest"
+deno = "latest"
+lua = "5.1.5"
+"aqua:jdx/usage" = "latest"
 
-bat = "latest"
-fd = "latest"
-fzf = "latest"
-jq = "latest"
-neovim = "latest"
-podman = "latest"
-ripgrep = "latest"
-shellcheck = "latest"
-tmux = "latest"
-trivy = "latest"
-uv = "latest"
-yazi = "latest"
-zoxide = "latest"
+# dev package
+"aqua:ajeetdsouza/zoxide" = "latest"
+"aqua:aristocratos/btop" = "latest"
+"aqua:astral-sh/uv" = "latest"
+"aqua:bcicen/ctop" = "latest"
+"aqua:BurntSushi/ripgrep" = "latest"
+"aqua:cli/cli" = "latest"
+"aqua:eza-community/eza" = "latest"
+"aqua:jqlang/jq" = "latest"
+"aqua:junegunn/fzf" = "latest"
+"aqua:koalaman/shellcheck" = "latest"
+"aqua:neovim/neovim" = "latest"
+"aqua:pypa/pipx" = { version = "latest", os = ["darwin", "linux"] }
+"aqua:sharkdp/bat" = "latest"
+"aqua:sharkdp/fd" = "latest"
+"aqua:sxyazi/yazi" = "latest"
+"aqua:x-motemen/ghq" = "latest"
+"github:tmux/tmux-builds" = "latest"
+
+# python
+"pipx:debugpy" = "latest"
+"pipx:httpie" = "latest" 
+"pipx:tmuxp" = "latest"
+"pipx:pipdeptree" = "latest"
+"pipx:pynvim" = "latest"
+"pipx:ruff" = "latest"
+"pipx:yewtube" = { version = "latest", uvx_args = "--with httpx==0.27.2,pip" }
 
 [settings]
 experimental = true
@@ -24,4 +42,3 @@ experimental = true
 XDG_CONFIG_HOME = "{{env.HOME}}/.config"
 SHELL = "/bin/bash"
 EDITOR = "nvim"
-MISE_PYTHON_DEFAULT_PACKAGES_FILE = "{{env.HOME}}/.config/mise/default-python-packages"

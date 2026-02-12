@@ -14,7 +14,7 @@ trap 'echo "[ERROR] ${BASH_SOURCE[0]}:${LINENO} aborted." >&2' ERR INT
 : "${DOTPATH:=$HOME/.dotfiles}"
 export DOTPATH
 
-: "${LOCALRC:=$HOME/.bash/.bashrc.local}"
+: "${LOCALRC:=$HOME/.bash/local.bash}"
 export LOCALRC
 
 ###############################################################################
@@ -34,10 +34,6 @@ fi
 # Development packages (mise-en-place)
 ###############################################################################
 
-echo ""
-info "30 Development packages (mise-en-place)"
-echo ""
-
 if ! has sudo; then
   error "Required: sudo"
   return 0
@@ -51,7 +47,7 @@ info "mise-en-place"
 if ! has mise; then
   warn "Not available mise, installing via curl..."
   curl https://mise.run | sh
-  eval "$("$HOME"/.local/bin/mise activate bash || true)"
+  eval "$("$HOME"/.local/bin/mise activate bash --shims)"
 
   if [ ! -f "$LOCALRC" ]; then
     ensure_dir "$HOME/.bash"
@@ -66,19 +62,21 @@ if ! has mise; then
     cat >> "$LOCALRC" <<'EOF'
 
 ### mise
-if [ -f "$HOME/.local/bin/mise" ]; then
-  eval "$("$HOME/.local/bin/mise" activate bash || true)"
+if [ -x "$HOME/.local/bin/mise" ]; then
+  eval "$("$HOME/.local/bin/mise" activate bash)"
 fi
-
+export MISE_DATA_DIR="$HOME/.local/share/mise"
+export MISE_STATE_DIR="$HOME/.local/state/mise"
+export MISE_CONFIG_DIR="$HOME/.config/mise"
 EOF
   info "Installed mise!!!"
   fi
 else
-  info "Already installed mise!"
+  warn "Already installed mise!"
 fi
 
 info "Install development packages via mise"
-mise install -y
+mise install -y -j 2
 # shellcheck disable=SC1091
 source "$HOME/.bashrc"
 info "Installed development packages via mise"

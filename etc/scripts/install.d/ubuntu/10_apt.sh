@@ -31,17 +31,13 @@ fi
 # Base packages (Ubuntu)
 ###############################################################################
 
-echo ""
-info "10 Base packages (Ubuntu)"
-echo ""
-
 if ! has sudo; then
   error "Required: sudo"
   return 0
 fi
 
-sudo apt-get update -y -qq
-sudo apt-get upgrade -y -qq
+sudo apt-get update -y -q
+sudo apt-get upgrade -y -q
 
 APT_BASE_PACKAGES=(
   build-essential
@@ -54,5 +50,5 @@ APT_BASE_PACKAGES=(
 )
 
 info "Install base packages via apt"
-sudo apt-get install -y -qq "${APT_BASE_PACKAGES[@]}"
+sudo apt-get install -y -q "${APT_BASE_PACKAGES[@]}"
 info "Installed base packages via apt"

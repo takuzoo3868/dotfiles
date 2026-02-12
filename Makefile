@@ -17,7 +17,6 @@ deploy: ## Deploy dotfile symlinks to $HOME
 	@DOTPATH=$(DOTPATH) bash $(DOTPATH)/etc/scripts/deploy
 
 init: ## Install development packages & setup settings
-	@echo '==> Start to install app using pkg manager.'
 	@DOTPATH=$(DOTPATH) bash $(DOTPATH)/etc/scripts/init
 
 deep: ## Setup more minor settings

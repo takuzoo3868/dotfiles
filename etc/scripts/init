@@ -30,7 +30,6 @@ else
 fi
 
 OS="$(detect_os)"
-info "Detected OS: $OS"
 
 ###############################################################################
 # Sudo keepalive (Linux / macOS only)
@@ -72,6 +71,7 @@ trap stop_sudo_keepalive EXIT
 run_install_scripts() {
   local base="$DOTPATH/etc/scripts/install.d"
 
+  info "Detected OS: $OS"
   if [[ ! -d "$base" ]]; then
     warn "install.d not found: $base"
     return 0
@@ -92,7 +92,8 @@ run_install_scripts() {
     )
 
     for script in "${scripts[@]}"; do
-      info "Running $(basename "$script")"
+      echo ""
+      info "Running $(basename "$script")..."
       bash "$script"
     done
   done
@@ -106,13 +107,3 @@ info "Install development packages"
 start_sudo_keepalive
 run_install_scripts
 info "Installed development packages!"
-
-# TODO: Replace Android termux support
-# android() {
-#   PKG_ANDROID="ncurses-utils binutils coreutils file grep wget taskwarrior neovim"
-
-#   pkg update
-#   pkg install "$PKG_DEFAULT"
-#   pkg install "$PKG_ANDROID"
-#   termux-setup-storage
-# }

@@ -31,10 +31,6 @@ fi
 # Useful tools
 ###############################################################################
 
-echo ""
-info "40 Useful tools"
-echo ""
-
 if ! has sudo; then
   error "Required: sudo"
   return 0
@@ -43,11 +39,6 @@ fi
 ###############################################################################
 # yazi plugins
 ###############################################################################
-
-# if ! has yazi; then
-#   info "Installing yazi"
-#   cargo install --force yazi-build
-# fi
 
 info "yazi plugins"
 if ! has yazi; then

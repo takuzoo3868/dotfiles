@@ -31,25 +31,19 @@ darwin*)
     alias ll='ls -alFG --color=auto'
     alias la='ls -AG'
     alias l='ls -CFG'
+    alias sed="gsed"
     ;;
 esac
 
 alias delds="find . -name '*.DS_Store' -type f -ls -delete"
 alias delap="find . -name '._*' -type f -ls -delete"
-alias sed="gsed"
 
 # restart $SHELL
 alias rebash='exec $SHELL -l'
+alias rezsh='exec $SHELL -l'
 
-# ghq peco hub
-# alias gcd='cd $(ghq root)/$(ghq list | peco)'
-# alias ophub='hub browse $(ghq list | peco | cut -d "/" -f 2,3)'
-
-# virtualenv
-# alias workoff='deactivate'
-
-# move go project
-# alias gogo="cd $HOME/go/src/github.com/takuzoo3868"
+# ghq fzf
+alias gcd='cd $(ghq root)/$(ghq list | fzf --reverse)'
 
 # tmuxp
 alias mux='tmuxp'

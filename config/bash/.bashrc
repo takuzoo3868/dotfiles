@@ -116,6 +116,3 @@ fi
 load_conf "$HOME"/.bash/local.bash
 load_conf "$HOME"/.bash/aliases.bash
 load_conf "$HOME"/.bash/prompt.bash
-
-### USE neovim as default editor
-export EDITOR=nvim

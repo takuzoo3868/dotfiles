@@ -1,16 +1,22 @@
-tmux_options: -2
 session_name: work
 
 windows:
 - window_name: work
   focus: true
-  layout: c50c,353x84,0,0[353x56,0,0,1,353x27,0,57{176x27,0,57,2,176x27,177,57,5}]
+  layout: "c50c,353x84,0,0[353x56,0,0,1,353x27,0,57{176x27,0,57,2,176x27,177,57,5}]"
   panes:
-    - yazi
+    - shell_command:
+        - yazi
+      focus: true
     - pane
     - pane
 
-- window_name: music
+- window_name: "music"
   focus: false
+  layout: "a8db,353x84,0,0[353x39,0,0,4,353x44,0,40,5]"
   panes:
-    - yt pl PLBFICLTzW2LckbdM1Ri6BBfpeSPwRYzXe
+    - shell_command:
+        - btop
+    - shell_command:
+        - yt pl PLBFICLTzW2LckbdM1Ri6BBfpeSPwRYzXe
+      focus: true

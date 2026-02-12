@@ -2,7 +2,7 @@
   templatedir = ~/.git_template
 
 [core]
-  editor = vim
+  editor = nvim
   excludesfile = ~/.gitignore.global
   preloadindex = true
   fscache = true
@@ -74,3 +74,6 @@
   clean = git-lfs clean -- %f
   smudge = git-lfs smudge -- %f
   process = git-lfs filter-process
+
+[ghq]
+  root = ~/Tools

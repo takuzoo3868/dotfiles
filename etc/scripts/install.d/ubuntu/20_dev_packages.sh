@@ -31,10 +31,6 @@ fi
 # Development packages (Ubuntu)
 ###############################################################################
 
-echo ""
-info "20 Development packages (Ubuntu)"
-echo ""
-
 if ! has sudo; then
   error "Required: sudo"
   return 0
@@ -50,31 +46,23 @@ DEV_PACKAGES=(
   tree
   p7zip-full
   7zip
+  xclip
+  xsel
   poppler-utils  
   ffmpeg
   fontforge
   imagemagick
+  mpv
 )
 
 info "Install development packages via apt"
-sudo apt-get install -y -qq "${DEV_PACKAGES[@]}"
+sudo apt-get install -y -q "${DEV_PACKAGES[@]}"
 info "Installed development packages via apt"
 
-if ! grep -Rs "^deb .*jonathonf/vim" /etc/apt/sources.list /etc/apt/sources.list.d; then
+if ! grep -qRs "^deb .*jonathonf/vim" /etc/apt/sources.list /etc/apt/sources.list.d; then
   warn "Not available vim(latest), installing via PPA"
   sudo add-apt-repository -y ppa:jonathonf/vim
-  sudo apt-get update -y -qq
-  sudo apt-get install -y -qq vim
+  sudo apt-get update -y -q
+  sudo apt-get install -y -q vim
   info "Installed vim(latest)"
 fi 
-
-# if ! has nvim; then
-#   warn "neovim not found, installing via snap"
-
-#   if has snap; then
-#     sudo snap install nvim --classic
-#     sudo apt-get install -y -qq python3-neovim xclip xsel
-#   else
-#     warn "snap not available, skipping neovim"
-#   fi
-# fi

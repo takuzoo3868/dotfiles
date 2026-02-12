@@ -45,6 +45,7 @@ DEV_PACKAGES=(
   httpie
   git
   nkf
+  gnu-sed
   python3
   python3-pip
   tmux
@@ -66,10 +67,7 @@ DEV_PACKAGES=(
   imagemagick
   openssl
   fontforge
-  burp-suite
-  iterm2
-  postman
 )
 
 info "Installing development packages"
-yay -S --needed "${DEV_PACKAGES[@]}"
+brew install "${DEV_PACKAGES[@]}"
