@@ -5,7 +5,7 @@
 #
 
 set -Eeuo pipefail
-trap 'cleanup; echo "[ERROR] ${BASH_SOURCE[0]}:${LINENO} aborted." >&2' ERR INT
+trap 'cleanup_tmpdir; echo "[ERROR] ${BASH_SOURCE[0]}:${LINENO} aborted." >&2' ERR INT
 
 ###############################################################################
 # Globals
@@ -37,7 +37,7 @@ fi
 # Cleanup handler
 ###############################################################################
 
-cleanup() {
+cleanup_tmpdir() {
   if [[ -n "${TMPDIR_WORK:-}" && -d "$TMPDIR_WORK" ]]; then
     rm -rf "$TMPDIR_WORK"
   fi
@@ -143,4 +143,4 @@ fi
 ###############################################################################
 
 info "Font installation completed successfully!"
-cleanup
+cleanup_tmpdir

@@ -31,11 +31,6 @@ fi
 # Development packages (macOS)
 ###############################################################################
 
-if ! has sudo; then
-  error "Required: sudo"
-  return 0
-fi
-
 DEV_PACKAGES=(
   coreutils
   moreutils

@@ -31,21 +31,25 @@ fi
 # Yet Another Yogurt
 ###############################################################################
 
-if [[ -n "${CI:-}" ]]; then
-  warn "CI detected, skipping yay installation"
-  return 0
-fi
+install_yay() {
+  if [[ -n "${CI:-}" ]]; then
+    warn "CI detected, skipping yay installation"
+    return 0
+  fi
 
-if ! has yay; then
-  warn "Not available yay, installing via git"
+  if ! has yay; then
+    warn "Not available yay, installing via git"
 
-  tmp="$(mktemp -d)"
-  trap 'rm -rf "$tmp"' RETURN
+    tmp="$(mktemp -d)"
+    trap 'rm -rf "$tmp"' RETURN
 
-  git clone https://aur.archlinux.org/yay.git "$tmp"
-  pushd "$tmp" >/dev/null
-  makepkg -si --noconfirm
-  popd >/dev/null
+    git clone https://aur.archlinux.org/yay.git "$tmp"
+    pushd "$tmp" >/dev/null
+    makepkg -si --noconfirm
+    popd >/dev/null
 
-  info "Installed yay"
-fi
+    info "Installed yay"
+  fi
+}
+
+install_yay
