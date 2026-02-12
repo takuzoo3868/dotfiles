@@ -52,6 +52,7 @@ DEV_PACKAGES=(
   fontforge
   mpv
   openssh
+  pacman-contrib
 )
 
 info "Install development packages via pacman"

@@ -36,8 +36,13 @@ OS="$(detect_os)"
 ###############################################################################
 
 start_sudo_keepalive() {
+  if [[ $EUID -eq 0 ]]; then
+    info "Running as root, skipping"
+    return 0
+  fi
+
   if [[ "$OS" == "windows" ]]; then
-    info "Skipping sudo keepalive on $OS"
+    info "Running on $OS, skipping"
     return 0
   fi
 
@@ -86,14 +91,12 @@ run_install_scripts() {
     [[ -d "$dir" ]] || continue
 
     info "Processing install scripts in: $(basename "$dir")"
-    echo "==> Target: $(find "$dir" -type f -name '[0-9][0-9]*.sh' | sort)"
 
-    find "$dir" -type f -name '[0-9][0-9]*.sh' | sort | \
     while IFS= read -r script; do
       echo ""
       info "Running $(basename "$script")..."
       bash "$script"
-    done
+    done < <(find "$dir" -type f -name '[0-9][0-9]*.sh' 2>/dev/null | sort)
   done
 }
 
