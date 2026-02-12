@@ -92,11 +92,16 @@ run_install_scripts() {
 
     info "Processing install scripts in: $(basename "$dir")"
 
-    while IFS= read -r script; do
+    scripts=()
+    while IFS= read -r file; do
+      scripts+=("$file")
+    done < <(find "$dir" -type f -name '[0-9][0-9]*.sh' 2>/dev/null | sort)
+
+    for script in "${scripts[@]}"; do
       echo ""
       info "Running $(basename "$script")..."
       bash "$script"
-    done < <(find "$dir" -type f -name '[0-9][0-9]*.sh' 2>/dev/null | sort)
+    done
   done
 }
 
