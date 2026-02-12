@@ -131,7 +131,13 @@ done
 
 ensure_dir "$FONTS_DIR"
 if compgen -G "dist/*.ttf" > /dev/null; then
-  cp -u dist/*.ttf "$FONTS_DIR"
+  for f in dist/*.ttf; do
+    dest="$FONTS_DIR/$(basename "$f")"
+
+    if [[ ! -f "$dest" ]] || [[ "$f" -nt "$dest" ]]; then
+      cp "$f" "$dest"
+    fi
+  done
 else
   warn "No patched font files found"
 fi

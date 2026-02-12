@@ -9,7 +9,7 @@ lua = "5.1.5"
 
 # dev package
 "aqua:ajeetdsouza/zoxide" = "latest"
-"aqua:aristocratos/btop" = "latest"
+"aqua:aristocratos/btop" = { version = "latest", os = ["linux"] }
 "aqua:astral-sh/uv" = "latest"
 "aqua:bcicen/ctop" = "latest"
 "aqua:BurntSushi/ripgrep" = "latest"
@@ -24,6 +24,7 @@ lua = "5.1.5"
 "aqua:sharkdp/fd" = "latest"
 "aqua:sxyazi/yazi" = "latest"
 "aqua:x-motemen/ghq" = "latest"
+"asdf:mise-plugins/mise-eza" = { version = "latest", os = ["darwin"] }
 "github:tmux/tmux-builds" = "latest"
 
 # python

@@ -48,6 +48,7 @@ DEV_PACKAGES=(
   imagemagick
   mpv
   openssl
+  btop
 )
 
 info "Install base packages via homebrew"
