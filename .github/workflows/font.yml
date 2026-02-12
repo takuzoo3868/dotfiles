@@ -111,7 +111,7 @@ jobs:
           FONTS_DIR: ${{ github.workspace }}/artifacts
         run: |
           chmod +x etc/scripts/deep.d/10_font.sh
-          bash /etc/scripts/deep.d/10_font.sh
+          bash etc/scripts/deep.d/10_font.sh
 
       ############################################################
       # Upload artifact
