@@ -62,9 +62,8 @@ if ! is_exists unzip; then
   exit 1
 fi
 
-echo ""
-info "10 Build fonts (Cica patched by nerd-fonts)"
-echo ""
+
+info "d10 Build fonts (Cica patched by nerd-fonts)"
 
 ###############################################################################
 # Working directory
@@ -130,8 +129,7 @@ done
 # Install fonts (idempotent)
 ###############################################################################
 
-mkdir -p "$FONTS_DIR"
-
+ensure_dir "$FONTS_DIR"
 if compgen -G "dist/*.ttf" > /dev/null; then
   cp -u dist/*.ttf "$FONTS_DIR"
 else

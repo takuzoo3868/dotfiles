@@ -64,19 +64,20 @@ $ bash -c "$(curl -fsSL https://raw.githubusercontent.com/takuzoo3868/dotfiles/m
 ```bash
 $ git clone https://github.com/takuzoo3868/dotfiles.git $HOME/.dotfiles
 $ cd $HOME/.dotfiles
-$ make deploy && make init
+$ make install
 ```
 
-- `make update` Updating dotfiles from this repository
-- `make deploy` Deploying dotfiles to host
-- `make init` Initializing some settings
+`make install` will perform the following tasks.  
+- `make deploy` Deploy dotfile symlinks to $HOME
+- `make init` Install development packages & setup settings
 
 Other options can be checked with `make help`.
 
 ## Recommend
 I recommend installing [Cica](https://github.com/miiton/Cica) or [Nerd fonts](https://github.com/ryanoasis/nerd-fonts) to display graphical icons on terminal. 
 
-A script to automate the installation is placed in `etc/scripts/deep.d/10_font.sh`.
+A script to automate the installation is placed in `etc/scripts/deep.d/10_font.sh`. 
+Requirements: `bash`, `fontforge`, `unzip`, `git`.  
 
 ## Screenshot
 
