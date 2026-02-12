@@ -19,10 +19,7 @@ deploy: ## Deploy dotfile symlinks to $HOME
 init: ## Install development packages & setup settings
 	@DOTPATH=$(DOTPATH) bash $(DOTPATH)/etc/scripts/init
 
-deep: ## Setup more minor settings
-	@find $(DOTPATH)/etc/scripts/deep.d -name "[0-9][0-9]*.sh"
-
-install: deploy init deep ## Run make deploy, init, deep
+install: deploy init ## Run make deploy, init
 	@exec $$SHELL
 
 lint: ## Run shellcheck against bash scripts

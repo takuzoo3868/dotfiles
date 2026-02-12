@@ -1,0 +1,158 @@
+name: Font
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 3 1 * *"
+
+jobs:
+  build-fonts:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      ############################################################
+      # Fetch latest Cica release
+      ############################################################
+      - name: Fetch latest Cica release
+        id: cica
+        run: |
+          VERSION=$(curl -fsSL https://api.github.com/repos/miiton/Cica/releases/latest \
+            | grep '"tag_name"' \
+            | cut -d '"' -f4)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      ############################################################
+      # Fetch latest Nerd Fonts release (latest tag)
+      ############################################################
+      - name: Fetch latest Nerd Fonts release
+        id: nerd
+        run: |
+          VERSION=$(curl -fsSL https://api.github.com/repos/ryanoasis/nerd-fonts/releases/latest \
+            | grep '"tag_name"' \
+            | cut -d '"' -f4)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      ############################################################
+      # Calculate script hash
+      ############################################################
+      - name: Calculate script hash
+        id: script
+        run: |
+          HASH=$(shasum -a 256 etc/scripts/install.d/deep.d/10_build_fonts.sh | cut -d ' ' -f1)
+          echo "hash=$HASH" >> $GITHUB_OUTPUT
+
+      ############################################################
+      # Generate combined state hash
+      ############################################################
+      - name: Generate state hash
+        id: state
+        run: |
+          STATE=$(echo "${{ steps.script.outputs.hash }}-${{ steps.cica.outputs.version }}-${{ steps.nerd.outputs.version }}" | shasum -a 256 | cut -d ' ' -f1)
+          echo "state=$STATE" >> $GITHUB_OUTPUT
+
+      ############################################################
+      # Restore previous state
+      ############################################################
+      - name: Restore previous state
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: .font_state
+          key: font-state-${{ runner.os }}
+
+      ############################################################
+      # Compare state
+      ############################################################
+      - name: Check for changes
+        id: diff
+        run: |
+          if [[ -f .font_state ]]; then
+            OLD=$(cat .font_state)
+          else
+            OLD=""
+          fi
+
+          echo "Old: $OLD"
+          echo "New: ${{ steps.state.outputs.state }}"
+
+          if [[ "$OLD" == "${{ steps.state.outputs.state }}" ]]; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      ############################################################
+      # Stop if no changes
+      ############################################################
+      - name: Skip build (no updates detected)
+        if: steps.diff.outputs.changed == 'false'
+        run: |
+          echo "No updates detected. Skipping build."
+          exit 0
+
+      ############################################################
+      # Install dependencies
+      ############################################################
+      - name: Install dependencies
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          brew update
+          brew install fontforge git unzip curl
+
+      ############################################################
+      # Run build
+      ############################################################
+      - name: Run font build
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          DOTPATH: ${{ github.workspace }}
+          FONTS_DIR: ${{ github.workspace }}/artifacts
+        run: |
+          mkdir -p artifacts
+          chmod +x etc/scripts/install.d/deep.d/10_build_fonts.sh
+          bash etc/scripts/install.d/deep.d/10_build_fonts.sh
+
+      ############################################################
+      # Upload artifact
+      ############################################################
+      - name: Upload artifact
+        if: steps.diff.outputs.changed == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: patched-cica-nerd-font
+          path: artifacts/
+
+      ############################################################
+      # Save new state
+      ############################################################
+      - name: Save state
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          echo "${{ steps.state.outputs.state }}" > .font_state
+
+      ############################################################
+      # Cleanup old artifacts (keep latest only)
+      ############################################################
+      - name: Cleanup old artifacts
+        if: steps.diff.outputs.changed == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const artifacts = await github.rest.actions.listArtifactsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+
+            const sorted = artifacts.data.artifacts
+              .filter(a => a.name === "patched-cica-nerd-font")
+              .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+            for (let i = 1; i < sorted.length; i++) {
+              await github.rest.actions.deleteArtifact({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                artifact_id: sorted[i].id
+              });
+            }
