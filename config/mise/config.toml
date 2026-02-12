@@ -14,17 +14,17 @@ lua = "5.1.5"
 "aqua:bcicen/ctop" = "latest"
 "aqua:BurntSushi/ripgrep" = "latest"
 "aqua:cli/cli" = "latest"
-"aqua:eza-community/eza" = "latest"
+"aqua:eza-community/eza" = { version = "latest", os = ["linux"] }
 "aqua:jqlang/jq" = "latest"
 "aqua:junegunn/fzf" = "latest"
 "aqua:koalaman/shellcheck" = "latest"
 "aqua:neovim/neovim" = "latest"
-"aqua:pypa/pipx" = { version = "latest", os = ["darwin", "linux"] }
+"aqua:pypa/pipx" = { version = "latest", os = ["linux", "macos"] }
 "aqua:sharkdp/bat" = "latest"
 "aqua:sharkdp/fd" = "latest"
 "aqua:sxyazi/yazi" = "latest"
 "aqua:x-motemen/ghq" = "latest"
-"asdf:mise-plugins/mise-eza" = { version = "latest", os = ["darwin"] }
+"asdf:mise-plugins/mise-eza" = { version = "latest", os = ["macos"] }
 "github:tmux/tmux-builds" = "latest"
 
 # python
