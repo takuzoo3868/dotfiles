@@ -33,7 +33,7 @@ fi
 
 if ! has sudo; then
   error "Required: sudo"
-  return 0
+  exit 1
 fi
 
 PACMAN_BASE_PACKAGES=(
