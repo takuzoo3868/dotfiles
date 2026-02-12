@@ -28,46 +28,35 @@ else
 fi
 
 ###############################################################################
-# macOS development packages
+# Development packages (macOS)
 ###############################################################################
 
-echo ""
-info "20 Development packages (macOS)"
-echo ""
+if ! has sudo; then
+  error "Required: sudo"
+  return 0
+fi
 
 DEV_PACKAGES=(
   coreutils
   moreutils
-  bat
-  bash
   curl
   wget
-  httpie
   git
-  nkf
-  gnu-sed
-  python3
-  python3-pip
-  tmux
-  tmuxp
-  reattach-to-user-namespace
-  jq
-  sevenzip
   tree
+  gnu-sed
+  sevenzip
   vim
-  neovim
-  yazi
-  fzf
+  reattach-to-user-namespace
   poppler
   ffmpeg
-  fd
-  ripgrep
-  zoxide
   resvg
   imagemagick
-  openssl
+  font-symbols-only-nerd-font
   fontforge
+  mpv
+  openssl
 )
 
-info "Installing development packages"
-brew install "${DEV_PACKAGES[@]}"
+info "Install base packages via homebrew"
+brew install --quiet "${DEV_PACKAGES[@]}"
+info "Installed base packages via homebrew"

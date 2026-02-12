@@ -39,20 +39,21 @@ fi
 DEV_PACKAGES=(
   coreutils
   moreutils
-  bash
-  git
-  curl
-  wget
   tree
+  unzip
   p7zip-full
   7zip
   xclip
   xsel
   poppler-utils  
   ffmpeg
-  fontforge
+  resvg
   imagemagick
+  fontforge
   mpv
+  openssh-client
+  openssh-server
+  libssl-dev
 )
 
 info "Install development packages via apt"

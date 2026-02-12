@@ -28,15 +28,19 @@ else
 fi
 
 ###############################################################################
-# yay setup
+# Yet Another Yogurt
 ###############################################################################
 
-echo ""
-info "15 Initialize yay (Arch Linux)"
-echo ""
-
 if ! has yay; then
-  warn "yay not found, installing via git"
-  git clone https://aur.archlinux.org/yay.git
-  cd yay && makepkg -si
+  warn "Not available yay, installing via git"
+
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' RETURN
+
+  git clone https://aur.archlinux.org/yay.git "$tmp"
+  pushd "$tmp" >/dev/null
+  makepkg -si --noconfirm
+  popd >/dev/null
+
+  info "Installed yay"
 fi

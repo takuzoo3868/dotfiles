@@ -28,17 +28,23 @@ else
 fi
 
 ###############################################################################
-# pacman setup
+# Base packages (Arch Linux)
 ###############################################################################
 
-echo ""
-info "10 Initialize pacman (Arch Linux)"
-echo ""
+if ! has sudo; then
+  error "Required: sudo"
+  return 0
+fi
 
-sudo pacman -Syu --noconfirm
-sudo pacman -S --needed --noconfirm \
-  base-devel \
-  git \
-  curl \
-  wget \
+PACMAN_BASE_PACKAGES=(
+  base-devel
+  git
+  curl
+  wget
   ca-certificates
+)
+
+info "Install base packages via pacman"
+sudo pacman -Syu --noconfirm
+sudo pacman -S --needed --noconfirm "${PACMAN_BASE_PACKAGES[@]}"
+info "Installed base packages via pacman"

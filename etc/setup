@@ -88,7 +88,6 @@ EOF
 confirm() {
   echo "*** ATTENTION ***"
   echo "This script may modify your shell environment."
-  echo "I recommend to read first. You can even copy commands one by one."
   # echo "If you use termux on Android, try this."
   # echo "$ /data/data/com.termux/files/usr/bin/bash"
   echo ""
@@ -136,9 +135,7 @@ download_dotfiles() {
 
 deploy_dotfiles() {
   [[ -d "$DOTPATH" ]] || die "$DOTPATH not found"
-  cd "$DOTPATH"
-  [[ -f Makefile ]] || die "Makefile not found"
-  make deploy
+  "${BASH:-bash}" "$DOTPATH/etc/scripts/deploy"
 }
 
 ###############################################################################
@@ -148,8 +145,8 @@ deploy_dotfiles() {
 initialize_dotfiles() {
   case "${1:-}" in
     init|-i|--init)
-      cd "$DOTPATH"
-      make init
+      [[ -d "$DOTPATH" ]] || die "$DOTPATH not found"
+      "${BASH:-bash}" "$DOTPATH/etc/scripts/init"
       ;;
     *)
       info "Skipped development packages install"
