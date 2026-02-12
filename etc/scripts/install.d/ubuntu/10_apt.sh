@@ -41,6 +41,7 @@ sudo apt-get upgrade -y -q
 
 APT_BASE_PACKAGES=(
   build-essential
+  libreadline-dev
   apt-transport-https
   ca-certificates
   software-properties-common
