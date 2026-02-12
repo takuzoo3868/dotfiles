@@ -31,6 +31,11 @@ fi
 # Yet Another Yogurt
 ###############################################################################
 
+if [[ -n "${CI:-}" ]]; then
+  warn "CI detected, skipping yay installation"
+  return 0
+fi
+
 if ! has yay; then
   warn "Not available yay, installing via git"
 

@@ -53,7 +53,6 @@ APT_BASE_PACKAGES=(
   libreadline-dev
   apt-transport-https
   ca-certificates
-  software-properties-common
   gnupg
   gnupg2
   lsb-release
