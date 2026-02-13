@@ -84,7 +84,7 @@ if [[ -n "${CI:-}" ]]; then
   warn "CI detected, Constrain jobs..."
   mise install -y -j 1
 else
-  mise install -y -j 4
+  mise install -y -j 2
 fi
 # shellcheck disable=SC1091
 source "$HOME/.bashrc"

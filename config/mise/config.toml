@@ -3,6 +3,8 @@
 go = "latest"
 python = "latest"
 rust = "latest"
+node = "latest"
+bun = "latest"
 deno = "latest"
 lua = "5.1.5"
 "aqua:jdx/usage" = "latest"
@@ -15,6 +17,7 @@ lua = "5.1.5"
 "aqua:BurntSushi/ripgrep" = "latest"
 "aqua:cli/cli" = "latest"
 "aqua:eza-community/eza" = { version = "latest", os = ["linux"] }
+"aqua:jesseduffield/lazygit" = "latest"
 "aqua:jqlang/jq" = "latest"
 "aqua:junegunn/fzf" = "latest"
 "aqua:koalaman/shellcheck" = "latest"
@@ -35,11 +38,24 @@ lua = "5.1.5"
 "pipx:pynvim" = "latest"
 "pipx:ruff" = "latest"
 "pipx:yewtube" = { version = "latest", uvx_args = "--with httpx==0.27.2,pip" }
+"pipx:posting" = "latest"
+
+# go
+"go:github.com/jorgerojas26/lazysql" = "latest"
+
+# node
+"npm:@google/gemini-cli" = "latest"
 
 [settings]
 experimental = true
+pipx.uvx = true
+npm.package_manager = "bun"
 
 [env]
 XDG_CONFIG_HOME = "{{env.HOME}}/.config"
 SHELL = "/bin/bash"
 EDITOR = "nvim"
+MISE_DATA_DIR = "{{env.HOME}}/.local/share/mise"
+MISE_STATE_DIR="{{env.HOME}}/.local/state/mise"
+MISE_CONFIG_DIR="{{env.HOME}}/.config/mise"
+MISE_NODE_COREPACK = "true"

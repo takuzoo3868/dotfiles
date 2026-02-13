@@ -68,6 +68,7 @@ jobs:
 
       - name: Install develop packages
         env:
+          MISE_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOTPATH: ${{ github.workspace }}
           TERM: xterm-256color
         run: |
@@ -109,6 +110,7 @@ jobs:
 
       - name: Install develop packages
         env:
+          MISE_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOTPATH: ${{ github.workspace }}
           TERM: xterm-256color
         run: |
