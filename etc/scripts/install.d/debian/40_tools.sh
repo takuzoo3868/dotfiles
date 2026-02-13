@@ -65,5 +65,5 @@ fi
 ###############################################################################
 
 if command -v fdfind >/dev/null 2>&1 && ! command -v fd >/dev/null 2>&1; then
-  ln -sf "$(command -v fdfind)" "$LOCAL_BIN/fd"
+  symlink "$(command -v fdfind)" "$LOCAL_BIN/fd"
 fi
