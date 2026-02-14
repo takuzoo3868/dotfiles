@@ -27,7 +27,6 @@ augroup MyAutoCmd
   autocmd!
 augroup END
 
-" dein settings {{{
 " dein自体の自動インストール
 let s:cache_home = empty($XDG_CACHE_HOME) ? expand('~/.cache') : $XDG_CACHE_HOME
 if exists('g:nyaovim_version')
@@ -69,7 +68,13 @@ endif
 if dein#check_install()
   call dein#install()
 endif
-" }}}
+
+" 不要プラグインの自動アンインストール
+let s:removed_plugins = dein#check_clean()
+if len(s:removed_plugins) > 0
+    call map(s:removed_plugins, "delete(v:val, 'rf')")
+    call dein#recache_runtimepath()
+endif
 
 " ~/.vimrc.localが存在する場合のみ設定を読み込む
 let s:local_vimrc = expand('~/.vimrc.local')

@@ -69,9 +69,6 @@ if ! has mise; then
 if [ -x "$HOME/.local/bin/mise" ]; then
   eval "$("$HOME/.local/bin/mise" activate bash)"
 fi
-export MISE_DATA_DIR="$HOME/.local/share/mise"
-export MISE_STATE_DIR="$HOME/.local/state/mise"
-export MISE_CONFIG_DIR="$HOME/.config/mise"
 EOF
   info "Installed mise!!!"
   fi

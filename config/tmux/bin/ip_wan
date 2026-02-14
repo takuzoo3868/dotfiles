@@ -14,7 +14,7 @@ trap 'echo "[ERROR] ${BASH_SOURCE[0]}:${LINENO} aborted." >&2' ERR INT
 #######################################
 
 ostype() {
-  printf '%s\n' "${OSTYPE,,}"
+  printf '%s\n' "${OSTYPE}"
 }
 
 export SHELL_PLATFORM='unknown'
@@ -22,15 +22,12 @@ export SHELL_PLATFORM='unknown'
 case "$(ostype)" in
   *linux*)  SHELL_PLATFORM='linux' ;;
   *darwin*) SHELL_PLATFORM='osx'   ;;
-  *bsd*)    SHELL_PLATFORM='bsd'   ;;
 esac
 
 shell_is_linux() { [[ $SHELL_PLATFORM == linux ]]; }
 shell_is_osx()   { [[ $SHELL_PLATFORM == osx   ]]; }
-shell_is_bsd()   { [[ $SHELL_PLATFORM == bsd   ]]; }
-shell_is_unix()  { [[ $SHELL_PLATFORM == linux || $SHELL_PLATFORM == bsd ]]; }
 
-export -f shell_is_linux shell_is_osx shell_is_bsd shell_is_unix
+export -f shell_is_linux shell_is_osx
 
 #######################################
 # Temporary directory

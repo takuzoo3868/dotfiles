@@ -17,6 +17,7 @@ lua = "5.1.5"
 "aqua:BurntSushi/ripgrep" = "latest"
 "aqua:cli/cli" = "latest"
 "aqua:eza-community/eza" = { version = "latest", os = ["linux"] }
+"aqua:jesseduffield/lazydocker" = "latest"
 "aqua:jesseduffield/lazygit" = "latest"
 "aqua:jqlang/jq" = "latest"
 "aqua:junegunn/fzf" = "latest"
