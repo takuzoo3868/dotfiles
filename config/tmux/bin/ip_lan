@@ -14,7 +14,7 @@ trap 'echo "[ERROR] ${BASH_SOURCE[0]}:${LINENO} aborted." >&2' ERR INT
 #######################################
 
 ostype() {
-  printf '%s\n' "${OSTYPE,,}"
+  printf '%s\n' "${OSTYPE}"
 }
 
 export SHELL_PLATFORM='unknown'
@@ -22,15 +22,12 @@ export SHELL_PLATFORM='unknown'
 case "$(ostype)" in
   *linux*)  SHELL_PLATFORM='linux' ;;
   *darwin*) SHELL_PLATFORM='osx'   ;;
-  *bsd*)    SHELL_PLATFORM='bsd'   ;;
 esac
 
 shell_is_linux() { [[ $SHELL_PLATFORM == linux ]]; }
 shell_is_osx()   { [[ $SHELL_PLATFORM == osx   ]]; }
-shell_is_bsd()   { [[ $SHELL_PLATFORM == bsd   ]]; }
-shell_is_unix()  { [[ $SHELL_PLATFORM == linux || $SHELL_PLATFORM == bsd ]]; }
 
-export -f shell_is_linux shell_is_osx shell_is_bsd shell_is_unix
+export -f shell_is_linux shell_is_osx
 
 #######################################
 # LAN IP detection
@@ -39,14 +36,15 @@ __run_lan() {
   local lan_ip=""
   local nic
 
-  if shell_is_bsd || shell_is_osx; then
-    # BSD / macOS (ifconfig)
+  if shell_is_osx; then
+    # macOS (ifconfig)
     while read -r nic; do
-      lan_ip=$(
-        ifconfig "$nic" 2>/dev/null |
-          awk '$1 == "inet" { print $2; exit }'
-      )
-      [[ -n "$lan_ip" ]] && break
+      if ifconfig "$nic" 2>/dev/null | grep -q "status: active"; then
+        ip_candidate=$(ifconfig "$nic" 2>/dev/null | \
+          awk '$1 == "inet" { print $2 }' | \
+          grep -E '^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[01])\.)')
+        [[ -n "$ip_candidate" ]] && lan_ip="$ip_candidate" && break
+      fi
     done < <(
       ifconfig 2>/dev/null |
         awk -F':' '/^[a-z]/ && $1 !~ /^lo/ { print $1 }'

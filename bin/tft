@@ -60,11 +60,11 @@ print-decimal-unicode-range() {
 
   local allChars=""
   local allCodes=""
-  local wrapAt=7
+  local wrapAt=10
 
-  local topLine="${bgColorBorder}╔══════╦══════╦══════╦══════╦══════╦══════╦══════╗${reset_color}"
-  local bottomLine="${bgColorBorder}╚══════╩══════╩══════╩══════╩══════╩══════╩══════╝${reset_color}"
-  local line="${bgColorBorder}╠══════╬══════╬══════╬══════╬══════╬══════╬══════╣${reset_color}"
+  local topLine="${bgColorBorder}╔══════╦══════╦══════╦══════╦══════╦══════╦══════╦══════╦══════╦══════╗${reset_color}"
+  local bottomLine="${bgColorBorder}╚══════╩══════╩══════╩══════╩══════╩══════╩══════╩══════╩══════╩══════╝${reset_color}"
+  local line="${bgColorBorder}╠══════╬══════╬══════╬══════╬══════╬══════╬══════╬══════╬══════╬══════╣${reset_color}"
   local bar="${bgColorBorder}║${reset_color}"
 
   local originalSequenceLength=${#originalSequence[@]}
@@ -79,17 +79,17 @@ print-decimal-unicode-range() {
   local sequenceLength=${#originalSequence[@]}
 
   printf '%b\n' "$topLine"
-
   for decimalCode in "${originalSequence[@]}"; do
     local hexCode
     hexCode=$(printf '%x' "$decimalCode")
-
     local code="$hexCode"
-    local char="\\u$hexCode"
-
-    if [[ "$char" == '\u0' ]]; then
+    local char
+    if (( decimalCode == 0 )); then
       char=' '
       code='    '
+    else
+      char=$(perl -C -e "print chr($decimalCode)")
+      code=$(printf "%4s" "$hexCode")
     fi
 
     allCodes+="${currentColorCode} ${underline}${code}${reset_color}${currentColorCode} ${reset_color}${bar}"
@@ -118,7 +118,6 @@ print-decimal-unicode-range() {
       allChars=""
     fi
   done
-
   printf '%b\n' "$bottomLine"
 }
 

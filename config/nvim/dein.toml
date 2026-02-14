@@ -47,11 +47,11 @@ repo = 'ConradIrwin/vim-bracketed-paste'
 # linter
 # ==========================================================
 
-[[plugins]]
-repo = 'w0rp/ale'
-hook_add = '''
-source ~/.config/nvim/plugins/ale.rc.vim
-'''
+# [[plugins]]
+# repo = 'w0rp/ale'
+# hook_add = '''
+# source ~/.config/nvim/plugins/ale.rc.vim
+# '''
 
 # ==========================================================
 # terminal
@@ -77,12 +77,12 @@ hook_post_update = '''
   let g:dein#plugin.build = cmd
 '''
 
-[[plugins]]
-repo = 'kassio/neoterm'
-if = "has('nvim')"
-hook_add = '''
-source ~/.config/nvim/plugins/neoterm.rc.vim
-'''
+# [[plugins]]
+# repo = 'kassio/neoterm'
+# if = "has('nvim')"
+# hook_add = '''
+# source ~/.config/nvim/plugins/neoterm.rc.vim
+# '''
 
 [[plugins]]
 repo = 'Shougo/vimshell'
@@ -210,22 +210,3 @@ repo = 'itchyny/calendar.vim'
 
 [[plugins]]
 repo = 'ryanoasis/vim-devicons'
-
-# ==========================================================
-# LSP
-# ==========================================================
-
-[[plugins]]
-repo = 'autozimu/LanguageClient-neovim'
-rev = 'next'
-build = 'bash install.sh'
-hook_add = '''
-set hidden
-let g:LanguageClient_serverCommands = {
-    \ 'vue': ['vls'],
-    \ 'rust': ['rls'],
-    \ }
-'''
-
-# [[plugins]]
-# repo = 'Shougo/context_filetype.vim'
