@@ -207,13 +207,13 @@ for OPT in "$@"; do
       echo "Nerd Fonts - Font Awesome Extension"
       print-unicode-ranges e200 e2a9
       ;;
-    --iec)
-      echo "Nerd Fonts - IEC Power Symbols"
+    --iec|--ps)
+      echo "Nerd Fonts - Font Power Symbols"
       print-unicode-ranges 23fb 23fe 2b58 2b58
       ;;
     --linux|--fontlogos)
-      echo "Nerd Fonts - Font Linux"
-      print-unicode-ranges f300 f31c
+      echo "Nerd Fonts - Font Logos"
+      print-unicode-ranges f300 f372
       ;;
     --material|--mdi)
       echo "Nerd Fonts - Material Design Icons"
@@ -221,7 +221,7 @@ for OPT in "$@"; do
       ;;
     --oct)
       echo "Nerd Fonts - Octicons"
-      print-unicode-ranges 2665 2665 26A1 26A1 f400 f4a8 f67c f67c
+      print-unicode-ranges f400 f4a8 2665 2665 26A1 26A1 f27c f27c
       ;;
     --pl)
       echo "Nerd Fonts - Powerline"
@@ -229,7 +229,7 @@ for OPT in "$@"; do
       ;;
     --ple)
       echo "Nerd Fonts - Powerline Extra"
-      print-unicode-ranges e0a3 e0a3 e0b4 e0c8 e0cc e0d2 e0d4 e0d4
+      print-unicode-ranges e0a3 e0a3 e0b4 e0c8 e0cc e0d2 e0d4 e0d4 e0d6 e0d7
       ;;
     --pom)
       echo "Nerd Fonts - Pomicons"
@@ -237,7 +237,7 @@ for OPT in "$@"; do
       ;;
     --seti)
       echo "Nerd Fonts - Symbols original"
-      print-unicode-ranges e5fa e62e
+      print-unicode-ranges e5fa e6b2
       ;;
     --weather)
       echo "Nerd Fonts - Weather Icons"
