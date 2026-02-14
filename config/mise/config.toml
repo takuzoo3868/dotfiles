@@ -3,6 +3,7 @@
 go = "latest"
 python = "latest"
 rust = "latest"
+sqlite = "latest"
 node = "latest"
 bun = "latest"
 deno = "latest"
@@ -15,7 +16,6 @@ lua = "5.1.5"
 "aqua:astral-sh/uv" = "latest"
 "aqua:bcicen/ctop" = "latest"
 "aqua:BurntSushi/ripgrep" = "latest"
-"aqua:cli/cli" = "latest"
 "aqua:eza-community/eza" = { version = "latest", os = ["linux"] }
 "aqua:jesseduffield/lazydocker" = "latest"
 "aqua:jesseduffield/lazygit" = "latest"
@@ -46,6 +46,9 @@ lua = "5.1.5"
 
 # node
 "npm:@google/gemini-cli" = "latest"
+
+# github
+"github:cli/cli" = { version = "latest", exe = "gh" }
 
 [settings]
 experimental = true
