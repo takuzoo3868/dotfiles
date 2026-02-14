@@ -3,8 +3,8 @@
 go = "latest"
 python = "latest"
 rust = "latest"
-sqlite = "latest"
 node = "latest"
+npm = "latest"
 bun = "latest"
 deno = "latest"
 lua = "5.1.5"
@@ -48,11 +48,12 @@ lua = "5.1.5"
 "npm:@google/gemini-cli" = "latest"
 
 # github
-"github:cli/cli" = { version = "latest", exe = "gh" }
+"github:cli/cli" = { version = "latest", exe = "gh", strip_components = 1 }
 
 [settings]
 experimental = true
 pipx.uvx = true
+github.github_attestations = false
 npm.package_manager = "bun"
 
 [env]

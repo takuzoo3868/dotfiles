@@ -159,7 +159,7 @@ __p2pquake_earthquake() {
     scale_jp=$(__get_earthquake_scale "$scale")
     tsunami_jp=$(__get_tsunami_info "$tsunami")
 
-    echo "  ${location} ${timestamp_24}  ${scale_jp}  ${tsunami_jp} " | tee "$EARTHQUAKE_TMP_FILE"
+    echo "  ${location} ${timestamp_24}  ${scale_jp}  ${tsunami_jp} " | tee "$EARTHQUAKE_TMP_FILE"
   else
     echo "  地震情報なし " | tee "$EARTHQUAKE_TMP_FILE"
   fi
