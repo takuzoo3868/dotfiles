@@ -30,8 +30,9 @@ You're good to go! The plugin was cloned to `~/.tmux/plugins/` dir and sourced.
 
 ## Layout Check
 
-`tmux list-windows`
-
+```bash
+$ tmux list-windows
+```
 
 ## Keybinding Cheat Sheet
 
