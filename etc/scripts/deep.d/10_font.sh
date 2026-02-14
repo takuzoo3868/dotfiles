@@ -88,7 +88,10 @@ mkdir -p orig dist
 ###############################################################################
 
 cica_url="$(
-  curl -fsSL "$CICA_API_URL" \
+  curl -fsSL \
+    -H "Authorization: Bearer ${GITHUB_TOKEN:-}" \
+    -H "Accept: application/vnd.github+json" \
+    "$CICA_API_URL" \
     | grep -E 'browser_download_url.*Cica_v[0-9]+\.[0-9]+\.[0-9]+\.zip' \
     | head -n 1 \
     | cut -d '"' -f 4
