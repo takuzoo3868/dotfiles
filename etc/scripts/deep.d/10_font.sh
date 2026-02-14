@@ -110,7 +110,7 @@ unzip -oq "$cica_zip" -d orig
 
 find orig -type f -name '*.ttf' -print0 |
 while IFS= read -r -d '' font; do
-  fontforge -script font-patcher -c "$font" --out dist --mono --mono --complete
+  fontforge -script font-patcher -c "$font" --out dist --complete
 done
 
 ###############################################################################
