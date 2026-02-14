@@ -18,7 +18,10 @@ jobs:
       - name: Fetch latest Cica release
         id: cica
         run: |
-          VERSION=$(curl -fsSL https://api.github.com/repos/miiton/Cica/releases/latest \
+          VERSION=$(curl -fsSL \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/miiton/Cica/releases/latest \
             | grep '"tag_name"' \
             | cut -d '"' -f4)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
@@ -29,7 +32,10 @@ jobs:
       - name: Fetch latest Nerd Fonts release
         id: nerd
         run: |
-          VERSION=$(curl -fsSL https://api.github.com/repos/ryanoasis/nerd-fonts/releases/latest \
+          VERSION=$(curl -fsSL \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/ryanoasis/nerd-fonts/releases/latest \
             | grep '"tag_name"' \
             | cut -d '"' -f4)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
@@ -110,6 +116,7 @@ jobs:
         env:
           DOTPATH: ${{ github.workspace }}
           FONTS_DIR: ${{ github.workspace }}/artifacts
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           chmod +x etc/scripts/deep.d/10_font.sh
           bash etc/scripts/deep.d/10_font.sh
