@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 #
 # Check Nerd fonts drawing on terminal.
+# Auto-adjust column width (supports 4–6+ hex digits)
 #
 # Author: takuzoo3868
 # Last Modified: 11 Dec 2018.
@@ -15,11 +16,12 @@ usage() {
   cat <<EOF
 usage: $PROGNAME [OPTION]
 
-Check Nerd fonts drawing on terminal.
+Check drawing on terminal. As of Nerd fonts v3.3.0
 
 optionas:
   -h, --help            show this help message and exit
   --char, --unicode     Print specific unicode codepoint(s)
+  --codi                Codicons
   --dev                 Font Devicon
   --fa                  Font Awesome
   --fae                 Font Awesome Extension
@@ -40,144 +42,154 @@ if [[ $# -eq 0 ]]; then
   usage
 fi
 
-# Given an array of decimal numbers print all unicode codepoint.
-print-decimal-unicode-range() {
-  local originalSequence=("$@")
-  local counter=0
-  local count=0
+draw_with_perl() {
+  local wrapAt=16
 
-  # colors
-  local bgColorBorder=$'\033[48;5;8m'
-  local bgColorCode=$'\033[48;5;246m'
-  local alternateBgColorCode=$'\033[48;5;240m'
-  local bgColorChar=$'\033[48;5;66m'
-  local alternateBgColorChar=$'\033[48;5;60m'
-  local underline=$'\033[4m'
-  local reset_color=$'\033[0m'
+  perl -C -e '
+    use utf8;
 
-  local currentColorCode="$bgColorCode"
-  local currentColorChar="$bgColorChar"
+    my $wrap = shift @ARGV;
+    my @input = @ARGV;
 
-  local allChars=""
-  local allCodes=""
-  local wrapAt=10
+    my $bgBorder = "\e[48;5;8m";
+    my $bgCode1  = "\e[48;5;246m";
+    my $bgCode2  = "\e[48;5;240m";
+    my $bgChar1  = "\e[48;5;66m";
+    my $bgChar2  = "\e[48;5;60m";
+    my $underline = "\e[4m";
+    my $reset = "\e[0m";
 
-  local topLine="${bgColorBorder}╔══════╦══════╦══════╦══════╦══════╦══════╦══════╦══════╦══════╦══════╗${reset_color}"
-  local bottomLine="${bgColorBorder}╚══════╩══════╩══════╩══════╩══════╩══════╩══════╩══════╩══════╩══════╝${reset_color}"
-  local line="${bgColorBorder}╠══════╬══════╬══════╬══════╬══════╬══════╬══════╬══════╬══════╬══════╣${reset_color}"
-  local bar="${bgColorBorder}║${reset_color}"
+    my @codes;
 
-  local originalSequenceLength=${#originalSequence[@]}
-  local leftoverSpaces=$((wrapAt - (originalSequenceLength % wrapAt)))
+    if ($input[0] eq "__RANGE__") {
+      shift @input;
+      for (my $i=0; $i<@input; $i+=2) {
+        my $start = hex($input[$i]);
+        my $end   = hex($input[$i+1]);
+        push @codes, ($start .. $end);
+      }
+    } else {
+      @codes = @input;
+    }
 
-  if (( leftoverSpaces < wrapAt )); then
-    for ((i=0; i<leftoverSpaces; i++)); do
-      originalSequence+=(0)
-    done
-  fi
+    my $maxHexLen = 4;
+    for my $c (@codes) {
+      my $len = length(sprintf("%x",$c));
+      $maxHexLen = $len if $len > $maxHexLen;
+    }
 
-  local sequenceLength=${#originalSequence[@]}
+    my $cellWidth = $maxHexLen + 2;
+    my $borderSegment = "═" x $cellWidth;
 
-  printf '%b\n' "$topLine"
-  for decimalCode in "${originalSequence[@]}"; do
-    local hexCode
-    hexCode=$(printf '%x' "$decimalCode")
-    local code="$hexCode"
-    local char
-    if (( decimalCode == 0 )); then
-      char=' '
-      code='    '
-    else
-      char=$(perl -C -e "print chr($decimalCode)")
-      code=$(printf "%4s" "$hexCode")
-    fi
+    sub top_line {
+      print $bgBorder . "╔$borderSegment";
+      for (2..$wrap) { print "╦$borderSegment"; }
+      print "╗$reset\n";
+    }
 
-    allCodes+="${currentColorCode} ${underline}${code}${reset_color}${currentColorCode} ${reset_color}${bar}"
-    allChars+="${currentColorChar}  ${char}   ${reset_color}${bar}"
+    sub mid_line {
+      print $bgBorder . "╠$borderSegment";
+      for (2..$wrap) { print "╬$borderSegment"; }
+      print "╣$reset\n";
+    }
 
-    counter=$((counter + 1))
-    count=$(((count + 1) % wrapAt))
+    sub bottom_line {
+      print $bgBorder . "╚$borderSegment";
+      for (2..$wrap) { print "╩$borderSegment"; }
+      print "╝$reset\n";
+    }
 
-    if (( count == 0 )); then
-      if [[ "$currentColorCode" == "$alternateBgColorCode" ]]; then
-        currentColorCode="$bgColorCode"
-        currentColorChar="$bgColorChar"
-      else
-        currentColorCode="$alternateBgColorCode"
-        currentColorChar="$alternateBgColorChar"
-      fi
+    top_line();
 
-      printf '%b%b\n' "$bar" "$allCodes"
-      printf '%b%b\n' "$bar" "$allChars"
+    my $count = 0;
+    my $colorToggle = 0;
 
-      if (( counter != sequenceLength )); then
-        printf '%b\n' "$line"
-      fi
+    my $codeBg = $bgCode1;
+    my $charBg = $bgChar1;
 
-      allCodes=""
-      allChars=""
-    fi
-  done
-  printf '%b\n' "$bottomLine"
+    my $allCodes = "";
+    my $allChars = "";
+
+    for my $c (@codes) {
+
+      my $hex = sprintf("%x",$c);
+      my $chr = chr($c);
+
+      my $pad = $cellWidth - length($hex);
+      my $left = int($pad/2);
+      my $right = $pad - $left;
+      my $codeCell = (" "x$left).$hex.(" "x$right);
+
+      $pad = $cellWidth - 1;
+      $left = int($pad/2);
+      $right = $pad - $left;
+      my $charCell = (" "x$left).$chr.(" "x$right);
+
+      $allCodes .= $codeBg.$underline.$codeCell.$reset.$codeBg.$bgBorder."║".$reset;
+      $allChars .= $charBg.$charCell.$reset.$charBg.$bgBorder."║".$reset;
+
+      $count++;
+
+      if ($count % $wrap == 0) {
+
+        print $bgBorder."║".$reset.$allCodes."\n";
+        print $bgBorder."║".$reset.$allChars."\n";
+
+        $allCodes = "";
+        $allChars = "";
+
+        if ($count < @codes) {
+          mid_line();
+        }
+
+        $colorToggle = !$colorToggle;
+        if ($colorToggle) {
+          $codeBg = $bgCode2;
+          $charBg = $bgChar2;
+        } else {
+          $codeBg = $bgCode1;
+          $charBg = $bgChar1;
+        }
+      }
+    }
+
+    if (length($allCodes) > 0) {
+
+      my $remaining = $wrap - ($count % $wrap);
+      for (1 .. $remaining) {
+        my $empty = " " x $cellWidth;
+        $allCodes .= $codeBg.$underline.$empty.$reset.$codeBg.$bgBorder."║".$reset;
+        $allChars .= $charBg.$empty.$reset.$charBg.$bgBorder."║".$reset;
+      }
+
+      print $bgBorder."║".$reset.$allCodes."\n";
+      print $bgBorder."║".$reset.$allChars."\n";
+    }
+
+    bottom_line();
+  ' "$wrapAt" "$@"
 }
 
-print-unicode-ranges() {
-  echo ''
-
-  local arr=("$@")
-  local len=${#arr[@]}
-  local combinedRanges=()
-
-  for ((j=0; j<len; j+=2)); do
-    local start="${arr[j]}"
-    local end="${arr[j+1]}"
-    local startDecimal=$((16#$start))
-    local endDecimal=$((16#$end))
-
-    while (( startDecimal <= endDecimal )); do
-      combinedRanges+=("$startDecimal")
-      ((startDecimal++))
-    done
-  done
-
-  print-decimal-unicode-range "${combinedRanges[@]}"
-}
-
-# Convert input (U+XXXX / 0xXXXX / XXXX / char) to decimal codepoint
 unicode-to-decimal() {
   local input="$1"
 
-  # U+XXXX
   if [[ "$input" =~ ^U\+([0-9A-Fa-f]+)$ ]]; then
     printf '%d' "$((16#${BASH_REMATCH[1]}))"
-    return
-  fi
-
-  # 0xXXXX
-  if [[ "$input" =~ ^0x([0-9A-Fa-f]+)$ ]]; then
+  elif [[ "$input" =~ ^0x([0-9A-Fa-f]+)$ ]]; then
     printf '%d' "$((16#${BASH_REMATCH[1]}))"
-    return
-  fi
-
-  # XXXX (hex only)
-  if [[ "$input" =~ ^[0-9A-Fa-f]{3,6}$ ]]; then
+  elif [[ "$input" =~ ^[0-9A-Fa-f]{3,6}$ ]]; then
     printf '%d' "$((16#$input))"
-    return
+  else
+    LC_CTYPE=C.UTF-8 printf '%d' "'$input"
   fi
-
-  # actual unicode character
-  LC_CTYPE=C.UTF-8 printf '%d' "'$input"
 }
 
 print-specific-unicode() {
   local codes=()
-  local arg
-
   for arg in "$@"; do
     codes+=("$(unicode-to-decimal "$arg")")
   done
-
-  print-decimal-unicode-range "${codes[@]}"
+  draw_with_perl "${codes[@]}"
 }
 
 for OPT in "$@"; do
@@ -197,51 +209,55 @@ for OPT in "$@"; do
       ;;
     --dev)
       echo "Nerd Fonts - Devicons"
-      print-unicode-ranges e700 e7c5
+      draw_with_perl "__RANGE__" e700 e8ef
       ;;
     --fa)
       echo "Nerd Fonts - Font Awesome"
-      print-unicode-ranges f000 f2e0
+      draw_with_perl "__RANGE__" f000 f2ff
       ;;
     --fae)
       echo "Nerd Fonts - Font Awesome Extension"
-      print-unicode-ranges e200 e2a9
+      draw_with_perl "__RANGE__" e200 e2a9
       ;;
     --iec|--ps)
       echo "Nerd Fonts - Font Power Symbols"
-      print-unicode-ranges 23fb 23fe 2b58 2b58
+      draw_with_perl "__RANGE__" 23fb 23fe 2b58 2b58
       ;;
     --linux|--fontlogos)
       echo "Nerd Fonts - Font Logos"
-      print-unicode-ranges f300 f372
+      draw_with_perl "__RANGE__" f300 f381
       ;;
     --material|--mdi)
       echo "Nerd Fonts - Material Design Icons"
-      print-unicode-ranges f500 fd46
+      draw_with_perl "__RANGE__" f0001 f1af0
       ;;
     --oct)
       echo "Nerd Fonts - Octicons"
-      print-unicode-ranges f400 f4a8 2665 2665 26A1 26A1 f27c f27c
+      draw_with_perl "__RANGE__" f400 f533 2665 2665 26A1 26A1
       ;;
     --pl)
       echo "Nerd Fonts - Powerline"
-      print-unicode-ranges e0a0 e0a2 e0b0 e0b3
+      draw_with_perl "__RANGE__" e0a0 e0a2 e0b0 e0b3
       ;;
     --ple)
       echo "Nerd Fonts - Powerline Extra"
-      print-unicode-ranges e0a3 e0a3 e0b4 e0c8 e0cc e0d2 e0d4 e0d4 e0d6 e0d7
+      draw_with_perl "__RANGE__" e0a3 e0a3 e0b4 e0c8 e0ca e0ca e0cc e0d7 2630 2630
       ;;
     --pom)
       echo "Nerd Fonts - Pomicons"
-      print-unicode-ranges e000 e00a
+      draw_with_perl "__RANGE__" e000 e00a
       ;;
     --seti)
-      echo "Nerd Fonts - Symbols original"
-      print-unicode-ranges e5fa e6b2
+      echo "Nerd Fonts - Seti-UI + Custom"
+      draw_with_perl "__RANGE__" e5fa e6b7
       ;;
     --weather)
       echo "Nerd Fonts - Weather Icons"
-      print-unicode-ranges e300 e3eb
+      draw_with_perl "__RANGE__" e300 e3e3
+      ;;
+    --codi)
+      echo "Nerd Fonts - Codicons"
+      draw_with_perl "__RANGE__" ea60 ec1e
       ;;
     -*)
       opt="${OPT#-}"

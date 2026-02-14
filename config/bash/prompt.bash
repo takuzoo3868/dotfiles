@@ -55,7 +55,7 @@ readonly ICON_HOME=""
 readonly ICON_DIR=""
 readonly ICON_ETC=""
 readonly ICON_USER=""
-readonly ICON_HOST=""
+readonly ICON_HOST=""
 
 readonly ICON_OK=""
 readonly ICON_FAIL=""
@@ -63,16 +63,14 @@ readonly ICON_LOCK=""
 readonly ICON_NOT_FOUND=""
 readonly ICON_STOP=""
 
-readonly ICON_OCTOCAT=""
+readonly ICON_OCTOCAT=""
 # shellcheck disable=SC2034
-readonly ICON_GIT_BITBUCKET=""
+readonly ICON_GIT_BITBUCKET=""
 # shellcheck disable=SC2034
 readonly ICON_GIT_GITLAB=""
 
-readonly ICON_GIT_BRANCH=""
-readonly ICON_GIT_COMMIT=""
-# shellcheck disable=SC2034
-readonly ICON_GIT_REMOTE_BRANCH=""
+readonly ICON_GIT_BRANCH=""
+readonly ICON_GIT_COMMIT=""
 readonly ICON_GIT_UNTRACKED=""
 readonly ICON_GIT_UNSTAGED=""
 readonly ICON_GIT_STAGED=""

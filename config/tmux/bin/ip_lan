@@ -67,7 +67,7 @@ __run_lan() {
     )
   fi
 
-  printf ' %s\n' "${lan_ip:-N/A}"
+  printf '󰌗 %s\n' "${lan_ip:-N/A}"
 }
 
 __run_lan

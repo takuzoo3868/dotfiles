@@ -78,7 +78,7 @@ __run_wan() {
   fi
 
   if [[ -n "$wan_ip" ]]; then
-    printf ' %s\n' "$wan_ip"
+    printf '󰖈 %s\n' "$wan_ip"
   fi
 }
 
