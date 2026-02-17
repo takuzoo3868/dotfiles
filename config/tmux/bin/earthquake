@@ -10,29 +10,6 @@ set -Eeuo pipefail
 trap 'echo "[ERROR] ${BASH_SOURCE[0]}:${LINENO} aborted." >&2' ERR INT
 
 #######################################
-# OS detection
-#######################################
-
-ostype() {
-  printf '%s\n' "${OSTYPE}"
-}
-
-export SHELL_PLATFORM='unknown'
-
-case "$(ostype)" in
-  *linux*)  SHELL_PLATFORM='linux' ;;
-  *darwin*) SHELL_PLATFORM='osx'   ;;
-  *bsd*)    SHELL_PLATFORM='bsd'   ;;
-esac
-
-shell_is_linux() { [[ $SHELL_PLATFORM == linux ]]; }
-shell_is_osx()   { [[ $SHELL_PLATFORM == osx   ]]; }
-shell_is_bsd()   { [[ $SHELL_PLATFORM == bsd   ]]; }
-shell_is_unix()  { [[ $SHELL_PLATFORM == linux || $SHELL_PLATFORM == bsd ]]; }
-
-export -f shell_is_linux shell_is_osx shell_is_bsd shell_is_unix
-
-#######################################
 # Temporary directory
 #######################################
 
@@ -48,8 +25,8 @@ readonly EARTHQUAKE_TMP_FILE="${EARTHQUAKE_DIR_TEMPORARY}/earthquake.txt"
 #######################################
 
 readonly EARTHQUAKE_DATA_PROVIDER_DEFAULT="p2pquake"
-readonly UPDATE_PERIOD_DEFAULT=20            # sec
-readonly ALERT_TIME_WINDOW_DEFAULT=30        # min
+readonly UPDATE_PERIOD_DEFAULT=25            # sec
+readonly ALERT_TIME_WINDOW_DEFAULT=20        # min
 readonly EARTHQUAKE_GET_DATA_LIMIT_DEFAULT=1
 readonly EARTHQUAKE_MIN_SCALE_DEFAULT=10     # 10(震度1)、20(震度2)、30(震度3)、40(震度4)、45(震度5弱)、50(震度5強)、55(震度6弱)、60(震度6強)、70(震度7)
 
@@ -63,23 +40,34 @@ export EARTHQUAKE_MIN_SCALE="${EARTHQUAKE_MIN_SCALE:-$EARTHQUAKE_MIN_SCALE_DEFAU
 # Helpers
 #######################################
 
+__to_epoch() {
+  if date -d "1970-01-01 00:00:00" +%s >/dev/null 2>&1; then
+    date -d "$1" +%s 2>/dev/null
+  else
+    date -j -f "%Y/%m/%d %H:%M:%S" "$1" +%s 2>/dev/null
+  fi
+}
+
+__to_hhmm() {
+  if date -d "1970-01-01 00:00:00" +%H:%M >/dev/null 2>&1; then
+    date -d "$1" +%H:%M 2>/dev/null
+  else
+    date -j -f "%Y/%m/%d %H:%M:%S" "$1" +%H:%M 2>/dev/null
+  fi
+}
+
 __read_tmp_file() {
   [[ -f "$EARTHQUAKE_TMP_FILE" ]] || return
   cat "$EARTHQUAKE_TMP_FILE"
-  exit 0
 }
 
 __check_alert_time_window() {
   local timestamp="$1"
   local unixtime now
 
-  if shell_is_osx || shell_is_bsd; then
-    unixtime=$(date -j -f "%Y-%m-%dT%H:%M:%S%z" "$timestamp" +%s 2>/dev/null || echo 0)
-  else
-    unixtime=$(date -d "$timestamp" +%s 2>/dev/null || echo 0)
-  fi
-
+  unixtime=$(__to_epoch "$timestamp" || echo 0)
   now=$(date +%s)
+
   (( (now - unixtime) / 60 < ALERT_TIME_WINDOW ))
 }
 
@@ -121,10 +109,10 @@ __p2pquake_earthquake() {
   local last_update time_now
 
   if [[ -f "$EARTHQUAKE_TMP_FILE" ]]; then
-    if shell_is_osx || shell_is_bsd; then
-      last_update=$(stat -f "%m" "$EARTHQUAKE_TMP_FILE")
+    if stat -c %Y "$EARTHQUAKE_TMP_FILE" >/dev/null 2>&1; then
+      last_update=$(stat -c %Y "$EARTHQUAKE_TMP_FILE") || last_update=0
     else
-      last_update=$(stat -c "%Y" "$EARTHQUAKE_TMP_FILE")
+      last_update=$(stat -f '%m' "$EARTHQUAKE_TMP_FILE") || last_update=0
     fi
 
     time_now=$(date +%s)
@@ -137,8 +125,7 @@ __p2pquake_earthquake() {
   local data location scale tsunami timestamp timestamp_24
 
   data=$(curl --max-time 4 -s \
-    "https://api.p2pquake.net/v2/jma/quake?limit=${EARTHQUAKE_GET_DATA_LIMIT}&min_scale=${EARTHQUAKE_MIN_SCALE}" \
-    || true)
+    "https://api.p2pquake.net/v2/jma/quake?limit=${EARTHQUAKE_GET_DATA_LIMIT}&min_scale=${EARTHQUAKE_MIN_SCALE}") || true
 
   [[ -z "$data" ]] && __read_tmp_file && return
 
@@ -147,12 +134,7 @@ __p2pquake_earthquake() {
   scale=$(jq -r '.[].earthquake.maxScale' <<<"$data")
   tsunami=$(jq -r '.[].earthquake.domesticTsunami' <<<"$data")
   timestamp=$(jq -r '.[].earthquake.time' <<<"$data")
-
-  if shell_is_osx || shell_is_bsd; then
-    timestamp_24=$(date -j -f "%Y-%m-%dT%H:%M:%S%z" "$timestamp" +%H:%M 2>/dev/null || echo "--:--")
-  else
-    timestamp_24=$(date -d "$timestamp" +%H:%M 2>/dev/null || echo "--:--")
-  fi
+  timestamp_24=$(__to_hhmm "$timestamp" || echo "--:--")
 
   if __check_alert_time_window "$timestamp"; then
     local scale_jp tsunami_jp

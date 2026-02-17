@@ -58,8 +58,9 @@ setup_bashrc_local() {
     cat >> "$LOCALRC" <<'EOF'
 
 ### path
-export PATH="$HOME/.local/bin:$PATH"
-export PATH="/opt/local/bin:/opt/local/sbin:$PATH"
+case ":$PATH:" in *:"$HOME/.local/bin":*) ;; *) export PATH="$HOME/.local/bin:$PATH" ;; esac
+case ":$PATH:" in *:"/opt/local/bin":*) ;; *) export PATH="/opt/local/bin:$PATH" ;; esac
+case ":$PATH:" in *:"/opt/local/sbin":*) ;; *) export PATH="/opt/local/sbin:$PATH" ;; esac
 EOF
   fi
 
@@ -72,7 +73,7 @@ EOF
     cat >> "$LOCALRC" <<'EOF'
 
 ### tmux
-export PATH="$HOME/.tmux/bin:$PATH"
+case ":$PATH:" in *:"$HOME/.tmux/bin":*) ;; *) export PATH="$HOME/.tmux/bin:$PATH" ;; esac
 
 ### tmux powerline: weather
 export WEATHER_API="!!! Replace your API key !!!"

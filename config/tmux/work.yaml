@@ -3,7 +3,7 @@ session_name: work
 windows:
 - window_name: work
   focus: true
-  layout: "577a,214x62,0,0[214x39,0,0,4,214x22,0,40{106x22,0,40,5,107x22,107,40,6}]"
+  layout: "f803,286x75,0,0{183x75,0,0,0,102x75,184,0[102x37,184,0,1,102x37,184,38,2]}"
   panes:
     - shell_command:
         - yazi
@@ -13,10 +13,14 @@ windows:
 
 - window_name: "music"
   focus: false
-  layout: "c3f7,214x62,0,0[214x30,0,0,7,214x31,0,31,8]"
+  layout: "c99d,286x75,0,0,0"
+  panes:
+    - shell_command:
+        - yt pl PLBFICLTzW2LckbdM1Ri6BBfpeSPwRYzXe
+
+- window_name: "monitor"
+  focus: false
+  layout: "c99d,286x75,0,0,0"
   panes:
     - shell_command:
         - btop
-    - shell_command:
-        - yt pl PLBFICLTzW2LckbdM1Ri6BBfpeSPwRYzXe
-      focus: true

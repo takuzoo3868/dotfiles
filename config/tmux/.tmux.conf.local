@@ -47,14 +47,6 @@ tmux_conf_new_session_prompt=false
 
 # -- display -------------------------------------------------------------------
 
-# RGB 24-bit colour support (tmux >= 2.2), possible values are:
-#  - true
-#  - false (default)
-tmux_conf_theme_24b_colour=true
-
-
-# -- display -------------------------------------------------------------------
-
 # RGB 24-bit colour support, possible values are:
 #   - true
 #   - false
@@ -199,17 +191,6 @@ tmux_conf_theme_right_separator_sub=''
 # tmux_conf_theme_right_separator_main=""
 # tmux_conf_theme_right_separator_sub="|"
 
-# auto restore tmux
-#set -g @continuum-restore 'on'
-
-set -g @online_icon ""
-set -g @offline_icon "#[bold]  OFFLINE #[nobold]"
-
-set -g @sidebar-tree-command 'tree -C'
-
-set -g @sysstat_cpu_view_tmpl '#{cpu.pused}'
-set -g @sysstat_mem_view_tmpl '#{mem.pused}'
-
 # status left/right content:
 #   - separate main sections with "|"
 #   - separate subsections with ","
@@ -267,9 +248,10 @@ set -g @sysstat_mem_view_tmpl '#{mem.pused}'
 #T (pane title)
 #W (currnet task like vim if editing a file in vim or zsh if running zsh)
 
-tmux_conf_theme_status_left=' 󰃧 #S | #{online_status} , #[bold]#(~/.tmux/bin/ip_lan)#[nobold] , #[bold]#(~/.tmux/bin/ip_wan)#[nobold] '
+tmux_conf_theme_status_left=' 󰃧 #S | #[bold]#(~/.tmux/bin/ip_lan)#[nobold] , #[bold]#(~/.tmux/bin/ip_wan)#[nobold] '
 #tmux_conf_theme_status_right='#{pairing}#{prefix} #{battery_status} #{battery_bar} #{battery_percentage} , %R , %d %b | #{username} | #{hostname} '
-tmux_conf_theme_status_right='#(~/.tmux/bin/earthquake)| #{prefix}#{pairing}#{synchronized}  #{sysstat_cpu}  #{sysstat_mem} #{?battery_status,#{battery_status},}#{?battery_bar, #{battery_bar},}#{?battery_percentage, #{battery_percentage},} ,  %F  %R | #(~/.tmux/bin/weather) |  #{username}#{root} '
+tmux_conf_theme_status_right='#(~/.tmux/bin/earthquake)| #{prefix}#{pairing}#{synchronized}  #{cpu_percentage}  #{ram_percentage} #{?battery_status,#{battery_status},}#{?battery_bar, #{battery_bar},}#{?battery_percentage, #{battery_percentage},} ,  %F  %R | #(~/.tmux/bin/weather) |  #{username}#{root} '
+
 
 # test color
 #008700 #d75f00
@@ -448,13 +430,8 @@ tmux_conf_uninstall_plugins_on_reload=true
 # /!\ do not add set -g @plugin 'tmux-plugins/tpm'
 # /!\ do not add run '~/.tmux/plugins/tpm/tpm'
 
-set -g @plugin "tmux-plugins/tmux-yank"
 set -g @plugin "tmux-plugins/tmux-copycat"
-set -g @plugin "tmux-plugins/tmux-open"
-set -g @plugin "tmux-plugins/tmux-pain-control"
-set -g @plugin "tmux-plugins/tmux-online-status"
-set -g @plugin "tmux-plugins/tmux-net-speed"
-set -g @plugin 'samoshkin/tmux-plugin-sysstat'
+set -g @plugin "tmux-plugins/tmux-cpu"
 set -g @plugin 'tmux-plugins/tmux-continuum'
 set -g @continuum-restore 'on'
 

@@ -13,29 +13,6 @@ set -Eeuo pipefail
 trap 'echo "[ERROR] ${BASH_SOURCE[0]}:${LINENO} aborted." >&2' ERR INT
 
 #######################################
-# OS detection
-#######################################
-
-ostype() {
-  printf '%s\n' "${OSTYPE,,}"
-}
-
-export SHELL_PLATFORM='unknown'
-
-case "$(ostype)" in
-  *linux*)  SHELL_PLATFORM='linux' ;;
-  *darwin*) SHELL_PLATFORM='osx'   ;;
-  *bsd*)    SHELL_PLATFORM='bsd'   ;;
-esac
-
-shell_is_linux() { [[ $SHELL_PLATFORM == linux ]]; }
-shell_is_osx()   { [[ $SHELL_PLATFORM == osx   ]]; }
-shell_is_bsd()   { [[ $SHELL_PLATFORM == bsd   ]]; }
-shell_is_unix()  { [[ $SHELL_PLATFORM == linux || $SHELL_PLATFORM == bsd ]]; }
-
-export -f shell_is_linux shell_is_osx shell_is_bsd shell_is_unix
-
-#######################################
 # Temporary directory
 #######################################
 
@@ -87,10 +64,10 @@ __file_is_fresh() {
   [[ ! -f "$file" ]] && return 1
 
   local last now
-  if shell_is_bsd || shell_is_osx; then
-    last=$(stat -f "%m" "$file")
+  if stat -c %Y "$file" >/dev/null 2>&1; then
+    last=$(stat -c %Y "$file") || return 1
   else
-    last=$(stat -c "%Y" "$file")
+    last=$(stat -f '%m' "$file") || return 1
   fi
   now=$(date +%s)
   (( now - last < WEATHER_UPDATE_PERIOD ))
@@ -113,7 +90,7 @@ __run_weather() {
   data=$(curl --max-time 4 -s \
     "https://api.openweathermap.org/data/2.5/weather?q=${WEATHER_LOCATION}&units=${WEATHER_UNIT}&appid=${WEATHER_API}") || true
 
-  [[ -z "$data" ]] && __read_tmp_file  && return
+  [[ -z "$data" ]] && __read_tmp_file
 
   local degree condition sunrise sunset
   degree=$(jq -r '.main.temp // empty' <<<"$data")
@@ -125,9 +102,17 @@ __run_weather() {
     degree=$(awk "BEGIN{printf \"%.1f\", $degree + 273.15}")
   fi
 
+  __epoch_to_hhmm() {
+    if date -d "@0" +%H%M >/dev/null 2>&1; then
+      date -d "@$1" +%H%M
+    else
+      date -r "$1" +%H%M
+    fi
+  }
+
   local sunrise_h sunset_h
-  sunrise_h=$(date -d "@$sunrise" +%H%M 2>/dev/null || date -r "$sunrise" +%H%M)
-  sunset_h=$(date -d "@$sunset" +%H%M 2>/dev/null || date -r "$sunset" +%H%M)
+  sunrise_h=$(__epoch_to_hhmm "$sunrise")
+  sunset_h=$(__epoch_to_hhmm "$sunset")
 
   local icon
   icon=$(__get_weather_image "$condition" "$sunrise_h" "$sunset_h" "$degree")

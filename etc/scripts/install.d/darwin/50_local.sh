@@ -59,8 +59,9 @@ setup_bashrc_local() {
 
 ### path
 eval "$(/opt/homebrew/bin/brew shellenv)"
-export PATH="$HOME/.local/bin:$PATH"
-export PATH="/opt/local/bin:/opt/local/sbin:$PATH"
+case ":$PATH:" in *:"$HOME/.local/bin":*) ;; *) export PATH="$HOME/.local/bin:$PATH" ;; esac
+case ":$PATH:" in *:"/opt/local/bin":*) ;; *) export PATH="/opt/local/bin:$PATH" ;; esac
+case ":$PATH:" in *:"/opt/local/sbin":*) ;; *) export PATH="/opt/local/sbin:$PATH" ;; esac
 EOF
   fi
 
@@ -73,7 +74,7 @@ EOF
     cat >> "$LOCALRC" <<'EOF'
 
 ### tmux
-export PATH="$HOME/.tmux/bin:$PATH"
+case ":$PATH:" in *:"$HOME/.tmux/bin":*) ;; *) export PATH="$HOME/.tmux/bin:$PATH" ;; esac
 
 ### tmux powerline: weather
 export WEATHER_API="!!! Replace your API key !!!"
@@ -104,6 +105,25 @@ EOF
 
 ### python ruff
 export RUFF_CACHE_DIR="$HOME/.cache/ruff"
+EOF
+  fi
+
+  if grep -q '### macOS' "$LOCALRC"; then
+    warn "Already configured macOS in $LOCALRC"
+  else
+    echo "==> Add macOS local settings to $LOCALRC"
+
+    cat >> "$LOCALRC" <<'EOF'
+
+### macOS
+if [[ `uname` == 'Darwin' ]]; then
+  if brew list | grep coreutils > /dev/null ; then
+    case ":$PATH:" in *:"$(brew --prefix coreutils)/libexec/gnubin":*) ;; *) export PATH="$(brew --prefix coreutils)/libexec/gnubin:$PATH" ;; esac
+  fi
+  if [ -f $(brew --prefix)/etc/bash_completion ]; then
+    . $(brew --prefix)/etc/bash_completion
+  fi
+fi
 EOF
   fi
 }

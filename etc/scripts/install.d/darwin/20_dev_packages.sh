@@ -49,6 +49,7 @@ DEV_PACKAGES=(
   mpv
   openssl
   btop
+  bash-completion
 )
 
 info "Install base packages via homebrew"
