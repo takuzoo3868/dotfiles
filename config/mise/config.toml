@@ -48,7 +48,8 @@ lua = "5.1.5"
 "npm:@google/gemini-cli" = "latest"
 
 # github
-"github:cli/cli" = { version = "latest", exe = "gh", strip_components = 1 }
+"github:cli/cli" = { version = "latest", bin = "qh", strip_components = 1 }
+"github:vi/websocat" = { version = "latest", bin = "websocat", strip_components = 1 }
 
 [settings]
 experimental = true

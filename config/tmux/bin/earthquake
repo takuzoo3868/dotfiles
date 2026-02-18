@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 #
 # tmux earthquake status script
+# REST API: default
+# WebSocket: --daemon
 #
 # Author: takuzoo3868
 # Last Modified: 9 Feb 2026.
@@ -19,6 +21,7 @@ if [ ! -d "$EARTHQUAKE_DIR_TEMPORARY" ]; then
 fi
 
 readonly EARTHQUAKE_TMP_FILE="${EARTHQUAKE_DIR_TEMPORARY}/earthquake.txt"
+readonly EARTHQUAKE_LOCK_FILE="${EARTHQUAKE_DIR_TEMPORARY}/earthquake_ws.lock"
 
 #######################################
 # Defaults
@@ -41,24 +44,18 @@ export EARTHQUAKE_MIN_SCALE="${EARTHQUAKE_MIN_SCALE:-$EARTHQUAKE_MIN_SCALE_DEFAU
 #######################################
 
 __to_epoch() {
-  if date -d "1970-01-01 00:00:00" +%s >/dev/null 2>&1; then
-    date -d "$1" +%s 2>/dev/null
-  else
-    date -j -f "%Y/%m/%d %H:%M:%S" "$1" +%s 2>/dev/null
-  fi
+  date -d "$1" +%s 2>/dev/null || \
+  date -j -f "%Y/%m/%d %H:%M:%S" "$1" +%s 2>/dev/null
 }
 
 __to_hhmm() {
-  if date -d "1970-01-01 00:00:00" +%H:%M >/dev/null 2>&1; then
-    date -d "$1" +%H:%M 2>/dev/null
-  else
-    date -j -f "%Y/%m/%d %H:%M:%S" "$1" +%H:%M 2>/dev/null
-  fi
+  date -d "$1" +%H:%M 2>/dev/null || \
+  date -j -f "%Y/%m/%d %H:%M:%S" "$1" +%H:%M 2>/dev/null
 }
 
 __read_tmp_file() {
   [[ -f "$EARTHQUAKE_TMP_FILE" ]] || return
-  cat "$EARTHQUAKE_TMP_FILE"
+  cat "$EARTHQUAKE_TMP_FILE" 2>/dev/null
 }
 
 __check_alert_time_window() {
@@ -82,7 +79,7 @@ __get_earthquake_scale() {
     55) echo "6弱" ;;
     60) echo "6強" ;;
     70) echo "7" ;;
-    *)  echo "" ;;
+    *)  echo "不明" ;;
   esac
 }
 
@@ -99,10 +96,10 @@ __get_tsunami_info() {
 }
 
 #######################################
-# Provider: p2pquake
+# p2pquake: REST API
 #######################################
 
-__p2pquake_earthquake() {
+__p2pquake_rest_api() {
   command -v curl >/dev/null || return
   command -v jq   >/dev/null || return
 
@@ -143,8 +140,69 @@ __p2pquake_earthquake() {
 
     echo "  ${location} ${timestamp_24}  ${scale_jp}  ${tsunami_jp} " | tee "$EARTHQUAKE_TMP_FILE"
   else
-    echo "  地震情報なし " | tee "$EARTHQUAKE_TMP_FILE"
+    echo "  地震情報なし " | tee "$EARTHQUAKE_TMP_FILE"
   fi
+}
+
+#######################################
+# p2pquake: WebSocket
+#######################################
+
+__p2pquake_ws_daemon() {
+  command -v websocat >/dev/null || exit 1
+  command -v jq >/dev/null || exit 1
+
+  exec 9>"$EARTHQUAKE_LOCK_FILE" || exit 1
+  flock -n 9 || exit 0
+
+  local last_line="  地震情報待機中 "
+  trap 'rm -f "$EARTHQUAKE_LOCK_FILE"; exit 0' INT TERM EXIT
+
+  while true; do
+    while IFS= read -r line; do
+      code=$(jq -r '.code' <<<"$line" 2>/dev/null)
+
+      case "$code" in
+        556) # 556(緊急地震速報（警報）)
+          cancelled=$(jq -r '.cancelled' <<<"$line")
+          [[ "$cancelled" == "true" ]] && continue
+
+          location=$(jq -r '.earthquake.hypocenter.name' <<<"$line")
+          magnitude=$(jq -r '.earthquake.hypocenter.magnitude' <<<"$line")
+          timestamp=$(jq -r '.earthquake.time' <<<"$line")
+
+          timestamp_24=$(__to_hhmm "$timestamp")
+
+          last_line="  EEW ${location} ${timestamp_24} M${magnitude}"
+          ;;
+
+        551) # 551(地震情報)
+          scale=$(jq -r '.earthquake.maxScale' <<<"$line")
+          (( scale < EARTHQUAKE_MIN_SCALE )) && continue
+
+          location=$(jq -r '.earthquake.hypocenter.name' <<<"$line")
+          tsunami=$(jq -r '.earthquake.domesticTsunami' <<<"$line")
+          timestamp=$(jq -r '.earthquake.time' <<<"$line")
+
+          scale_jp=$(__get_earthquake_scale "$scale")
+          tsunami_jp=$(__get_tsunami_info "$tsunami")
+          timestamp_24=$(__to_hhmm "$timestamp")
+
+          last_line="  ${location} ${timestamp_24}  ${scale_jp}  ${tsunami_jp} "
+          ;;
+      esac
+
+      printf "%s" "$last_line" > "$EARTHQUAKE_TMP_FILE"
+    done < <(
+      websocat -t --no-close wss://api.p2pquake.net/v2/ws 2>/dev/null
+    )
+
+    sleep 3
+  done
+}
+
+__p2pquake_tmux() {
+  __read_tmp_file || printf "  地震情報待機中 "
 }
 
 #######################################
@@ -152,10 +210,17 @@ __p2pquake_earthquake() {
 #######################################
 
 __run_earthquake() {
-  case "$EARTHQUAKE_DATA_PROVIDER" in
-    p2pquake) __p2pquake_earthquake ;;
-    *) echo "Unknown provider: $EARTHQUAKE_DATA_PROVIDER" ;;
+  case "${1:-}" in
+    --daemon)
+      __p2pquake_ws_daemon
+      ;;
+    --tmux)
+      __p2pquake_tmux
+      ;;
+    *)
+      __p2pquake_rest_api
+      ;;
   esac
 }
 
-__run_earthquake
+__run_earthquake "$@"

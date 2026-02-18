@@ -79,10 +79,6 @@ I recommend installing [Cica](https://github.com/miiton/Cica) or [Nerd fonts](ht
 A script to automate the installation is placed in `etc/scripts/deep.d/10_font.sh`. 
 Requirements: `bash`, `fontforge`, `unzip`, `git`.  
 
-## Screenshot
-
-![img01](doc/misc/Screenshot_from_2026-02-12_22-50-56.png)
-
 ## References
 
 - [b4b4r07/dotfiles](https://github.com/b4b4r07/dotfiles)

@@ -92,9 +92,9 @@ __run_weather() {
 
   [[ -z "$data" ]] && __read_tmp_file
 
-  local degree condition sunrise sunset
+  local degree weather_id sunrise sunset
   degree=$(jq -r '.main.temp // empty' <<<"$data")
-  condition=$(jq -r '.weather[0].description // empty' <<<"$data")
+  weather_id=$(jq -r '.weather[0].id // empty' <<<"$data")
   sunrise=$(jq -r '.sys.sunrise // 0' <<<"$data")
   sunset=$(jq -r '.sys.sunset // 0' <<<"$data")
 
@@ -115,7 +115,7 @@ __run_weather() {
   sunset_h=$(__epoch_to_hhmm "$sunset")
 
   local icon
-  icon=$(__get_weather_image "$condition" "$sunrise_h" "$sunset_h" "$degree")
+  icon=$(__get_weather_image "$weather_id" "$sunrise_h" "$sunset_h" "$degree")
 
   echo "${icon} ${degree}°$(echo "$WEATHER_UNIT_CASE" | tr '[:lower:]' '[:upper:]')" | tee "$WEATHER_TMP_FILE"
 }
@@ -125,57 +125,101 @@ __run_weather() {
 # Available conditions: https://openweathermap.org/weather-conditions
 #######################################
 __get_weather_image() {
-  local condition="$1" sunrise="$2" sunset="$3" degree="$4"
+  local weather_id="$1" sunrise="$2" sunset="$3" degree="$4"
   local now
   now=$(date +%H%M)
 
-  case "$condition" in
-    ## Group 800: Clear
-    "clear sky")
-      if (( now >= sunset || now <= sunrise )); then
-        (( $(awk "BEGIN{print ($degree <= 5)}") )) && echo "" || echo ""
-      else
-        (( $(awk "BEGIN{print ($degree >= 25)}") )) && echo "" || echo ""
-      fi
+  case "$weather_id" in
+    ## Group 2xx: Thunderstorm
+    2??)
+      echo "󰖓"
       ;;
-    ## Group 80x: Clouds
-    "few clouds")
-      echo "" ;;
-    "scattered clouds")
-      echo "" ;;
-    "broken clouds" | "overcast clouds")
-      echo "" ;;
-
-    ## Group 7xx: Atmosphere
-    "dust" | "Haze" | "Smoke" | "sand" | "dust whirls")
-      echo "" ;;
-    "fog" | "mist")
-      echo "" ;;
-    "volcanic ash")
-      echo "" ;;
-    "tornado" | "tropical storm" | "hurricane")
-      echo "" ;;
-
-    ## Group 5xx: Rain & Group 3xx: Drizzle
-    "rain" | "light rain"  | "moderate rain" | "heavy intensity rain" | "drizzle" | "light intensity drizzle" | "heavy intensity drizzle" | "light intensity drizzle rain" | "drizzle rain")
-      echo "" ;;
-    "shower rain" | "scattered showers" | "very heavy rain" | "extreme rain" | "light intensity shower rain" | "heavy intensity shower rain" | "ragged shower rain" | "heavy intensity drizzle rain" | "shower rain and drizzle" | "heavy shower rain and drizzle" | "shower drizzle" | "squalls")
-      echo "" ;;
-    "mixed rain and snow" | "mixed rain and sleet" | "freezing drizzle" | "freezing rain" | "mixed rain and hail" | "Light rain and snow" | "rain and snow")
-      echo "" ;;
+    
+    ## Group 3xx: Drizzle
+    3??)
+      echo ""  # (alternatve) sprinkle
+      ;;
+    
+    ## Group 5xx: Rain
+    5??)
+      case "$weather_id" in
+        511)
+          echo "󰙿"  # freezing rain
+          ;;
+        520|521|522|531)
+          echo ""  # shower rain
+          ;;
+        *)
+          echo ""
+          ;;
+      esac
+      ;;
     
     ## Group 6xx: Snow
-    "snow" | "light snow" | "heavy snow" | "sleet" | "light shower sleet" | "shower sleet" | "light shower snow" | "shower snow" | "heavy shower snow")
-      echo "" ;;
+    6??)
+      case "$weather_id" in
+        611|612|613)
+          echo "󰖒"  # sleet
+          ;;
+        *)
+          echo ""
+          ;;
+      esac
+      ;;
     
-    ## Group 2xx: Thunderstorm
-    "thunderstorm with light rain" | "thunderstorm with rain" | "thunderstorm with heavy rain" | "light thunderstorm" | "thunderstorm" | "heavy thunderstorm" | "ragged thunderstorm" | "thunderstorm with light drizzle" | "thunderstorm with drizzle" | "thunderstorm with heavy drizzle")
-      echo "" ;;
+    ## Group 7xx: Atmosphere
+    7??)
+      case "$weather_id" in
+        711)
+          echo ""  # smoke
+          ;;
+        731|751|761)
+          echo ""  # dust
+          ;;
+        762)
+          echo ""  # volcanic ash
+          ;;
+        771)
+          echo "󰖖"  # squalls
+          ;;
+        781)
+          echo "󰼸"  # tornado
+          ;;
+        *)
+          echo "󰖑"
+          ;;
+      esac
+      ;;
     
-    "not available")
-      echo "" ;;
+    ## Group 8xx: Clear, Clouds
+    8??)
+      case "$weather_id" in
+        800)
+          if (( now >= sunset || now <= sunrise )); then
+            (( $(awk "BEGIN{print ($degree <= 0)}") )) && echo "󰼩" || echo ""
+          else
+            (( $(awk "BEGIN{print ($degree >= 28)}") )) && echo "󰸁" || echo ""
+          fi
+          ;;
+        801)
+          if (( now >= sunset || now <= sunrise )); then
+            echo ""
+          else
+            echo ""
+          fi
+          ;;
+        802)
+          echo ""
+          ;;
+        *)
+          echo ""
+          ;;
+      esac
+      ;;
+    
     *)
-      echo "" ;;
+      echo ""
+      ;;
   esac
 }
 
