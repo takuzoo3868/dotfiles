@@ -56,6 +56,7 @@ __to_hhmm() {
 __read_tmp_file() {
   [[ -f "$EARTHQUAKE_TMP_FILE" ]] || return
   cat "$EARTHQUAKE_TMP_FILE" 2>/dev/null
+  exit 0
 }
 
 __check_alert_time_window() {
@@ -124,13 +125,13 @@ __p2pquake_rest_api() {
   data=$(curl --max-time 4 -s \
     "https://api.p2pquake.net/v2/jma/quake?limit=${EARTHQUAKE_GET_DATA_LIMIT}&min_scale=${EARTHQUAKE_MIN_SCALE}") || true
 
-  [[ -z "$data" ]] && __read_tmp_file && return
+  [[ -z "$data" || "$data" == "[]" ]] && __read_tmp_file && return
 
-  location=$(jq -r '.[].earthquake.hypocenter.name' <<<"$data")
+  location=$(jq -r '.[0].earthquake.hypocenter.name' <<<"$data")
   # magnitude=$(jq -r '.[].earthquake.hypocenter.magnitude' <<<"$data")
-  scale=$(jq -r '.[].earthquake.maxScale' <<<"$data")
-  tsunami=$(jq -r '.[].earthquake.domesticTsunami' <<<"$data")
-  timestamp=$(jq -r '.[].earthquake.time' <<<"$data")
+  scale=$(jq -r '.[0].earthquake.maxScale' <<<"$data")
+  tsunami=$(jq -r '.[0].earthquake.domesticTsunami' <<<"$data")
+  timestamp=$(jq -r '.[0].earthquake.time' <<<"$data")
   timestamp_24=$(__to_hhmm "$timestamp" || echo "--:--")
 
   if __check_alert_time_window "$timestamp"; then
@@ -152,12 +153,29 @@ __p2pquake_ws_daemon() {
   command -v websocat >/dev/null || exit 1
   command -v jq >/dev/null || exit 1
 
-  exec 9>"$EARTHQUAKE_LOCK_FILE" || exit 1
-  flock -n 9 || exit 0
+  if command -v flock >/dev/null; then
+    exec 9>"$EARTHQUAKE_LOCK_FILE" || exit 1
+    flock -n 9 || exit 0
+    trap 'pkill -P $$ 2>/dev/null; rm -f "$EARTHQUAKE_LOCK_FILE"; exit 0' HUP INT TERM EXIT
+  else
+    local lock_dir="${EARTHQUAKE_LOCK_FILE}.dir"
+    if ! mkdir "$lock_dir" 2>/dev/null; then
+      exit 0
+    fi
+    trap 'pkill -P $$ 2>/dev/null; rm -rf "$lock_dir"; exit 0' HUP INT TERM EXIT
+  fi
+
+  local tmux_pid="${2:-}"
+  if [[ -n "$tmux_pid" ]]; then
+    (
+      while kill -0 "$tmux_pid" 2>/dev/null; do
+        sleep 5
+      done
+      kill -HUP $$ 2>/dev/null
+    ) &
+  fi
 
   local last_line="  地震情報待機中 "
-  trap 'rm -f "$EARTHQUAKE_LOCK_FILE"; exit 0' INT TERM EXIT
-
   while true; do
     while IFS= read -r line; do
       code=$(jq -r '.code' <<<"$line" 2>/dev/null)
@@ -167,26 +185,32 @@ __p2pquake_ws_daemon() {
           cancelled=$(jq -r '.cancelled' <<<"$line")
           [[ "$cancelled" == "true" ]] && continue
 
-          location=$(jq -r '.earthquake.hypocenter.name' <<<"$line")
-          magnitude=$(jq -r '.earthquake.hypocenter.magnitude' <<<"$line")
-          timestamp=$(jq -r '.earthquake.time' <<<"$line")
+          IFS=$'\t' read -r location magnitude timestamp < <(
+            jq -r '[
+              .earthquake.hypocenter.name,
+              .earthquake.hypocenter.magnitude,
+              .earthquake.originTime
+            ] | @tsv' <<<"$line"
+          )
 
-          timestamp_24=$(__to_hhmm "$timestamp")
+          timestamp_24=$(__to_hhmm "$timestamp" || echo "--:--")
 
           last_line="  EEW ${location} ${timestamp_24} M${magnitude}"
           ;;
 
         551) # 551(地震情報)
-          scale=$(jq -r '.earthquake.maxScale' <<<"$line")
-          (( scale < EARTHQUAKE_MIN_SCALE )) && continue
-
-          location=$(jq -r '.earthquake.hypocenter.name' <<<"$line")
-          tsunami=$(jq -r '.earthquake.domesticTsunami' <<<"$line")
-          timestamp=$(jq -r '.earthquake.time' <<<"$line")
+          IFS=$'\t' read -r scale location tsunami timestamp < <(
+            jq -r 'if (.earthquake.maxScale < '"$EARTHQUAKE_MIN_SCALE"') then empty else [
+              .earthquake.maxScale,
+              .earthquake.hypocenter.name,
+              .earthquake.domesticTsunami,
+              .earthquake.time
+            ] | @tsv end' <<<"$line"
+          )
 
           scale_jp=$(__get_earthquake_scale "$scale")
           tsunami_jp=$(__get_tsunami_info "$tsunami")
-          timestamp_24=$(__to_hhmm "$timestamp")
+          timestamp_24=$(__to_hhmm "$timestamp"|| echo "--:--")
 
           last_line="  ${location} ${timestamp_24}  ${scale_jp}  ${tsunami_jp} "
           ;;
@@ -212,7 +236,7 @@ __p2pquake_tmux() {
 __run_earthquake() {
   case "${1:-}" in
     --daemon)
-      __p2pquake_ws_daemon
+      __p2pquake_ws_daemon "$@"
       ;;
     --tmux)
       __p2pquake_tmux

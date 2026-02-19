@@ -250,7 +250,7 @@ tmux_conf_theme_right_separator_sub=''
 
 tmux_conf_theme_status_left=' 󰃧 #S | #[bold]#(~/.tmux/bin/ip_lan)#[nobold] , #[bold]#(~/.tmux/bin/ip_wan)#[nobold] '
 #tmux_conf_theme_status_right='#{pairing}#{prefix} #{battery_status} #{battery_bar} #{battery_percentage} , %R , %d %b | #{username} | #{hostname} '
-tmux_conf_theme_status_right='#(~/.tmux/bin/earthquake)| #{prefix}#{pairing}#{synchronized}  #{cpu_percentage}  #{ram_percentage} #{?battery_status,#{battery_status},}#{?battery_bar, #{battery_bar},}#{?battery_percentage, #{battery_percentage},} ,  %F  %R | #(~/.tmux/bin/weather) |  #{username}#{root} '
+tmux_conf_theme_status_right='#(~/.tmux/bin/earthquake --tmux)| #{prefix}#{pairing}#{synchronized}  #{cpu_percentage}  #{ram_percentage} #{?battery_status,#{battery_status},}#{?battery_bar, #{battery_bar},}#{?battery_percentage, #{battery_percentage},} ,  %F  %R | #(~/.tmux/bin/weather) |  #{username}#{root} '
 
 
 # test color
@@ -396,6 +396,9 @@ bind m run "cut -c3- '#{TMUX_CONF}' | sh -s _toggle_mouse" \; display 'mouse #{?
 set -g allow-passthrough on
 set -ga update-environment TERM
 set -ga update-environment TERM_PROGRAM
+
+# for earthquake info script
+run-shell -b "~/.tmux/bin/earthquake --daemon #{pid}"
 
 # -- tpm -----------------------------------------------------------------------
 

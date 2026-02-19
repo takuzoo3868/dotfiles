@@ -44,18 +44,29 @@ else
 fi
 
 readonly BOLD RESET BLUE CYAN GREEN ORANGE RED YELLOW
-export BLUE CYAN GREEN ORANGE RED YELLOW
 export PROMPT_DIRTRIM=2
 
 ###############################################################################
 # Icons
 ###############################################################################
 
-readonly ICON_HOME=""
-readonly ICON_DIR=""
-readonly ICON_ETC=""
+readonly ICON_HOME="󱂵"
+readonly ICON_DIR="󰉋"
+readonly ICON_DESKTOP="󰉖"        # Desktop
+readonly ICON_DOWNLOAD="󰉍"       # Downloads
+readonly ICON_DOCUMENT="󱧶"       # Documents
+readonly ICON_MUSIC="󱍙"          # Music
+readonly ICON_PICTURE="󰉏"        # Pictures
+readonly ICON_VIDEO="󱧺"          # Videos
+readonly ICON_CONFIG="󱁿"         # .config, .dotfiles
+readonly ICON_TRASH=""          # Trash
+readonly ICON_ROOT=""           # Root (/)
+
 readonly ICON_USER=""
 readonly ICON_HOST=""
+readonly ICON_SSH="󰢹"
+readonly ICON_VENV="󰆧"
+readonly ICON_JOBS="󱑑"
 
 readonly ICON_OK=""
 readonly ICON_FAIL=""
@@ -81,6 +92,10 @@ readonly ICON_GIT_INCOMING_CHANGES=""
 readonly ICON_GIT_OUTGOING_CHANGES=""
 # shellcheck disable=SC2034
 readonly ICON_GIT_TAG=""
+
+###############################################################################
+# Helpers
+###############################################################################
 
 prompt_git() {
   git rev-parse --is-inside-work-tree >/dev/null 2>&1 || return 0
@@ -115,45 +130,112 @@ prompt_git() {
     "${status:+ ${status}}"
 }
 
-prompt_dir_icon() {
+###############################################################################
+# Build Prompt (PROMPT_COMMAND)
+###############################################################################
+
+__build_prompt() {
+  local exit_code=$?
+
+  # 1. User
+  local user_color="${BLUE}"
+  [[ ${USER:-} == root ]] && user_color="${ORANGE}"
+  local p_user="${user_color}${ICON_USER} ${BOLD}\u${RESET} "
+
+  # 2. Host
+  local host_color="${CYAN}"
+  local host_icon="${ICON_HOST}"
+  if [[ -n "${SSH_CLIENT:-}" || -n "${SSH_TTY:-}" ]]; then
+    host_color="${ORANGE}"
+    host_icon="${ICON_SSH}"
+  fi
+  local p_host="${host_color}${host_icon} ${BOLD}\h${RESET} "
+
+  # 3. Dir
+  local dir_icon="${ICON_DIR}"
   case "$PWD" in
-    "$HOME") printf '%s' "${ICON_HOME}" ;;
-    /etc)   printf '%s' "${ICON_ETC}" ;;
-    *)      printf '%s' "${ICON_DIR}" ;;
+    "$HOME") 
+      dir_icon="${ICON_HOME}" 
+      ;;
+    "$HOME"/Desktop|"$HOME"/Desktop/*)     
+      dir_icon="${ICON_DESKTOP}" 
+      ;;
+    "$HOME"/Downloads|"$HOME"/Downloads/*) 
+      dir_icon="${ICON_DOWNLOAD}" 
+      ;;
+    "$HOME"/Documents|"$HOME"/Documents/*) 
+      dir_icon="${ICON_DOCUMENT}" 
+      ;;
+    "$HOME"/Music|"$HOME"/Music/*)         
+      dir_icon="${ICON_MUSIC}" 
+      ;;
+    "$HOME"/Pictures|"$HOME"/Pictures/*)   
+      dir_icon="${ICON_PICTURE}" 
+      ;;
+    "$HOME"/Videos|"$HOME"/Videos/*|"$HOME"/Movies|"$HOME"/Movies/*) 
+      dir_icon="${ICON_VIDEO}" 
+      ;;
+    "$HOME"/.config|"$HOME"/.config/*|"$HOME"/.dotfiles|"$HOME"/.dotfiles/*|/etc|/etc/*) 
+      dir_icon="${ICON_CONFIG}" 
+      ;;
+    "$HOME"/.local/share/Trash*) 
+      dir_icon="${ICON_TRASH}" 
+      ;;
+    /) 
+      dir_icon="${ICON_ROOT}" 
+      ;;
+    *)
+      dir_icon="${ICON_DIR}"
+      ;;
   esac
-}
+  local p_dir="${GREEN}${dir_icon} ${BOLD}\w${RESET} "
 
-prompt_user() {
-  local color="${BLUE}"
-  [[ ${USER:-} == root ]] && color="${ORANGE}"
-  printf '%s%s' "${color}" "${ICON_USER}"
-}
+  # 4. Git
+  local git_info
+  git_info="$(prompt_git)"
+  local p_git="${git_info:+${YELLOW}${git_info}${RESET}}"
 
-prompt_host() {
-  printf '%s%s' "${CYAN}" "${ICON_HOST}"
-}
+  # 5. Environment (uv / Python venv / mise)
+  local p_venv=""
+  local env_str=""
 
-prompt_result() {
-  local code=$?
-  case "$code" in
-    0)   printf '%s' "${ICON_OK}" ;;
-    126) printf '%s' "${ICON_LOCK}" ;;
-    127) printf '%s' "${ICON_NOT_FOUND}" ;;
-    130) printf '%s' "${ICON_STOP}" ;;
-    *)   printf '%s %s%s%s' "${ICON_FAIL}" "${BOLD}" "$code" "${RESET}" ;;
+  # --- uv / Python venv ---
+  if [[ -n "${VIRTUAL_ENV:-}" ]]; then
+    local venv_name
+    venv_name="$(basename "${VIRTUAL_ENV}")"
+    if [[ "$venv_name" == ".venv" || "$venv_name" == "venv" ]]; then
+      venv_name="$(basename "$(dirname "${VIRTUAL_ENV}")")"
+    fi
+    env_str+="${BLUE}${ICON_VENV} ${venv_name}${RESET} "
+  fi
+
+  # --- mise ---
+  if [[ -n "${MISE_ENV:-}" ]]; then
+    local icon_mise="" 
+    env_str+="${CYAN}${icon_mise} ${MISE_ENV}${RESET} "
+  fi
+  p_venv="${env_str}"
+
+  # 6. Job
+  local p_jobs=""
+  local jobs_count
+  jobs_count=$(jobs -p | wc -l)
+  if [[ $jobs_count -gt 0 ]]; then
+    p_jobs="${CYAN}${ICON_JOBS} ${jobs_count}${RESET} "
+  fi
+
+  # 7. Result
+  local p_result=""
+  case "$exit_code" in
+    0)   p_result=" ${ICON_OK}" ;;
+    126) p_result=" ${ICON_LOCK}" ;;
+    127) p_result=" ${ICON_NOT_FOUND}" ;;
+    130) p_result=" ${ICON_STOP}" ;;
+    *)   p_result=" ${ICON_FAIL} ${BOLD}${exit_code}${RESET}" ;;
   esac
+  p_result="${YELLOW}${p_result}${RESET}"
+
+  PS1="${p_venv}${p_user}${p_host}${p_dir}${p_git}${p_jobs}${p_result}\n$ "
 }
 
-###############################################################################
-# PS1
-###############################################################################
-
-PS1=""
-PS1+="\$(prompt_user) \[${BOLD}\]\u\[${RESET}\] "
-PS1+="\$(prompt_host) \[${BOLD}\]\h\[${RESET}\] "
-PS1+="\[${GREEN}\]\$(prompt_dir_icon) \[${BOLD}\]\w\[${RESET}\] "
-PS1+="\[${YELLOW}\]\$(prompt_git)\[${RESET}\] "
-PS1+="\[${YELLOW}\]\$(prompt_result)\[${RESET}\]"
-PS1+=$'\n$ '
-
-export PS1
+export PROMPT_COMMAND="__build_prompt"
