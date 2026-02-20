@@ -20,30 +20,32 @@ fi
 ###############################################################################
 
 if tput setaf 1 >/dev/null 2>&1; then
-  tput sgr0
+  BOLD="\[$(tput bold)\]"
+  RESET="\[$(tput sgr0)\]"
 
-  BOLD="$(tput bold)"
-  RESET="$(tput sgr0)"
-
-  BLUE="$(tput setaf 27)"
-  CYAN="$(tput setaf 39)"
-  GREEN="$(tput setaf 76)"
-  ORANGE="$(tput setaf 166)"
-  RED="$(tput setaf 124)"
-  YELLOW="$(tput setaf 154)"
+  BLUE="\[$(tput setaf 27)\]"
+  CYAN="\[$(tput setaf 39)\]"
+  GREEN="\[$(tput setaf 76)\]"
+  ORANGE="\[$(tput setaf 208)\]"
+  RED="\[$(tput setaf 203)\]"
+  YELLOW="\[$(tput setaf 154)\]"
+  PURPLE="\[$(tput setaf 135)\]"
+  GRAY="\[$(tput setaf 242)\]"
 else
   BOLD=''
-  RESET=$'\e[0m'
+  RESET='\[\e[0m\]'
 
-  BLUE=$'\e[1;34m'
-  CYAN=$'\e[1;36m'
-  GREEN=$'\e[1;32m'
-  ORANGE=$'\e[1;33m'
-  RED=$'\e[1;31m'
-  YELLOW=$'\e[1;33m'
+  BLUE='\[\e[1;34m\]'
+  CYAN='\[\e[1;36m\]'
+  GREEN='\[\e[1;32m\]'
+  ORANGE='\[\e[1;33m\]'
+  RED='\[\e[1;31m\]'
+  YELLOW='\[\e[1;33m\]'
+  PURPLE='\[\e[1;35m\]'
+  GRAY='\[\e[1;30m\]'
 fi
 
-readonly BOLD RESET BLUE CYAN GREEN ORANGE RED YELLOW
+readonly BOLD RESET BLUE CYAN GREEN ORANGE RED YELLOW PURPLE GRAY
 export PROMPT_DIRTRIM=2
 
 ###############################################################################
@@ -74,10 +76,9 @@ readonly ICON_LOCK=""
 readonly ICON_NOT_FOUND=""
 readonly ICON_STOP=""
 
+readonly ICON_GIT=""
 readonly ICON_OCTOCAT=""
-# shellcheck disable=SC2034
 readonly ICON_GIT_BITBUCKET=""
-# shellcheck disable=SC2034
 readonly ICON_GIT_GITLAB=""
 
 readonly ICON_GIT_BRANCH=""
@@ -86,48 +87,73 @@ readonly ICON_GIT_UNTRACKED=""
 readonly ICON_GIT_UNSTAGED=""
 readonly ICON_GIT_STAGED=""
 readonly ICON_GIT_STASH=""
-# shellcheck disable=SC2034
-readonly ICON_GIT_INCOMING_CHANGES=""
-# shellcheck disable=SC2034
-readonly ICON_GIT_OUTGOING_CHANGES=""
-# shellcheck disable=SC2034
-readonly ICON_GIT_TAG=""
+
+readonly ICON_TIME=""
+readonly ICON_EXEC_TIME="󱫌"
 
 ###############################################################################
 # Helpers
 ###############################################################################
 
+trap 'timer_start=${timer_start:-$SECONDS}' DEBUG
+
 prompt_git() {
-  git rev-parse --is-inside-work-tree >/dev/null 2>&1 || return 0
+  local rev_info
+  rev_info="$(git rev-parse --absolute-git-dir --is-inside-git-dir 2>/dev/null)"
+  [[ -z "$rev_info" ]] && return 0
+
+  local git_dir="${rev_info%$'\n'*}"
+  local is_inside="${rev_info#*$'\n'}"
+
+  [[ "$is_inside" == "true" ]] && return 0
+
+  local provider_icon="${ICON_GIT}"
+  if [[ -f "$git_dir/config" ]]; then
+    while IFS= read -r line; do
+      if [[ "$line" == *url\ =* ]]; then
+        if [[ "$line" == *bitbucket* ]]; then
+          provider_icon="${ICON_GIT_BITBUCKET}"
+        elif [[ "$line" == *gitlab* ]]; then
+          provider_icon="${ICON_GIT_GITLAB}"
+        elif [[ "$line" == *github* ]]; then
+          provider_icon="${ICON_OCTOCAT}"
+        fi
+        break
+      fi
+    done < "$git_dir/config"
+  fi
 
   local status=''
   local branch
   local commit
 
-  if [[ $(git rev-parse --is-inside-git-dir 2>/dev/null) == false ]]; then
-    git update-index --really-refresh -q >/dev/null 2>&1 || true
+  branch="$(git branch --show-current 2>/dev/null)"
+  [[ -z "$branch" ]] && branch="(detached)"
+  
+  commit="$(git rev-parse --short HEAD 2>/dev/null)"
+  [[ -z "$commit" ]] && commit="(new)"
 
-    git diff --quiet --cached || status+="${ICON_GIT_STAGED}"
-    git diff-files --quiet || status+="${ICON_GIT_UNSTAGED}"
+  local git_status
+  git_status="$(git --no-optional-locks status --porcelain 2>/dev/null)"
 
-    [[ -n $(git ls-files --others --exclude-standard) ]] \
-      && status+="${ICON_GIT_UNTRACKED}"
+  if [[ -n "$git_status" ]]; then
+    local is_staged=0 is_unstaged=0 is_untracked=0
+    while IFS= read -r line; do
+      [[ ${line:0:2} == "??" ]] && is_untracked=1
+      [[ ${line:0:1} != " " && ${line:0:1} != "?" ]] && is_staged=1
+      [[ ${line:1:1} != " " && ${line:1:1} != "?" ]] && is_unstaged=1
+      [[ $is_staged -eq 1 && $is_unstaged -eq 1 && $is_untracked -eq 1 ]] && break
+    done <<< "$git_status"
 
-    git rev-parse --verify refs/stash >/dev/null 2>&1 \
-      && status+="${ICON_GIT_STASH}"
+    [[ $is_staged -eq 1 ]] && status+=" ${ICON_GIT_STAGED}"
+    [[ $is_unstaged -eq 1 ]] && status+=" ${ICON_GIT_UNSTAGED}"
+    [[ $is_untracked -eq 1 ]] && status+=" ${ICON_GIT_UNTRACKED}"
   fi
+  
+  [[ -f "$git_dir/refs/stash" || -f "$git_dir/logs/refs/stash" ]] && status+=" ${ICON_GIT_STASH}"
 
-  branch="$(git symbolic-ref --quiet --short HEAD \
-            || git rev-parse --short HEAD \
-            || printf '(unknown)')"
-
-  commit="$(git rev-parse --short HEAD)"
-
-  printf '%s %s %s%s' \
-    "${ICON_OCTOCAT}" \
-    "${ICON_GIT_BRANCH} ${branch}" \
-    "${ICON_GIT_COMMIT} ${commit}" \
-    "${status:+ ${status}}"
+  printf '%s' \
+    "${provider_icon}  ${ICON_GIT_BRANCH}  ${branch} ${ICON_GIT_COMMIT}  ${commit}${status}"
 }
 
 ###############################################################################
@@ -136,6 +162,16 @@ prompt_git() {
 
 __build_prompt() {
   local exit_code=$?
+
+  # 0. Exec Time
+  local p_exec_time=""
+  if [[ -n "${timer_start:-}" ]]; then
+    local duration=$((SECONDS - timer_start))
+    unset timer_start
+    if [[ $duration -ge 2 ]]; then
+      p_exec_time="${ORANGE}${ICON_EXEC_TIME}  ${duration}s${RESET} "
+    fi
+  fi
 
   # 1. User
   local user_color="${BLUE}"
@@ -188,12 +224,15 @@ __build_prompt() {
       dir_icon="${ICON_DIR}"
       ;;
   esac
-  local p_dir="${GREEN}${dir_icon} ${BOLD}\w${RESET} "
+  local p_dir="${GREEN}${dir_icon}  ${BOLD}\w${RESET} "
 
   # 4. Git
+  local p_git=""
   local git_info
   git_info="$(prompt_git)"
-  local p_git="${git_info:+${YELLOW}${git_info}${RESET}}"
+  if [[ -n "$git_info" ]]; then
+    p_git="${YELLOW}${git_info}${RESET}  "
+  fi
 
   # 5. Environment (uv / Python venv / mise)
   local p_venv=""
@@ -201,25 +240,25 @@ __build_prompt() {
 
   # --- uv / Python venv ---
   if [[ -n "${VIRTUAL_ENV:-}" ]]; then
-    local venv_name
-    venv_name="$(basename "${VIRTUAL_ENV}")"
+    local venv_name="${VIRTUAL_ENV##*/}"
     if [[ "$venv_name" == ".venv" || "$venv_name" == "venv" ]]; then
-      venv_name="$(basename "$(dirname "${VIRTUAL_ENV}")")"
+      local parent_dir="${VIRTUAL_ENV%/*}"
+      venv_name="${parent_dir##*/}"
     fi
-    env_str+="${BLUE}${ICON_VENV} ${venv_name}${RESET} "
+    env_str+="${PURPLE}${ICON_VENV} ${BOLD}${venv_name}${RESET} "
   fi
 
   # --- mise ---
   if [[ -n "${MISE_ENV:-}" ]]; then
     local icon_mise="" 
-    env_str+="${CYAN}${icon_mise} ${MISE_ENV}${RESET} "
+    env_str+="${PURPLE}${icon_mise} ${BOLD}${MISE_ENV}${RESET} "
   fi
   p_venv="${env_str}"
 
   # 6. Job
   local p_jobs=""
-  local jobs_count
-  jobs_count=$(jobs -p | wc -l)
+  local current_jobs=($(jobs -p 2>/dev/null))
+  local jobs_count=${#current_jobs[@]}
   if [[ $jobs_count -gt 0 ]]; then
     p_jobs="${CYAN}${ICON_JOBS} ${jobs_count}${RESET} "
   fi
@@ -227,15 +266,17 @@ __build_prompt() {
   # 7. Result
   local p_result=""
   case "$exit_code" in
-    0)   p_result=" ${ICON_OK}" ;;
-    126) p_result=" ${ICON_LOCK}" ;;
-    127) p_result=" ${ICON_NOT_FOUND}" ;;
-    130) p_result=" ${ICON_STOP}" ;;
-    *)   p_result=" ${ICON_FAIL} ${BOLD}${exit_code}${RESET}" ;;
+    0)   p_result="${GRAY}${ICON_OK}${RESET}  " ;;
+    126) p_result="${ORANGE}${ICON_LOCK}${RESET}  " ;;
+    127) p_result="${ORANGE}${ICON_NOT_FOUND}${RESET}  " ;;
+    130) p_result="${ORANGE}${ICON_STOP}${RESET}  " ;;
+    *)   p_result="${RED}${ICON_FAIL} ${BOLD}${exit_code}${RESET}  " ;;
   esac
-  p_result="${YELLOW}${p_result}${RESET}"
 
-  PS1="${p_venv}${p_user}${p_host}${p_dir}${p_git}${p_jobs}${p_result}\n$ "
+  # 8. Time
+  local p_time="${GRAY}${ICON_TIME} \t${RESET}"
+
+  PS1="${p_venv}${p_user}${p_host}${p_dir}${p_git}${p_jobs}${p_exec_time}${p_result}${p_time}\n$ "
 }
 
 export PROMPT_COMMAND="__build_prompt"

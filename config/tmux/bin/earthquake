@@ -226,7 +226,7 @@ __p2pquake_ws_daemon() {
 }
 
 __p2pquake_tmux() {
-  __read_tmp_file || printf "  地震情報待機中 "
+  __read_tmp_file || printf "  地震情報なし "
 }
 
 #######################################
