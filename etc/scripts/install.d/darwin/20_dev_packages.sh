@@ -44,7 +44,6 @@ DEV_PACKAGES=(
   reattach-to-user-namespace
   poppler
   ffmpeg
-  resvg
   imagemagick
   mpv
   openssl

@@ -47,7 +47,6 @@ DEV_PACKAGES=(
   xsel
   poppler
   ffmpeg
-  resvg
   imagemagick
   mpv
   openssh
