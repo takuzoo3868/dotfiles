@@ -127,11 +127,19 @@ __p2pquake_rest_api() {
 
   [[ -z "$data" || "$data" == "[]" ]] && __read_tmp_file && return
 
-  location=$(jq -r '.[0].earthquake.hypocenter.name' <<<"$data")
-  # magnitude=$(jq -r '.[].earthquake.hypocenter.magnitude' <<<"$data")
-  scale=$(jq -r '.[0].earthquake.maxScale' <<<"$data")
-  tsunami=$(jq -r '.[0].earthquake.domesticTsunami' <<<"$data")
-  timestamp=$(jq -r '.[0].earthquake.time' <<<"$data")
+  IFS=$'\t' read -r scale location tsunami timestamp < <(
+    jq -r '.[0] | [
+      .earthquake.maxScale,
+      (if .earthquake.hypocenter.name == "" then
+         if (.points | length) > 0 then .points[0].addr + "等" else "調査中" end
+       else
+         .earthquake.hypocenter.name
+       end),
+      .earthquake.domesticTsunami,
+      .earthquake.time
+    ] | @tsv' <<<"$data"
+  ) || true
+
   timestamp_24=$(__to_hhmm "$timestamp" || echo "--:--")
 
   if __check_alert_time_window "$timestamp"; then
@@ -202,11 +210,17 @@ __p2pquake_ws_daemon() {
           IFS=$'\t' read -r scale location tsunami timestamp < <(
             jq -r 'if (.earthquake.maxScale < '"$EARTHQUAKE_MIN_SCALE"') then empty else [
               .earthquake.maxScale,
-              .earthquake.hypocenter.name,
+              (if .earthquake.hypocenter.name == "" then
+                 if (.points | length) > 0 then .points[0].addr + "等" else "調査中" end
+               else
+                 .earthquake.hypocenter.name
+               end),
               .earthquake.domesticTsunami,
               .earthquake.time
             ] | @tsv end' <<<"$line"
-          )
+          ) || true
+
+          [[ -z "$scale" ]] && continue
 
           scale_jp=$(__get_earthquake_scale "$scale")
           tsunami_jp=$(__get_tsunami_info "$tsunami")
@@ -219,6 +233,7 @@ __p2pquake_ws_daemon() {
       printf "%s" "$last_line" > "$EARTHQUAKE_TMP_FILE"
     done < <(
       websocat -t --no-close wss://api.p2pquake.net/v2/ws 2>/dev/null
+      # websocat -t --no-close wss://api-realtime-sandbox.p2pquake.net/v2/ws 2>/dev/null
     )
 
     sleep 3

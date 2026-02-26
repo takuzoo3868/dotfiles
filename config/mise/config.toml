@@ -33,7 +33,7 @@ lua = "5.1.5"
 
 # python
 "pipx:debugpy" = "latest"
-"pipx:httpie" = "latest" 
+"pipx:httpie" = { version = "latest", uvx_args = "--with httpie-edgegrid" } 
 "pipx:tmuxp" = "latest"
 "pipx:pipdeptree" = "latest"
 "pipx:pynvim" = "latest"
