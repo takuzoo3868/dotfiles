@@ -59,16 +59,51 @@ sudo apt-get install -y -q "${DEV_PACKAGES[@]}"
 info "Installed development packages via apt"
 
 ###############################################################################
-# Vim
+# Vim (Build from source)
 ###############################################################################
 
-if ! grep -qRs "^deb .*jonathonf/vim" /etc/apt/sources.list /etc/apt/sources.list.d; then
-  warn "Not available vim(latest), installing via PPA"
-  sudo add-apt-repository -y ppa:jonathonf/vim
-  sudo apt-get update -y -q
-  sudo apt-get install -y -q vim
-  info "Installed vim(latest)"
-fi 
+install_vim_from_source() {
+  if [[ -x "/usr/local/bin/vim" ]]; then
+    info "Vim (source build) is already installed. Skipping build."
+    return 0
+  fi
+
+  warn "Not available Vim (latest), building from source..."
+
+  local VIM_BUILD_DEPS=(
+    libncurses-dev
+    python3-dev
+    liblua5.4-dev
+    lua5.4
+  )
+
+  info "Install Vim build dependencies via apt"
+  sudo apt-get install -y -q "${VIM_BUILD_DEPS[@]}"
+
+  local tmp
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' RETURN
+
+  info "Cloning and building the latest Vim from source..."
+  git clone --depth 1 https://github.com/vim/vim.git "$tmp/vim"
+
+  pushd "$tmp/vim" >/dev/null
+
+  ./configure --with-features=huge \
+              --enable-multibyte \
+              --enable-python3interp=yes \
+              --enable-luainterp=yes \
+              --prefix=/usr/local
+
+  make -j"$(nproc)"
+  sudo make install
+
+  popd >/dev/null
+
+  info "Installed Vim (latest from source)"
+}
+
+install_vim_from_source
 
 ###############################################################################
 # GitHub CLI
