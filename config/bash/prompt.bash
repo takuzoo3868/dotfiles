@@ -168,7 +168,7 @@ __build_prompt() {
   if [[ -n "${timer_start:-}" ]]; then
     local duration=$((SECONDS - timer_start))
     unset timer_start
-    if [[ $duration -ge 2 ]]; then
+    if [[ $duration -ge 30 ]]; then
       p_exec_time="${ORANGE}${ICON_EXEC_TIME}  ${duration}s${RESET} "
     fi
   fi
@@ -257,7 +257,12 @@ __build_prompt() {
 
   # 6. Job
   local p_jobs=""
-  local current_jobs=($(jobs -p 2>/dev/null))
+  local jobs_out
+  jobs_out="$(jobs -p 2>/dev/null)"
+  
+  local current_jobs
+  read -r -a current_jobs <<< "${jobs_out//$'\n'/ }"
+  
   local jobs_count=${#current_jobs[@]}
   if [[ $jobs_count -gt 0 ]]; then
     p_jobs="${CYAN}${ICON_JOBS} ${jobs_count}${RESET} "
