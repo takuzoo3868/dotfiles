@@ -48,12 +48,9 @@ export WEATHER_UNIT_CASE
 
 __get_location() {
   local city
-  city=$(curl -sf "http://ip-api.com/json/?fields=city" | jq -r '.city // empty') || true
+  city=$(curl --max-time 2 -sf "http://ip-api.com/json/?fields=city" | jq -r '.city // empty') || true
   echo "${city:-Japan}"
 }
-
-WEATHER_LOCATION="$(__get_location)"
-export WEATHER_LOCATION
 
 #######################################
 # Helpers
@@ -86,9 +83,12 @@ __read_tmp_file() {
 __run_weather() {
   __file_is_fresh "$WEATHER_TMP_FILE" && __read_tmp_file
 
+  local weather_location
+  weather_location="$(__get_location)"
+
   local data
   data=$(curl --max-time 4 -s \
-    "https://api.openweathermap.org/data/2.5/weather?q=${WEATHER_LOCATION}&units=${WEATHER_UNIT}&appid=${WEATHER_API}") || true
+    "https://api.openweathermap.org/data/2.5/weather?q=${weather_location}&units=${WEATHER_UNIT}&appid=${WEATHER_API}") || true
 
   [[ -z "$data" ]] && __read_tmp_file
 

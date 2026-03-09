@@ -1,26 +1,25 @@
 session_name: work
 
 windows:
-- window_name: work
-  focus: true
-  layout: "f803,286x75,0,0{183x75,0,0,0,102x75,184,0[102x37,184,0,1,102x37,184,38,2]}"
-  panes:
-    - shell_command:
-        - yazi
-      focus: true
-    - pane
-    - pane
+  - window_name: "work"
+    focus: true
+    layout: main-vertical 
+    options:
+      main-pane-width: 65%
+    panes:
+      - shell_command: yazi
+        focus: true
+      - shell_command: clear
+      - shell_command: clear
 
-- window_name: "music"
-  focus: false
-  layout: "c99d,286x75,0,0,0"
-  panes:
-    - shell_command:
-        - yt pl PLBFICLTzW2LckbdM1Ri6BBfpeSPwRYzXe
+  - window_name: "music"
+    focus: false
+    panes:
+      - shell_command:
+          - yt pl PLBFICLTzW2LckbdM1Ri6BBfpeSPwRYzXe
 
-- window_name: "monitor"
-  focus: false
-  layout: "c99d,286x75,0,0,0"
-  panes:
-    - shell_command:
-        - btop
+  - window_name: "monitor"
+    focus: false
+    panes:
+      - shell_command:
+          - btop

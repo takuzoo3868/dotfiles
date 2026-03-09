@@ -119,7 +119,6 @@ __p2pquake_rest_api() {
     fi
   fi
 
-  # local data location magnitude scale tsunami timestamp timestamp_24
   local data location scale tsunami timestamp timestamp_24
 
   data=$(curl --max-time 4 -s \
@@ -186,6 +185,10 @@ __p2pquake_ws_daemon() {
   local last_line="  地震情報待機中 "
   while true; do
     while IFS= read -r line; do
+      if ! echo "$line" | grep -q -E '"code":\s*(551|556)'; then
+        continue
+      fi
+      
       code=$(jq -r '.code' <<<"$line" 2>/dev/null)
 
       case "$code" in

@@ -87,7 +87,7 @@ rules = [
 ]
 
 [tasks]
-image_alloc = 1073741824 # = 1024*1024*1024 = 1024MB
+image_alloc = 268435456
 
 [plugin]
 fetchers = [

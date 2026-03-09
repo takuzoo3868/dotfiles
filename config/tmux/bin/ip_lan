@@ -10,64 +10,85 @@ set -Eeuo pipefail
 trap 'echo "[ERROR] ${BASH_SOURCE[0]}:${LINENO} aborted." >&2' ERR INT
 
 #######################################
-# OS detection
+# Temporary directory
 #######################################
 
-ostype() {
-  printf '%s\n' "${OSTYPE}"
-}
-
-export SHELL_PLATFORM='unknown'
-
-case "$(ostype)" in
-  *linux*)  SHELL_PLATFORM='linux' ;;
-  *darwin*) SHELL_PLATFORM='osx'   ;;
-esac
-
-shell_is_linux() { [[ $SHELL_PLATFORM == linux ]]; }
-shell_is_osx()   { [[ $SHELL_PLATFORM == osx   ]]; }
-
-export -f shell_is_linux shell_is_osx
+export DIR_TEMPORARY="/tmp/tmux-lan_${USER}"
+if [ ! -d "$DIR_TEMPORARY" ]; then
+  mkdir -p "$DIR_TEMPORARY"
+fi
 
 #######################################
-# LAN IP detection
+# LAN IP
 #######################################
+
 __run_lan() {
+  local tmp_file="${DIR_TEMPORARY}/lan_ip.txt"
   local lan_ip=""
-  local nic
+  local last_update=0
+  local time_now
+  local update_period=300  # seconds
 
-  if shell_is_osx; then
-    # macOS (ifconfig)
-    while read -r nic; do
-      if ifconfig "$nic" 2>/dev/null | grep -q "status: active"; then
-        ip_candidate=$(ifconfig "$nic" 2>/dev/null | \
-          awk '$1 == "inet" { print $2 }' | \
-          grep -E '^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[01])\.)')
-        [[ -n "$ip_candidate" ]] && lan_ip="$ip_candidate" && break
-      fi
-    done < <(
-      ifconfig 2>/dev/null |
-        awk -F':' '/^[a-z]/ && $1 !~ /^lo/ { print $1 }'
-    )
-
-  else
-    # Linux (iproute2)
-    while read -r nic; do
-      lan_ip=$(
-        ip -4 addr show "$nic" 2>/dev/null |
-          awk '/inet / { print $2 }' |
-          cut -d/ -f1 |
-          tail -n 1
-      )
-      [[ -n "$lan_ip" ]] && break
-    done < <(
-      ip -o link show |
-        awk -F': ' '{print $2}' |
-        grep -v '^lo$'
-    )
+  if command -v stat >/dev/null 2>&1; then
+    if stat -c "%Y" "$tmp_file" >/dev/null 2>&1; then
+      stat_cmd='stat -c %Y'
+    else
+      stat_cmd='stat -f %m'
+    fi
   fi
 
-  printf '󰌗 %s\n' "${lan_ip:-N/A}"
+  # Read cache if valid
+  if [[ -f "$tmp_file" ]]; then
+    last_update=$($stat_cmd "$tmp_file")
+    time_now=$(date +%s)
+
+    if (( time_now - last_update < update_period )); then
+      lan_ip=$(<"$tmp_file")
+    fi
+  fi
+
+  # Fetch LAN IP
+  if [[ -z "$lan_ip" ]]; then
+    local nic ip_candidate
+    if command -v ifconfig >/dev/null 2>&1; then
+      # macOS / BSD (ifconfig)
+      while read -r nic; do
+        if ifconfig "$nic" 2>/dev/null | grep -q "status: active"; then
+          ip_candidate=$(ifconfig "$nic" 2>/dev/null | \
+            awk '$1 == "inet" { print $2 }' | \
+            grep -E '^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[01])\.)') || true
+
+          if [[ -n "$ip_candidate" ]]; then
+            lan_ip="$ip_candidate"
+            break
+          fi
+        fi
+      done < <(ifconfig 2>/dev/null | awk -F':' '/^[a-z]/ && $1 !~ /^lo/ { print $1 }')
+    elif command -v ip >/dev/null 2>&1; then
+      # Linux (iproute2)
+      while read -r nic; do
+        ip_candidate=$(ip -4 addr show "$nic" 2>/dev/null | awk '/inet / { print $2 }' | cut -d/ -f1 | tail -n 1) || true
+        if [[ -n "$ip_candidate" ]]; then
+          lan_ip="$ip_candidate"
+          break
+        fi
+      done < <(ip -o link show | awk -F': ' '{print $2}' | grep -v '^lo$')
+    fi
+
+    # Save to cache
+    if [[ -n "$lan_ip" ]]; then
+      printf '%s\n' "$lan_ip" >"$tmp_file"
+    elif [[ -f "$tmp_file" ]]; then
+      lan_ip=$(<"$tmp_file")
+    fi
+  fi
+
+  # Print result
+  if [[ -n "$lan_ip" ]]; then
+    printf '󰌗 %s\n' "$lan_ip"
+  else
+    printf '󰌗 N/A\n'
+  fi
 }
 
 __run_lan

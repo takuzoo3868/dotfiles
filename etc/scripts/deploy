@@ -150,6 +150,22 @@ run_deploy() {
   symlink "$CONFPATH/yazi/theme.toml" "$HOME/.config/yazi/theme.toml"
 
   ###############################################################################
+  # btop
+  ###############################################################################
+
+  info "btop"
+  ensure_dir "$HOME/.config/btop"
+  symlink "$CONFPATH/btop/btop.conf" "$HOME/.config/btop/btop.conf"
+
+  ###############################################################################
+  # yewtube (mps-youtube)
+  ###############################################################################
+
+  info "yewtube (mps-youtube)"
+  ensure_dir "$HOME/.config/mps-youtube"
+  symlink "$CONFPATH/mps-youtube/config.json" "$HOME/.config/mps-youtube/config.json"
+
+  ###############################################################################
   # SQLite3
   ###############################################################################
 

@@ -358,8 +358,8 @@ tmux_conf_urlscan_options="--compact --dedupe"
 # -- user customizations -------------------------------------------------------
 # this is the place to override or undo settings
 
-# redraw status line every 5 seconds
-set -g status-interval 5
+# redraw status line [seconds]
+set -g status-interval 60
 
 # increase history size
 #set -g history-limit 10000
