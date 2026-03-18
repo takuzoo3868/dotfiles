@@ -27,6 +27,7 @@ lua = "5.1.5"
 "aqua:sharkdp/bat" = "latest"
 "aqua:sharkdp/fd" = "latest"
 "aqua:sxyazi/yazi" = "latest"
+"aqua:tsl0922/ttyd" = { version = "latest", os = ["linux"] }
 "aqua:x-motemen/ghq" = "latest"
 "asdf:mise-plugins/mise-eza" = { version = "latest", os = ["macos"] }
 "github:tmux/tmux-builds" = "latest"
@@ -43,6 +44,7 @@ lua = "5.1.5"
 
 # go
 "go:github.com/jorgerojas26/lazysql" = "latest"
+"go:github.com/charmbracelet/vhs" = "latest"
 
 # node
 "npm:@google/gemini-cli" = "latest"

@@ -49,6 +49,7 @@ DEV_PACKAGES=(
   openssl
   btop
   bash-completion
+  ttyd
 )
 
 info "Install base packages via homebrew"
